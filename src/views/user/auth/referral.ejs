@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Referral Code</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+
+        .fade-out {
+            animation: fadeOut 0.5s ease-out forwards;
+        }
+    </style>
+</head>
+
+<body class="bg-gradient-to-br from-slate-900 to-slate-800 min-h-screen flex items-center justify-center px-4">
+
+    <div class="w-full max-w-md bg-slate-800 p-8 rounded-lg shadow-xl">
+
+        <!-- Heading -->
+        <h1 class="text-3xl font-bold text-center text-white mb-4">
+            Enter Referral Code
+        </h1>
+
+        <!-- Description -->
+        <p class="text-gray-300 text-center text-sm mb-6">
+            Enter your friend's referral code to unlock exclusive rewards.  
+            If you don’t have one, you can skip this step.
+        </p>
+
+        <!-- Referral Form -->
+        <form action="/auth/referral" method="POST" id="referralForm" class="space-y-4">
+
+            <div>
+                <input
+                    type="text"
+                    name="referralCode"
+                    id="referralCode"
+                    placeholder="Enter referral code"
+                    class="w-full px-4 py-2 rounded border border-gray-400 focus:ring-2 focus:ring-blue-500 text-gray-900"
+                    value="<%= referralCode || '' %>"
+                    required
+                >
+            </div>
+
+            <!-- Error Message -->
+            <% if (error) { %>
+                <div
+                    id="errorBox"
+                    class="bg-red-500 bg-opacity-20 border border-red-400 text-red-300 px-4 py-2 rounded text-sm text-center">
+                    <%= error %>
+                </div>
+            <% } %>
+
+            <button 
+                type="submit"
+                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded transition">
+                Submit
+            </button>
+        </form>
+
+        <!-- Skip Link -->
+        <p class="text-center text-gray-400 text-sm mt-4">
+            No code?  
+            <a href="/auth/signup" class="text-blue-400 hover:text-blue-300 font-medium">
+                Skip this step
+            </a>
+        </p>
+
+    </div>
+
+<script>
+    // ✅ Auto-dismiss error EXACTLY in 3 seconds
+    const errorBox = document.getElementById("errorBox");
+
+    if (errorBox) {
+        // Start fade at 2.5s
+        setTimeout(() => {
+            errorBox.classList.add("fade-out");
+        }, 1500);
+
+        // Remove at 3s
+        setTimeout(() => {
+            errorBox.remove();
+        }, 2000);
+    }
+</script>
+
+</body>
+</html>

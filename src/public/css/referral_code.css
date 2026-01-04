@@ -1,0 +1,156 @@
+/* Referral Code Page Styles */
+
+:root {
+  --primary-dark: #0f1f35;
+  --secondary-dark: #1a2f4a;
+  --text-light: #ffffff;
+  --text-secondary: #b0b8c1;
+  --border-color: #3b5998;
+  --button-blue: #3b82f6;
+  --button-hover: #2563eb;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body.referral-body {
+  background: linear-gradient(135deg, var(--primary-dark) 0%, var(--secondary-dark) 100%);
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  color: var(--text-light);
+  min-height: 100vh;
+}
+
+.referral-container {
+  width: 100%;
+  max-width: 500px;
+  padding: 40px 30px;
+  text-align: center;
+}
+
+/* Heading Styles */
+.referral-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--text-light);
+  margin-bottom: 1.5rem;
+  letter-spacing: 0.5px;
+}
+
+/* Description Styles */
+.referral-description {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 2.5rem;
+}
+
+/* Input Field Styles */
+.referral-input {
+  background-color: transparent;
+  border: 2px solid var(--border-color);
+  color: var(--text-light);
+  padding: 12px 16px;
+  font-size: 1rem;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.referral-input::placeholder {
+  color: var(--text-secondary);
+  opacity: 0.7;
+}
+
+.referral-input:focus {
+  background-color: transparent;
+  border-color: var(--button-blue);
+  color: var(--text-light);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  outline: none;
+}
+
+.referral-input:hover {
+  border-color: var(--button-blue);
+}
+
+/* Button Styles */
+.btn-submit {
+  background-color: var(--text-light);
+  color: var(--primary-dark);
+  border: none;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  text-transform: capitalize;
+  cursor: pointer;
+}
+
+.btn-submit:hover {
+  background-color: #f0f0f0;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(255, 255, 255, 0.15);
+}
+
+.btn-submit:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 8px rgba(255, 255, 255, 0.1);
+}
+
+/* Skip Link Styles */
+.referral-skip-link {
+  color: var(--button-blue);
+  text-decoration: none;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+}
+
+.referral-skip-link:hover {
+  color: var(--button-hover);
+  text-decoration: underline;
+}
+
+/* Alert Styles */
+.alert-danger {
+  background-color: rgba(220, 53, 69, 0.1);
+  border-color: #dc3545;
+  color: #ff6b6b;
+}
+
+/* Form Group */
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+/* Responsive Styles */
+@media (max-width: 576px) {
+  .referral-container {
+    padding: 30px 20px;
+  }
+
+  .referral-title {
+    font-size: 1.75rem;
+  }
+
+  .referral-description {
+    font-size: 0.9rem;
+  }
+
+  .referral-input {
+    padding: 10px 14px;
+    font-size: 0.95rem;
+  }
+
+  .btn-submit {
+    padding: 10px !important;
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .referral-container {
+    max-width: 100%;
+  }
+}

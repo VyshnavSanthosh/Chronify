@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Promotions - ChronoMy</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="./css/select_coupon.css">
+</head>
+<body class="promo-modal-page">
+    <!-- Header -->
+    <header class="navbar-custom">
+        <div class="container-fluid">
+            <div class="navbar-content">
+                <button class="navbar-toggler">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-brand">CHRONIFY</div>
+                <nav class="navbar-menu">
+                    <a href="/" class="nav-link">HOME</a>
+                </nav>
+                <div class="navbar-actions">
+                    <input type="text" class="search-input" placeholder="What are you looking for?">
+                    <button class="icon-btn">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="white">
+                            <circle cx="8" cy="8" r="7"></circle>
+                            <path d="M13 13l4 4"></path>
+                        </svg>
+                    </button>
+                    <button class="icon-btn"><svg width="20" height="20" viewBox="0 0 20 20" fill="white"><path d="M10 2c-2 0-4 2-4 4 0 3 4 8 4 8s4-5 4-8c0-2-2-4-4-4z"></path></svg></button>
+                    <button class="icon-btn"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="white"><circle cx="10" cy="10" r="8"></circle><path d="M10 6v8M6 10h8"></path></svg></button>
+                    <button class="icon-btn"><svg width="20" height="20" viewBox="0 0 20 20" fill="white"><circle cx="10" cy="10" r="8"></circle></svg></button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Modal Overlay -->
+    <div class="modal-overlay active">
+        <div class="modal-content promo-modal">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h5 class="modal-title">EXTRA 10% OFF</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body">
+                <div class="promo-list">
+                    <!-- EJS Loop for promotions -->
+                    <% (promotions || [
+                        {
+                            id: 1,
+                            code: 'EXTRA 10% OFF',
+                            description: 'Extra 10% off | Valid 3-31 Aug (2-5 days)',
+                            discount: '10%',
+                            validity: 'Valid till 25 Feb, 2025',
+                            terms: 'Extra 10% off | Valid 2-5 days (2-5 days)',
+                            savings: 'SAVE10 - 10% of your first purchase'
+                        },
+                        {
+                            id: 2,
+                            code: 'BRD / SRL',
+                            description: 'Buy 6 GET 1 Free | Valid 3-31 Aug (2-5 days)',
+                            discount: 'Buy 6 Get 1',
+                            validity: 'Valid till 25 Feb, 2025',
+                            terms: 'Buy 6 GET 1 Free | Valid 2-5 days (2-5 days)',
+                            savings: 'BUYSIX - Buy 6 items get 1 free'
+                        },
+                        {
+                            id: 3,
+                            code: 'EXTRA 20% OFF',
+                            description: 'Extra 20% off | Valid 3-31 Aug (2-5 days)',
+                            discount: '20%',
+                            validity: 'Valid till 15 Feb, 2025',
+                            terms: 'Extra 20% off | Valid 2-5 days (2-5 days)',
+                            savings: 'SAVE20 - 20% off on your purchase'
+                        },
+                        {
+                            id: 4,
+                            code: 'EXTRA 50% OFF',
+                            description: 'Extra 50% off | Valid 3-07 Feb (2-5 days)',
+                            discount: '50%',
+                            validity: 'Valid till 07 Feb, 2025',
+                            terms: 'Extra 50% off | Valid 2-5 days (2-5 days)',
+                            savings: 'SAVE50 - 50% off on selected items'
+                        }
+                    ]).forEach((promo, index) => { %>
+                        <div class="promo-item">
+                            <div class="promo-left">
+                                <div class="promo-code"><strong><%= promo.code %></strong></div>
+                                <div class="promo-description"><%= promo.description %></div>
+                                <div class="promo-terms"><small><%= promo.terms %></small></div>
+                                <div class="promo-validity"><strong><%= promo.validity %></strong></div>
+                            </div>
+                            <div class="promo-right">
+                                <div class="promo-discount"><%= promo.discount %></div>
+                                <div class="promo-savings"><small><%= promo.savings %></small></div>
+                            </div>
+                        </div>
+                        <% if (index < promotions.length - 1) { %>
+                            <hr class="promo-divider">
+                        <% } %>
+                    <% }); %>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer-custom">
+        <div class="container-fluid">
+            <div class="row">
+                <!-- Exclusive Section -->
+                <div class="col-md-2">
+                    <h6 class="footer-title">Exclusive</h6>
+                    <p class="footer-text">Subscribe</p>
+                    <p class="footer-small">Get 30% off your first order</p>
+                    <form class="newsletter-form">
+                        <input type="email" placeholder="Enter your email" class="footer-input">
+                        <button type="submit" class="footer-btn">&gt;</button>
+                    </form>
+                </div>
+
+                <!-- Support Section -->
+                <div class="col-md-2">
+                    <h6 class="footer-title">Support</h6>
+                    <ul class="footer-links">
+                        <li><a href="#">9th Floor, Oshan, Business Park, Thane, West Mumbai, Maharashtra 400007</a></li>
+                        <li><a href="mailto:neurotech@gmail.com">neurotech@gmail.com</a></li>
+                        <li><a href="tel:+919226734581">+91 22 6734 581</a></li>
+                    </ul>
+                </div>
+
+                <!-- Account Section -->
+                <div class="col-md-2">
+                    <h6 class="footer-title">Account</h6>
+                    <ul class="footer-links">
+                        <li><a href="#">My Account</a></li>
+                        <li><a href="#">Login / Register</a></li>
+                        <li><a href="#">Cart</a></li>
+                        <li><a href="#">Wishlist</a></li>
+                        <li><a href="#">Shop</a></li>
+                    </ul>
+                </div>
+
+                <!-- Quick Link Section -->
+                <div class="col-md-2">
+                    <h6 class="footer-title">Quick Link</h6>
+                    <ul class="footer-links">
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Use</a></li>
+                        <li><a href="#">FAQ</a></li>
+                        <li><a href="#">Contact</a></li>
+                    </ul>
+                </div>
+
+                <!-- Download App Section -->
+                <div class="col-md-2">
+                    <h6 class="footer-title">Download App</h6>
+                    <p class="footer-small">Save ₹3 with App New User Only</p>
+                    <div class="app-links">
+                        <img src="/placeholder.svg?height=50&width=50" alt="QR Code" class="qr-code">
+                        <div class="store-buttons">
+                            <button class="store-btn">Google Play</button>
+                            <button class="store-btn">App Store</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Social Links -->
+                <div class="col-md-2 social-links">
+                    <a href="#"><i class="bi bi-facebook"></i></a>
+                    <a href="#"><i class="bi bi-twitter"></i></a>
+                    <a href="#"><i class="bi bi-instagram"></i></a>
+                    <a href="#"><i class="bi bi-linkedin"></i></a>
+                </div>
+            </div>
+
+            <hr class="footer-divider">
+            <p class="footer-copyright">© Copyright Khmer 2022. All rights reserved</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

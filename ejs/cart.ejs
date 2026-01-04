@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart - CHRONIFY</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/cart.css">
+</head>
+<body class="cart-page">
+
+    <!-- Header Navigation -->
+    <header class="navbar-section">
+        <nav class="navbar navbar-expand-lg navbar-dark">
+            <div class="container-fluid">
+                <a class="navbar-brand fw-bold" href="/">
+                    <span class="menu-icon">☰</span> CHRONIFY
+                </a>
+                <a class="nav-link ms-3" href="/">Home</a>
+                
+                <div class="ms-auto d-flex align-items-center gap-3">
+                    <!-- Search Bar -->
+                    <div class="search-bar">
+                        <input type="text" placeholder="What are you looking for?" class="form-control form-control-sm">
+                        <button class="btn btn-sm btn-link"><i class="bi bi-search"></i></button>
+                    </div>
+                    
+                    <!-- Icons -->
+                    <a href="/wishlist" class="icon-link" title="Wishlist">❤️</a>
+                    <a href="/cart" class="icon-link active" title="Cart">🛒</a>
+                    <a href="/profile" class="icon-link" title="Profile">👤</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container-fluid py-5">
+        <div class="row">
+            <!-- Cart Items Section -->
+            <div class="col-lg-8">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h1 class="cart-title">CART</h1>
+                    <% if (cartItems && cartItems.length > 0) { %>
+                        <button class="btn btn-danger btn-sm" onclick="emptyCart()">Empty my Cart</button>
+                    <% } %>
+                </div>
+
+                <!-- Cart Items List -->
+                <% if (cartItems && cartItems.length > 0) { %>
+                    <div class="cart-items-container">
+                        <% cartItems.forEach((item, index) => { %>
+                            <div class="cart-item-card mb-4">
+                                <div class="row align-items-center">
+                                    <!-- Product Image -->
+                                    <div class="col-md-2">
+                                        <div class="product-image-box">
+                                            <img src="<%= item.image %>" alt="<%= item.name %>" class="img-fluid rounded">
+                                        </div>
+                                    </div>
+
+                                    <!-- Product Details -->
+                                    <div class="col-md-4">
+                                        <h5 class="product-name"><%= item.name %></h5>
+                                        <p class="product-price">Price: <%= item.price.toLocaleString('en-IN', { style: 'currency', currency: 'INR' }) %></p>
+                                        <p class="product-color">Colour: <strong><%= item.color %></strong></p>
+                                    </div>
+
+                                    <!-- Quantity Selector -->
+                                    <div class="col-md-3">
+                                        <div class="quantity-control">
+                                            <form method="POST" action="/cart/update/<%= item.id %>" class="d-flex align-items-center gap-2">
+                                                <button type="button" class="btn btn-outline-secondary btn-sm qty-btn" onclick="decreaseQty(this)">−</button>
+                                                <input type="number" name="quantity" value="<%= item.quantity %>" class="form-control form-control-sm qty-input" min="1" max="10">
+                                                <button type="button" class="btn btn-outline-secondary btn-sm qty-btn" onclick="increaseQty(this)">+</button>
+                                            </form>
+                                        </div>
+                                    </div>
+
+                                    <!-- Remove Button -->
+                                    <div class="col-md-3 text-end">
+                                        <form method="POST" action="/cart/remove/<%= item.id %>" style="display:inline;">
+                                            <button type="submit" class="btn btn-danger btn-sm">Remove</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        <% }); %>
+                    </div>
+                <% } else { %>
+                    <div class="empty-cart-message text-center py-5">
+                        <p class="text-muted">Your cart is empty</p>
+                        <a href="/" class="btn btn-primary mt-3">Continue Shopping</a>
+                    </div>
+                <% } %>
+            </div>
+
+            <!-- Cart Summary Section -->
+            <div class="col-lg-4">
+                <div class="cart-summary-box">
+                    <h4 class="summary-title">TOTAL</h4>
+                    
+                    <% 
+                        let subtotal = 0;
+                        if (cartItems && cartItems.length > 0) {
+                            cartItems.forEach(item => {
+                                subtotal += (item.price * item.quantity);
+                            });
+                        }
+                    %>
+
+                    <div class="summary-content">
+                        <div class="summary-row">
+                            <span>Subtotal:</span>
+                            <span class="amount"><%= subtotal.toLocaleString('en-IN', { style: 'currency', currency: 'INR' }) %></span>
+                        </div>
+
+                        <p class="shipping-note">*Shipping, taxes, and discount codes calculated at checkout.</p>
+
+                        <% if (cartItems && cartItems.length > 0) { %>
+                            <form action="/checkout" method="GET" class="mt-4">
+                                <button type="submit" class="btn btn-primary w-100 mb-2">Proceed to checkout</button>
+                            </form>
+                            <a href="/" class="btn btn-outline-light w-100">Back to shopping</a>
+                        <% } else { %>
+                            <a href="/" class="btn btn-primary w-100 mt-4">Continue Shopping</a>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer-section mt-5">
+        <div class="container-fluid">
+            <div class="row py-5">
+                <!-- Exclusive Section -->
+                <div class="col-md-2">
+                    <h6 class="footer-title">Exclusive</h6>
+                    <p class="footer-text">Subscribe</p>
+                    <p class="footer-text small">Get 10% off your first order</p>
+                    <div class="subscribe-box">
+                        <input type="email" placeholder="Enter your email" class="form-control form-control-sm">
+                        <button class="btn btn-sm btn-outline-light">➤</button>
+                    </div>
+                </div>
+
+                <!-- Support Section -->
+                <div class="col-md-2">
+                    <h6 class="footer-title">Support</h6>
+                    <ul class="footer-links">
+                        <li><a href="#">9th Floor, Orian Business Park, Thane</a></li>
+                        <li><a href="#">World Mumbai, Maharashtra</a></li>
+                        <li><a href="mailto:necrollsales@gmail.com">necrollsales@gmail.com</a></li>
+                        <li><a href="tel:+919226734588">+91 22 6734 588</a></li>
+                    </ul>
+                </div>
+
+                <!-- Account Section -->
+                <div class="col-md-2">
+                    <h6 class="footer-title">Account</h6>
+                    <ul class="footer-links">
+                        <li><a href="/profile">My Account</a></li>
+                        <li><a href="/auth">Login / Register</a></li>
+                        <li><a href="/cart">Cart</a></li>
+                        <li><a href="/wishlist">Wishlist</a></li>
+                        <li><a href="/shop">Shop</a></li>
+                    </ul>
+                </div>
+
+                <!-- Quick Link Section -->
+                <div class="col-md-2">
+                    <h6 class="footer-title">Quick Link</h6>
+                    <ul class="footer-links">
+                        <li><a href="/privacy">Privacy Policy</a></li>
+                        <li><a href="/terms">Terms of Use</a></li>
+                        <li><a href="/faq">FAQ</a></li>
+                        <li><a href="/contact">Contact</a></li>
+                    </ul>
+                </div>
+
+                <!-- Download App Section -->
+                <div class="col-md-2">
+                    <h6 class="footer-title">Download App</h6>
+                    <p class="footer-text small">Save $3 with App for new user only</p>
+                    <div class="app-links">
+                        <img src="https://via.placeholder.com/150x50?text=Google+Play" alt="Google Play" class="img-fluid mb-2">
+                        <img src="https://via.placeholder.com/150x50?text=App+Store" alt="App Store" class="img-fluid">
+                    </div>
+                    <div class="social-links mt-3">
+                        <a href="#" class="social-icon">f</a>
+                        <a href="#" class="social-icon">𝕏</a>
+                        <a href="#" class="social-icon">📷</a>
+                        <a href="#" class="social-icon">in</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Copyright -->
+            <div class="footer-bottom text-center py-3 border-top border-secondary">
+                <p class="text-muted small">© Copyright Eknar 2025. All rights reserved</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function emptyCart() {
+            if (confirm('Are you sure you want to empty your cart?')) {
+                fetch('/cart/empty', { method: 'POST' })
+                    .then(() => location.reload())
+                    .catch(err => console.error(err));
+            }
+        }
+
+        function increaseQty(btn) {
+            const input = btn.previousElementSibling;
+            input.value = parseInt(input.value) + 1;
+        }
+
+        function decreaseQty(btn) {
+            const input = btn.nextElementSibling;
+            if (parseInt(input.value) > 1) {
+                input.value = parseInt(input.value) - 1;
+            }
+        }
+    </script>
+</body>
+</html>

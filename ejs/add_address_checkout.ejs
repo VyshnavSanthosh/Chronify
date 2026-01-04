@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add New Address - Chronify</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/add_address_checkout.css">
+</head>
+<body class="bg-dark-blue">
+    
+    <!-- Header -->
+    <header class="navbar navbar-expand-lg navbar-dark bg-header-dark py-3 border-bottom border-primary">
+        <div class="container-fluid px-4">
+            <a class="navbar-brand fw-bold fs-5" href="/">
+                <i class="bi bi-clock"></i> Chronify
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <div class="ms-auto d-flex gap-3 align-items-center">
+                    
+                    <a href="/wishlist" class="text-light"><i class="bi bi-heart"></i></a>
+                    <a href="/cart" class="text-light"><i class="bi bi-cart"></i></a>
+                    <a href="/profile" class="text-light"><i class="bi bi-person-circle"></i></a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="min-vh-100 py-5">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <!-- Page Title -->
+                    <h1 class="text-white mb-4 fw-bold">Add New Address</h1>
+
+                    <!-- Add Address Form -->
+                    <div class="card bg-white border-0 shadow-lg">
+                        <div class="card-body p-4">
+                            <form id="addAddressForm" method="POST" action="/api/addresses">
+                                
+                                <!-- Address Field (Full Width) -->
+                                <div class="mb-4">
+                                    <label for="fullAddress" class="form-label text-dark fw-600 mb-2">Address</label>
+                                    <input type="text" class="form-control form-control-lg" id="fullAddress" 
+                                        name="address" placeholder="House Name, House Number, Locality" required>
+                                </div>
+
+                                <!-- Two Column: Name & Phone -->
+                                <div class="row">
+                                    <div class="col-md-6 mb-4">
+                                        <label for="fullName" class="form-label text-dark fw-600 mb-2">Name</label>
+                                        <input type="text" class="form-control form-control-lg" id="fullName" 
+                                            name="name" placeholder="<%= user.fullName || 'Vyshnav' %>" required>
+                                    </div>
+                                    <div class="col-md-6 mb-4">
+                                        <label for="phoneNumber" class="form-label text-dark fw-600 mb-2">Phone</label>
+                                        <input type="tel" class="form-control form-control-lg" id="phoneNumber" 
+                                            name="phone" placeholder="8737002022" pattern="[0-9]{10}" required>
+                                    </div>
+                                </div>
+
+                                <!-- Two Column: District & State -->
+                                <div class="row">
+                                    <div class="col-md-6 mb-4">
+                                        <label for="districtTown" class="form-label text-dark fw-600 mb-2">District / Town</label>
+                                        <input type="text" class="form-control form-control-lg" id="districtTown" 
+                                            name="district" placeholder="eg. Ernakulam" required>
+                                    </div>
+                                    <div class="col-md-6 mb-4">
+                                        <label for="state" class="form-label text-dark fw-600 mb-2">State</label>
+                                        <select class="form-select form-select-lg" id="state" name="state" required>
+                                            <option value="">Select State</option>
+                                            <option value="Andhra Pradesh">Andhra Pradesh</option>
+                                            <option value="Arunachal Pradesh">Arunachal Pradesh</option>
+                                            <option value="Assam">Assam</option>
+                                            <option value="Bihar">Bihar</option>
+                                            <option value="Chhattisgarh">Chhattisgarh</option>
+                                            <option value="Delhi">Delhi</option>
+                                            <option value="Goa">Goa</option>
+                                            <option value="Gujarat">Gujarat</option>
+                                            <option value="Haryana">Haryana</option>
+                                            <option value="Himachal Pradesh">Himachal Pradesh</option>
+                                            <option value="Jharkhand">Jharkhand</option>
+                                            <option value="Karnataka">Karnataka</option>
+                                            <option value="Kerala">Kerala</option>
+                                            <option value="Madhya Pradesh">Madhya Pradesh</option>
+                                            <option value="Maharashtra">Maharashtra</option>
+                                            <option value="Manipur">Manipur</option>
+                                            <option value="Meghalaya">Meghalaya</option>
+                                            <option value="Mizoram">Mizoram</option>
+                                            <option value="Nagaland">Nagaland</option>
+                                            <option value="Odisha">Odisha</option>
+                                            <option value="Punjab">Punjab</option>
+                                            <option value="Rajasthan">Rajasthan</option>
+                                            <option value="Sikkim">Sikkim</option>
+                                            <option value="Tamil Nadu">Tamil Nadu</option>
+                                            <option value="Telangana">Telangana</option>
+                                            <option value="Tripura">Tripura</option>
+                                            <option value="Uttar Pradesh">Uttar Pradesh</option>
+                                            <option value="Uttarakhand">Uttarakhand</option>
+                                            <option value="West Bengal">West Bengal</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <!-- Two Column: Landmark & Pin Code -->
+                                <div class="row">
+                                    <div class="col-md-6 mb-4">
+                                        <label for="landmark" class="form-label text-dark fw-600 mb-2">Landmark (optional)</label>
+                                        <input type="text" class="form-control form-control-lg" id="landmark" 
+                                            name="landmark" placeholder="eg. Hospital">
+                                    </div>
+                                    <div class="col-md-6 mb-4">
+                                        <label for="pinCode" class="form-label text-dark fw-600 mb-2">Pin Code</label>
+                                        <input type="text" class="form-control form-control-lg" id="pinCode" 
+                                            name="pinCode" placeholder="eg. 682030" pattern="[0-9]{6}" required>
+                                    </div>
+                                </div>
+
+                                <!-- Address Type Selection -->
+                                <div class="mb-4">
+                                    <label class="form-label text-dark fw-600 mb-3">Address Type</label>
+                                    <div class="d-flex gap-4">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="addressType" 
+                                                id="homeAddress" value="Home" checked>
+                                            <label class="form-check-label text-dark" for="homeAddress">
+                                                Home
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="addressType" 
+                                                id="workAddress" value="Work">
+                                            <label class="form-check-label text-dark" for="workAddress">
+                                                Work
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <!-- Make this default checkbox -->
+                                    <div class="form-check mt-3">
+                                        <input class="form-check-input" type="checkbox" name="setDefault" 
+                                            id="setDefault">
+                                        <label class="form-check-label text-dark" for="setDefault">
+                                            Make this default
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <!-- Action Buttons -->
+                                <div class="d-flex gap-3 justify-content-end mt-5">
+                                    <a href="/checkout" class="btn btn-outline-danger btn-lg px-4">
+                                        Cancel
+                                    </a>
+                                    <button type="submit" class="btn btn-primary btn-lg px-4">
+                                        Add Address
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-footer-dark text-light pt-5 pb-3 border-top border-primary mt-5">
+        <div class="container">
+            <div class="row mb-4">
+                <!-- Exclusive Section -->
+                <div class="col-md-2 mb-4">
+                    <h6 class="fw-bold mb-3">Exclusive</h6>
+                    <p class="small text-muted">Subscribe</p>
+                    <p class="small mb-2">Get 50% off your first order</p>
+                    <form class="d-flex gap-2">
+                        <input type="email" class="form-control form-control-sm" placeholder="Enter your email">
+                        <button type="submit" class="btn btn-outline-light btn-sm px-2">
+                            <i class="bi bi-arrow-right"></i>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Support Section -->
+                <div class="col-md-2 mb-4">
+                    <h6 class="fw-bold mb-3">Support</h6>
+                    <p class="small text-muted mb-2">9th Floor, Chirag<br>Business Park, Thane<br>Maharashtra 400007</p>
+                    <p class="small text-muted mb-2">necrotichelp@gmail.com<br>+91 22 4073 4585</p>
+                </div>
+
+                <!-- Account Section -->
+                <div class="col-md-2 mb-4">
+                    <h6 class="fw-bold mb-3">Account</h6>
+                    <ul class="list-unstyled small text-muted">
+                        <li class="mb-2"><a href="/profile" class="text-decoration-none text-muted">My Account</a></li>
+                        <li class="mb-2"><a href="/auth/login" class="text-decoration-none text-muted">Login / Register</a></li>
+                        <li class="mb-2"><a href="/cart" class="text-decoration-none text-muted">Cart</a></li>
+                        <li class="mb-2"><a href="/wishlist" class="text-decoration-none text-muted">Wishlist</a></li>
+                        <li><a href="/shop" class="text-decoration-none text-muted">Shop</a></li>
+                    </ul>
+                </div>
+
+                <!-- Quick Link Section -->
+                <div class="col-md-2 mb-4">
+                    <h6 class="fw-bold mb-3">Quick Link</h6>
+                    <ul class="list-unstyled small text-muted">
+                        <li class="mb-2"><a href="/privacy" class="text-decoration-none text-muted">Privacy Policy</a></li>
+                        <li class="mb-2"><a href="/terms" class="text-decoration-none text-muted">Terms of Use</a></li>
+                        <li class="mb-2"><a href="/faq" class="text-decoration-none text-muted">FAQ</a></li>
+                        <li><a href="/contact" class="text-decoration-none text-muted">Contact</a></li>
+                    </ul>
+                </div>
+
+                <!-- Download App Section -->
+                <div class="col-md-2">
+                    <h6 class="fw-bold mb-3">Download App</h6>
+                    <p class="small text-muted mb-2">Save up to 50% from the app only</p>
+                    <div class="d-flex flex-column gap-2">
+                        <img src="https://qr.example.com/app-qr.png" alt="QR Code" style="width: 80px; height: 80px;">
+                        <small>
+                            <a href="#" class="text-decoration-none text-light me-2">
+                                <i class="bi bi-google-play"></i> Google Play
+                            </a>
+                        </small>
+                        <small>
+                            <a href="#" class="text-decoration-none text-light">
+                                <i class="bi bi-apple"></i> App Store
+                            </a>
+                        </small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Social Links & Copyright -->
+            <div class="row border-top border-secondary pt-3">
+                <div class="col-md-6">
+                    <p class="small text-muted mb-0">© Copyright Chronify 2025. All rights reserved</p>
+                </div>
+                <div class="col-md-6 text-end">
+                    <div class="d-flex gap-3 justify-content-end">
+                        <a href="#" class="text-light text-decoration-none"><i class="bi bi-facebook"></i></a>
+                        <a href="#" class="text-light text-decoration-none"><i class="bi bi-twitter"></i></a>
+                        <a href="#" class="text-light text-decoration-none"><i class="bi bi-instagram"></i></a>
+                        <a href="#" class="text-light text-decoration-none"><i class="bi bi-linkedin"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Form Validation Script -->
+    <script>
+        document.getElementById('addAddressForm').addEventListener('submit', function(e) {
+            if (!this.checkValidity()) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            this.classList.add('was-validated');
+        });
+    </script>
+</body>
+</html>

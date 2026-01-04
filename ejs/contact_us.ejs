@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us - ChronoMy</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="./css/contact_us.css">
+</head>
+<body class="contact-us-page">
+    <!-- Promo Banner -->
+    <div class="promo-banner">
+        <p>Get 10% off for your first purchase USE CODE NEW1</p>
+    </div>
+
+    <!-- Header -->
+    <header class="navbar-section">
+        <nav class="navbar navbar-expand-lg navbar-dark">
+            <div class="container-fluid">
+                <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasMenu">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <a class="navbar-brand" href="/">ChronoMy</a>
+                <a href="/" class="nav-link d-none d-lg-inline">Home</a>
+                
+                <div class="ms-auto d-flex gap-3 align-items-center">
+                    
+                    <a href="/wishlist" class="nav-link">
+                        <i class="far fa-heart"></i>
+                    </a>
+                    <a href="/cart" class="nav-link">
+                        <i class="fas fa-shopping-bag"></i>
+                    </a>
+                    <a href="/profile" class="nav-link">
+                        <i class="fas fa-user-circle"></i>
+                    </a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="contact-us-content">
+        <div class="container-fluid">
+            <div class="row g-4">
+                <!-- Left Column - Contact Information -->
+                <div class="col-lg-4">
+                    <!-- Call To Us Card -->
+                    <div class="contact-card">
+                        <div class="card-icon">
+                            <i class="fas fa-phone"></i>
+                        </div>
+                        <h4 class="card-title">Call To Us</h4>
+                        <p class="card-description">We are available 24/7, 7 days a week.</p>
+                        <p class="contact-detail">
+                            Phone: <%= phone || '+1-800-000-0000' %>
+                        </p>
+                    </div>
+
+                    <!-- Write To Us Card -->
+                    <div class="contact-card mt-4">
+                        <div class="card-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <h4 class="card-title">Write To Us</h4>
+                        <p class="card-description">Fill out our form and we will contact you within 24 hours.</p>
+                        <!-- Customer Service Email -->
+                        <p class="contact-detail">
+                            Emails: 
+                        </p>
+                        <p class="email-list">
+                            <%= customerEmail || 'customer@exclusive.com' %>
+                        </p>
+                        <p class="email-list">
+                            <%= supportEmail || 'support@exclusive.com' %>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Right Column - Contact Form -->
+                <div class="col-lg-8">
+                    <form class="contact-form" method="POST" action="/contact/submit">
+                        <!-- Form Row 1: Name, Email, Phone -->
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-4">
+                                <input 
+                                    type="text" 
+                                    class="form-control form-input" 
+                                    placeholder="Your Name *" 
+                                    name="name" 
+                                    required
+                                >
+                            </div>
+                            <div class="col-md-4">
+                                <input 
+                                    type="email" 
+                                    class="form-control form-input" 
+                                    placeholder="Your Email *" 
+                                    name="email" 
+                                    required
+                                >
+                            </div>
+                            <div class="col-md-4">
+                                <input 
+                                    type="tel" 
+                                    class="form-control form-input" 
+                                    placeholder="Your Phone *" 
+                                    name="phone" 
+                                    required
+                                >
+                            </div>
+                        </div>
+
+                        <!-- Form Row 2: Message -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <textarea 
+                                    class="form-control form-textarea" 
+                                    placeholder="Your Message" 
+                                    name="message" 
+                                    rows="8"
+                                ></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="row">
+                            <div class="col-12 d-flex justify-content-end">
+                                <button type="submit" class="btn btn-send-message">
+                                    Send Message
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer-section">
+        <div class="container-fluid">
+            <div class="row">
+                <!-- Exclusive Section -->
+                <div class="col-md-6 col-lg-2 footer-col">
+                    <h5>Exclusive</h5>
+                    <p>Subscribe</p>
+                    <p class="footer-description">Get 10% off your first order</p>
+                    <div class="input-group footer-email-form">
+                        <input type="email" class="form-control" placeholder="Enter your email">
+                        <button class="btn btn-light" type="button">
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Support Section -->
+                <div class="col-md-6 col-lg-2 footer-col">
+                    <h5>Support</h5>
+                    <ul class="footer-links">
+                        <li>9th Floor, Orion Business Park, Thane West, Mumbai</li>
+                        <li><a href="mailto:nexorotech@gmail.com">nexorotch@gmail.com</a></li>
+                        <li><a href="tel:+91-22-4973-4581">+91 22 4973 4581</a></li>
+                    </ul>
+                </div>
+
+                <!-- Account Section -->
+                <div class="col-md-6 col-lg-2 footer-col">
+                    <h5>Account</h5>
+                    <ul class="footer-links">
+                        <li><a href="/my-account">My Account</a></li>
+                        <li><a href="/login">Login / Register</a></li>
+                        <li><a href="/cart">Cart</a></li>
+                        <li><a href="/wishlist">Wishlist</a></li>
+                        <li><a href="/shop">Shop</a></li>
+                    </ul>
+                </div>
+
+                <!-- Quick Link Section -->
+                <div class="col-md-6 col-lg-2 footer-col">
+                    <h5>Quick Link</h5>
+                    <ul class="footer-links">
+                        <li><a href="/privacy">Privacy Policy</a></li>
+                        <li><a href="/terms">Terms Of Use</a></li>
+                        <li><a href="/faq">FAQ</a></li>
+                        <li><a href="/contact">Contact</a></li>
+                    </ul>
+                </div>
+
+                <!-- Download App Section -->
+                <div class="col-md-6 col-lg-2 footer-col">
+                    <h5>Download App</h5>
+                    <p>Save $3 with App New User Only</p>
+                    <div class="app-download-links">
+                        <div class="qr-code">
+                            <img src="/images/qr-code.png" alt="Download App QR Code" width="80">
+                        </div>
+                        <div>
+                            <a href="#" class="app-link">
+                                <i class="fab fa-google-play"></i> Google Play
+                            </a>
+                            <a href="#" class="app-link">
+                                <i class="fab fa-apple"></i> App Store
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Social Media -->
+            <div class="row footer-social">
+                <div class="col-12">
+                    <div class="social-links">
+                        <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Copyright -->
+            <div class="row footer-copyright">
+                <div class="col-12">
+                    <p>&copy; Copyright Chromi 2022. All rights reserved</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - ChronoMy</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="./css/about_us.css">
+</head>
+<body class="bg-dark-navy">
+    <!-- Header Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-navy-dark border-bottom border-secondary">
+        <div class="container-fluid">
+            <!-- Hamburger Menu -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- Logo -->
+            <a class="navbar-brand ms-2 ms-lg-0" href="/">
+                <span class="text-white fs-5 fw-bold">CHRONIFY</span>
+            </a>
+
+            <!-- Center Nav Items -->
+            <div class="d-none d-lg-flex ms-4">
+                <a class="nav-link text-white text-decoration-none" href="/">Home</a>
+            </div>
+
+            <!-- Search Bar -->
+            <div class="flex-grow-1 d-none d-md-flex justify-content-center mx-4">
+               
+            </div>
+
+            <!-- Right Side Icons -->
+            <div class="d-flex align-items-center gap-3">
+                <a href="/wishlist" class="text-white text-decoration-none">
+                    <i class="bi bi-heart" style="font-size: 1.3rem;"></i>
+                </a>
+                <a href="/cart" class="text-white text-decoration-none">
+                    <i class="bi bi-cart" style="font-size: 1.3rem;"></i>
+                </a>
+                <a href="/profile" class="text-white text-decoration-none">
+                    <i class="bi bi-person-circle" style="font-size: 1.3rem;"></i>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="py-5">
+        <div class="container">
+            <div class="row align-items-center g-5">
+                <!-- Left Column - Brand Story -->
+                <div class="col-lg-6">
+                    <div class="about-content">
+                        <p class="about-text text-white lh-lg">
+                            <%= aboutText || "Born from a love for craftsmanship and a vision to redefine timepiece, ChronoMy started its journey in 2025. From humble beginnings, we've grown into a brand that stands for quality, class, and elegance. Every watch we create reflects our commitment to design excellence and meticulous mastery." %>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Right Column - Product Image -->
+                <div class="col-lg-6">
+                    <div class="about-image-wrapper">
+                        <img src="<%= aboutImage || '/placeholder.svg?height=500&width=400' %>" alt="ChronoMy Watch" class="img-fluid about-image rounded-4">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-black mt-5 py-5 border-top border-secondary">
+        <div class="container">
+            <div class="row g-4">
+                <!-- Exclusive Column -->
+                <div class="col-md-2">
+                    <h6 class="text-white fw-bold mb-3">Exclusive</h6>
+                    <h6 class="text-white-50 small mb-2">Subscribe</h6>
+                    <p class="text-white-50 small">Get 10% off your first order</p>
+                    <form class="mt-3">
+                        <div class="input-group input-group-sm">
+                            <input type="email" class="form-control bg-secondary border-0 text-white" placeholder="Enter your email" aria-label="Email">
+                            <button class="btn btn-outline-light" type="submit">
+                                <i class="bi bi-arrow-right"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Support Column -->
+                <div class="col-md-2">
+                    <h6 class="text-white fw-bold mb-3">Support</h6>
+                    <ul class="list-unstyled text-white-50 small">
+                        <li class="mb-2">9th Floor, Orion Business Park, Thane West, Mumbai, Maharashtra 400607</li>
+                        <li class="mb-2"><a href="mailto:nexorotech@gmail.com" class="text-white-50 text-decoration-none">nexorotech@gmail.com</a></li>
+                        <li class="mb-2"><a href="tel:+912224973481" class="text-white-50 text-decoration-none">+91 22 4973 481</a></li>
+                    </ul>
+                </div>
+
+                <!-- Account Column -->
+                <div class="col-md-2">
+                    <h6 class="text-white fw-bold mb-3">Account</h6>
+                    <ul class="list-unstyled text-white-50 small">
+                        <li class="mb-2"><a href="/profile" class="text-white-50 text-decoration-none">My Account</a></li>
+                        <li class="mb-2"><a href="/auth" class="text-white-50 text-decoration-none">Login / Register</a></li>
+                        <li class="mb-2"><a href="/cart" class="text-white-50 text-decoration-none">Cart</a></li>
+                        <li class="mb-2"><a href="/wishlist" class="text-white-50 text-decoration-none">Wishlist</a></li>
+                        <li class="mb-2"><a href="/product-list" class="text-white-50 text-decoration-none">Shop</a></li>
+                    </ul>
+                </div>
+
+                <!-- Quick Link Column -->
+                <div class="col-md-2">
+                    <h6 class="text-white fw-bold mb-3">Quick Link</h6>
+                    <ul class="list-unstyled text-white-50 small">
+                        <li class="mb-2"><a href="/privacy" class="text-white-50 text-decoration-none">Privacy Policy</a></li>
+                        <li class="mb-2"><a href="/terms" class="text-white-50 text-decoration-none">Terms Of Use</a></li>
+                        <li class="mb-2"><a href="/faq" class="text-white-50 text-decoration-none">FAQ</a></li>
+                        <li class="mb-2"><a href="/contact" class="text-white-50 text-decoration-none">Contact</a></li>
+                    </ul>
+                </div>
+
+                <!-- Download App Column -->
+                <div class="col-md-2">
+                    <h6 class="text-white fw-bold mb-3">Download App</h6>
+                    <p class="text-white-50 small">Save $3 with App New User Only</p>
+                    <div class="d-flex gap-2 align-items-center">
+                        <img src="/placeholder.svg?height=40&width=40" alt="QR Code" class="img-fluid" style="width: 50px; height: 50px;">
+                        <div>
+                            <div class="mb-1">
+                                <a href="#" class="text-white-50 text-decoration-none small d-block">
+                                    <i class="bi bi-google-play"></i> Google Play
+                                </a>
+                            </div>
+                            <div>
+                                <a href="#" class="text-white-50 text-decoration-none small d-block">
+                                    <i class="bi bi-apple"></i> App Store
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Social Links -->
+                    <div class="mt-3 d-flex gap-2">
+                        <a href="#" class="text-white-50"><i class="bi bi-facebook"></i></a>
+                        <a href="#" class="text-white-50"><i class="bi bi-twitter"></i></a>
+                        <a href="#" class="text-white-50"><i class="bi bi-instagram"></i></a>
+                        <a href="#" class="text-white-50"><i class="bi bi-linkedin"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Copyright -->
+            <div class="mt-5 pt-4 border-top border-secondary text-center">
+                <p class="text-white-50 small mb-0">© Copyright Chronify 2025. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

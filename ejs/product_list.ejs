@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChronoMy - Shop Watches</title>
+    <link rel="stylesheet" href="/css/product_list.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <div class="header-left">
+                <button class="menu-toggle">☰</button>
+                <div class="logo">CHRONIFY</div>
+            </div>
+            <div class="header-center">
+                <input type="text" class="search-bar" placeholder="Search watches...">
+            </div>
+            <div class="header-right">
+                <button class="icon-btn">❤</button>
+                <button class="icon-btn">👤</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <!-- Categories Section -->
+            <div class="sidebar-section">
+                <h3 class="section-title">Categories</h3>
+                <ul class="category-list">
+                    <% (categories || ['Mechanical', 'Automatic', 'Quartz', 'Chronographs']).forEach(cat => { %>
+                        <li><a href="#"><%= cat %></a></li>
+                    <% }); %>
+                </ul>
+            </div>
+
+            <!-- Sort By Section -->
+            <div class="sidebar-section">
+                <h3 class="section-title">Sort By</h3>
+                <ul class="sort-list">
+                    <li><a href="#">Price: Low - High</a></li>
+                    <li><a href="#">Price: High - Low</a></li>
+                    <li><a href="#">Newest</a></li>
+                    <li><a href="#">Popular</a></li>
+                </ul>
+            </div>
+
+            <!-- Discover Section -->
+            <div class="sidebar-section">
+                <h3 class="section-title">Discover</h3>
+                <ul class="discover-list">
+                    <% (discover || ['New Arrivals', 'Featured Picks', 'Bestsellers', 'Limited Edition', 'Sale']).forEach(item => { %>
+                        <li><a href="#"><%= item %></a></li>
+                    <% }); %>
+                </ul>
+            </div>
+
+            <!-- Brands Section -->
+            <div class="sidebar-section">
+                <h3 class="section-title">Brands</h3>
+                <ul class="brands-list">
+                    <% (brands || ['Rolex', 'Omega', 'TAG Heuer', 'Breitling', 'Patek Philippe', 'Seiko']).forEach(brand => { %>
+                        <li><label><input type="checkbox"> <%= brand %></label></li>
+                    <% }); %>
+                </ul>
+            </div>
+
+            <!-- Apply Button -->
+            <button class="apply-btn">APPLY</button>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Info Bar -->
+            <div class="info-bar">
+                Get 60% off on our first purchase. Use code first15. Min order limit 1000
+            </div>
+
+            <!-- Product Grid -->
+            <div class="products-grid">
+                <% if (products && products.length > 0) { %>
+                    <% products.forEach(product => { %>
+                        <div class="product-card">
+                            <div class="product-image">
+                                <img src="<%= product.image || '/placeholder.svg?height=280&width=200' %>" alt="<%= product.name %>">
+                            </div>
+                            <div class="product-info">
+                                <h4 class="product-name"><%= product.name %></h4>
+                                <div class="product-meta">
+                                    <span class="product-code"><%= product.code %></span>
+                                </div>
+                                <div class="product-rating">
+                                    <% for (let i = 0; i < (product.rating || 5); i++) { %>
+                                        <span class="star">★</span>
+                                    <% } %>
+                                    <span class="rating-text">(<%= product.reviews || 0 %>)</span>
+                                </div>
+                                <div class="product-price">
+                                    <span class="price">$<%= product.price || '0' %></span>
+                                </div>
+                            </div>
+                        </div>
+                    <% }); %>
+                <% } else { %>
+                    <!-- Sample Products (for development) -->
+                    <% 
+                        const sampleProducts = [
+                            { name: 'Luxury Sport', code: 'MODEL001', rating: 5, reviews: 124, price: '2,450', image: '/placeholder.svg?height=280&width=200' },
+                            { name: 'Chronograph Elite', code: 'MODEL002', rating: 5, reviews: 89, price: '3,200', image: '/placeholder.svg?height=280&width=200' },
+                            { name: 'Premium Blue', code: 'MODEL003', rating: 5, reviews: 156, price: '2,800', image: '/placeholder.svg?height=280&width=200' },
+                            { name: 'Classic Black', code: 'MODEL004', rating: 5, reviews: 201, price: '1,950', image: '/placeholder.svg?height=280&width=200' },
+                            { name: 'Gold Edition', code: 'MODEL005', rating: 5, reviews: 134, price: '4,100', image: '/placeholder.svg?height=280&width=200' },
+                            { name: 'Steel Premium', code: 'MODEL006', rating: 5, reviews: 178, price: '2,650', image: '/placeholder.svg?height=280&width=200' },
+                            { name: 'Titanium Sport', code: 'MODEL007', rating: 5, reviews: 92, price: '3,450', image: '/placeholder.svg?height=280&width=200' },
+                            { name: 'Rose Gold', code: 'MODEL008', rating: 5, reviews: 210, price: '3,800', image: '/placeholder.svg?height=280&width=200' },
+                            { name: 'Racing Series', code: 'MODEL009', rating: 5, reviews: 145, price: '2,300', image: '/placeholder.svg?height=280&width=200' },
+                            { name: 'Dress Watch', code: 'MODEL010', rating: 5, reviews: 167, price: '2,550', image: '/placeholder.svg?height=280&width=200' },
+                            { name: 'GMT Master', code: 'MODEL011', rating: 5, reviews: 198, price: '4,500', image: '/placeholder.svg?height=280&width=200' },
+                            { name: 'Dive Watch Pro', code: 'MODEL012', rating: 5, reviews: 223, price: '3,100', image: '/placeholder.svg?height=280&width=200' },
+                            { name: 'Heritage Classic', code: 'MODEL013', rating: 5, reviews: 156, price: '2,700', image: '/placeholder.svg?height=280&width=200' },
+                            { name: 'Modern Minimalist', code: 'MODEL014', rating: 5, reviews: 189, price: '1,800', image: '/placeholder.svg?height=280&width=200' },
+                            { name: 'Expedition Bold', code: 'MODEL015', rating: 5, reviews: 134, price: '2,400', image: '/placeholder.svg?height=280&width=200' },
+                            { name: 'Ultra Precision', code: 'MODEL016', rating: 5, reviews: 201, price: '3,900', image: '/placeholder.svg?height=280&width=200' }
+                        ];
+                        sampleProducts.forEach(product => {
+                    %>
+                        <div class="product-card">
+                            <div class="product-image">
+                                <img src="<%= product.image %>" alt="<%= product.name %>">
+                            </div>
+                            <div class="product-info">
+                                <h4 class="product-name"><%= product.name %></h4>
+                                <div class="product-meta">
+                                    <span class="product-code"><%= product.code %></span>
+                                </div>
+                                <div class="product-rating">
+                                    <% for (let i = 0; i < product.rating; i++) { %>
+                                        <span class="star">★</span>
+                                    <% } %>
+                                    <span class="rating-text">(<%= product.reviews %>)</span>
+                                </div>
+                                <div class="product-price">
+                                    <span class="price">$<%= product.price %></span>
+                                </div>
+                            </div>
+                        </div>
+                    <% }); %>
+                <% } %>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination">
+                <% for (let i = 1; i <= 4; i++) { %>
+                    <button class="pagination-dot <%= i === 1 ? 'active' : '' %>"></button>
+                <% } %>
+                <button class="pagination-next">›</button>
+            </div>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <!-- Exclusive Column -->
+            <div class="footer-column">
+                <h4>Exclusive</h4>
+                <p>Subscribe to our newsletter for exclusive deals</p>
+                <form class="newsletter-form">
+                    <input type="email" placeholder="Enter your email" required>
+                    <button type="submit">➤</button>
+                </form>
+            </div>
+
+            <!-- Support Column -->
+            <div class="footer-column">
+                <h4>Support</h4>
+                <ul>
+                    <li><a href="#">Chg. Policy</a></li>
+                    <li><a href="#">Track Order</a></li>
+                    <li><a href="#">International Shipping</a></li>
+                    <li><a href="#">Returns</a></li>
+                    <li><a href="#">Contact Us</a></li>
+                </ul>
+            </div>
+
+            <!-- Account Column -->
+            <div class="footer-column">
+                <h4>Account</h4>
+                <ul>
+                    <li><a href="#">My Account</a></li>
+                    <li><a href="#">Login/Register</a></li>
+                    <li><a href="#">Cart</a></li>
+                    <li><a href="#">Wishlist</a></li>
+                    <li><a href="#">Shop</a></li>
+                </ul>
+            </div>
+
+            <!-- Quick Link Column -->
+            <div class="footer-column">
+                <h4>Quick Link</h4>
+                <ul>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Terms of Use</a></li>
+                    <li><a href="#">FAQ</a></li>
+                    <li><a href="#">Contact</a></li>
+                </ul>
+            </div>
+
+            <!-- Download App Column -->
+            <div class="footer-column">
+                <h4>Download App</h4>
+                <div class="app-links">
+                    <div class="qr-code">
+                        <!-- QR Code would be generated here -->
+                        <div class="qr-placeholder">QR</div>
+                    </div>
+                    <div>
+                        <p>Download our mobile app</p>
+                        <button>App Store</button>
+                        <button>Play Store</button>
+                    </div>
+                </div>
+                <div class="social-links">
+                    <a href="#">f</a>
+                    <a href="#">x</a>
+                    <a href="#">in</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Copyright -->
+        <div class="footer-bottom">
+            <p>&copy; 2025 ChronoMy. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>

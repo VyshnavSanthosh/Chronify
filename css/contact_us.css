@@ -1,0 +1,362 @@
+:root {
+  --bg-dark: #0f1f35;
+  --bg-darker: #0a1420;
+  --text-light: #ffffff;
+  --text-muted: #b0b0b0;
+  --border-color: #1e3a5f;
+  --primary-blue: #3b82f6;
+  --accent-gold: #fbbf24;
+  --card-bg: #1a2f4a;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body.contact-us-page {
+  background-color: var(--bg-dark);
+  color: var(--text-light);
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Promo Banner */
+.promo-banner {
+  background-color: var(--bg-darker);
+  color: var(--text-light);
+  text-align: center;
+  padding: 10px 0;
+  font-size: 0.9rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+/* Navbar */
+.navbar-section {
+  background-color: var(--bg-darker);
+  border-bottom: 1px solid var(--border-color);
+  padding: 1rem 0;
+}
+
+.navbar {
+  background-color: transparent !important;
+}
+
+.navbar-brand {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-light) !important;
+}
+
+.nav-link {
+  color: var(--text-light) !important;
+  transition: color 0.3s ease;
+}
+
+.nav-link:hover {
+  color: var(--primary-blue) !important;
+}
+
+.search-form {
+  display: flex;
+  align-items: center;
+}
+
+.search-input {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  color: var(--text-light);
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+}
+
+.search-input::placeholder {
+  color: var(--text-muted);
+}
+
+.search-form .btn-link {
+  color: var(--text-light);
+  text-decoration: none;
+  padding: 0 0.5rem;
+}
+
+/* Contact Us Content */
+.contact-us-content {
+  padding: 60px 20px;
+  min-height: calc(100vh - 300px);
+}
+
+.contact-us-content .container-fluid {
+  max-width: 1400px;
+}
+
+/* Contact Cards */
+.contact-card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 30px;
+  transition: all 0.3s ease;
+}
+
+.contact-card:hover {
+  border-color: var(--primary-blue);
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2);
+}
+
+.card-icon {
+  width: 50px;
+  height: 50px;
+  background-color: var(--primary-blue);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 15px;
+  font-size: 1.5rem;
+  color: var(--text-light);
+}
+
+.card-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-light);
+  margin-bottom: 10px;
+}
+
+.card-description {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  margin-bottom: 15px;
+}
+
+.contact-detail {
+  color: var(--text-light);
+  font-size: 0.95rem;
+  margin-bottom: 5px;
+}
+
+.email-list {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin-bottom: 5px;
+}
+
+/* Contact Form */
+.contact-form {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 30px;
+}
+
+.form-input,
+.form-textarea {
+  background-color: #e8e8e8;
+  border: none;
+  color: #333;
+  padding: 12px 15px;
+  border-radius: 4px;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+}
+
+.form-input::placeholder,
+.form-textarea::placeholder {
+  color: #999;
+}
+
+.form-input:focus,
+.form-textarea:focus {
+  background-color: #f5f5f5;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.form-textarea {
+  resize: vertical;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.btn-send-message {
+  background-color: var(--primary-blue);
+  color: var(--text-light);
+  border: none;
+  padding: 12px 40px;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-send-message:hover {
+  background-color: #2563eb;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+/* Footer */
+.footer-section {
+  background-color: var(--bg-darker);
+  border-top: 1px solid var(--border-color);
+  padding: 40px 20px 20px;
+  margin-top: 60px;
+}
+
+.footer-col {
+  margin-bottom: 30px;
+}
+
+.footer-col h5 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-light);
+  margin-bottom: 15px;
+}
+
+.footer-col p {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin-bottom: 10px;
+}
+
+.footer-description {
+  font-size: 0.85rem;
+  margin-bottom: 15px;
+}
+
+.footer-email-form {
+  margin-top: 15px;
+}
+
+.footer-email-form .form-control {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  color: var(--text-light);
+  padding: 0.5rem 0.75rem;
+  font-size: 0.85rem;
+}
+
+.footer-email-form .form-control::placeholder {
+  color: var(--text-muted);
+}
+
+.footer-email-form .btn {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  color: var(--text-light);
+  padding: 0.5rem 1rem;
+}
+
+.footer-links {
+  list-style: none;
+  padding: 0;
+}
+
+.footer-links li {
+  margin-bottom: 10px;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.footer-links a {
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.footer-links a:hover {
+  color: var(--primary-blue);
+}
+
+.app-download-links {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  margin-top: 15px;
+}
+
+.qr-code img {
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+}
+
+.app-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 0.85rem;
+  margin-bottom: 5px;
+  transition: color 0.3s ease;
+}
+
+.app-link:hover {
+  color: var(--primary-blue);
+}
+
+.footer-social {
+  border-top: 1px solid var(--border-color);
+  padding-top: 20px;
+  margin-top: 30px;
+}
+
+.social-links {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+}
+
+.social-links a {
+  color: var(--text-muted);
+  font-size: 1.25rem;
+  transition: color 0.3s ease;
+}
+
+.social-links a:hover {
+  color: var(--primary-blue);
+}
+
+.footer-copyright {
+  text-align: center;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-color);
+  margin-top: 20px;
+}
+
+.footer-copyright p {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .contact-us-content {
+    padding: 30px 15px;
+  }
+
+  .contact-form {
+    padding: 20px;
+  }
+
+  .form-input {
+    padding: 10px 12px;
+    font-size: 0.9rem;
+  }
+
+  .btn-send-message {
+    width: 100%;
+    margin-top: 15px;
+  }
+
+  .footer-col {
+    text-align: center;
+  }
+
+  .app-download-links {
+    justify-content: center;
+  }
+}

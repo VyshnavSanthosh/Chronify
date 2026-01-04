@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChronoMy - Luxury Watches</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/css/custom.css">
+</head>
+<body class="bg-gray-950 text-white">
+
+    <!-- Header/Navigation -->
+    <header class="bg-gray-900 border-b border-gray-800 sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <!-- Logo -->
+            <div class="text-2xl font-bold tracking-wider">
+                <span class="text-white">CHRONI</span><span class="text-amber-500">FY</span>
+            </div>
+
+            <!-- Navigation Menu -->
+            <nav class="hidden md:flex gap-8">
+                <a href="/" class="hover:text-amber-500 transition">HOME</a>
+                <a href="/shop" class="hover:text-amber-500 transition">SHOP</a>
+                <a href="/about" class="hover:text-amber-500 transition">ABOUT</a>
+                <a href="/contact" class="hover:text-amber-500 transition">CONTACT</a>
+            </nav>
+
+            <!-- User Actions -->
+            <div class="flex items-center gap-4">
+                <input type="text" placeholder="Search..." class="hidden md:block bg-gray-800 px-4 py-2 rounded text-sm text-white placeholder-gray-500">
+                <a href="/account" class="text-gray-400 hover:text-amber-500">ACCOUNT</a>
+                <a href="/cart" class="text-gray-400 hover:text-amber-500">CART</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section with Carousel -->
+    <section class="bg-gradient-to-b from-gray-900 to-gray-950 py-20 overflow-hidden">
+        <div class="container mx-auto px-4">
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <!-- Hero Text -->
+                <div class="flex flex-col justify-center">
+                    <h1 class="text-5xl md:text-6xl font-bold leading-tight mb-8 uppercase tracking-wide">
+                        Crafted for those<br>
+                        who <span class="text-amber-500">value</span> every<br>
+                        moment.
+                    </h1>
+                    <button class="bg-amber-500 text-gray-950 px-8 py-3 w-fit font-semibold hover:bg-amber-600 transition">
+                        SHOP NOW
+                    </button>
+                </div>
+
+                <!-- Hero Image (with carousel placeholder) -->
+                <div class="relative flex justify-center items-center">
+                    <img src="<%= heroImage %>" alt="Featured Watch" class="w-full max-w-md">
+                    
+                    <!-- Carousel Controls -->
+                    <button class="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-12 text-amber-500 text-3xl hover:text-amber-400">&lt;</button>
+                    <button class="absolute right-0 top-1/2 -translate-y-1/2 translate-x-12 text-amber-500 text-3xl hover:text-amber-400">&gt;</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- New Arrivals Section -->
+    <section class="py-20 bg-gray-950">
+        <div class="container mx-auto px-4">
+            <h2 class="text-4xl font-bold text-center mb-16 uppercase tracking-widest">New Arrivals</h2>
+            
+            <!-- Products Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <% newArrivals.forEach(watch => { %>
+                    <!-- Product Card -->
+                    <div class="bg-gray-900 border-2 border-gray-800 hover:border-blue-600 transition p-4 group cursor-pointer">
+                        <!-- Product Image -->
+                        <div class="relative mb-4 overflow-hidden h-64 bg-gray-800">
+                            <img src="<%= watch.image %>" alt="<%= watch.name %>" class="w-full h-full object-cover group-hover:scale-105 transition">
+                        </div>
+                        
+                        <!-- Product Info -->
+                        <h3 class="text-lg font-semibold mb-2"><%= watch.name %></h3>
+                        <p class="text-sm text-gray-400 mb-3"><%= watch.model %></p>
+                        
+                        <!-- Rating -->
+                        <div class="flex items-center gap-1 mb-4">
+                            <% for(let i = 0; i < 5; i++) { %>
+                                <span class="<%= i < watch.rating ? 'text-amber-500' : 'text-gray-600' %>">★</span>
+                            <% } %>
+                            <span class="text-xs text-gray-500">(<%= watch.reviews %>)</span>
+                        </div>
+                        
+                        <!-- Price -->
+                        <p class="text-amber-500 font-bold text-xl">$<%= watch.price %></p>
+                    </div>
+                <% }); %>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Sale Section -->
+    <section class="py-20 bg-gray-900">
+        <div class="container mx-auto px-4">
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <!-- Featured Image -->
+                <div class="relative">
+                    <img src="<%= featuredWatch.image %>" alt="Featured Watch" class="w-full">
+                </div>
+
+                <!-- Sale Info -->
+                <div class="flex flex-col justify-center">
+                    <h2 class="text-5xl md:text-6xl font-bold mb-6 uppercase">
+                        <%= featuredWatch.title %>
+                    </h2>
+                    <p class="text-gray-400 text-lg mb-8"><%= featuredWatch.description %></p>
+                    
+                    <!-- Sale Badge -->
+                    <div class="mb-8">
+                        <span class="inline-block text-4xl font-bold text-amber-500 border-2 border-amber-500 px-6 py-4 rounded-full">
+                            SALE <%= featuredWatch.discount %>%
+                        </span>
+                    </div>
+                    
+                    <button class="bg-amber-500 text-gray-950 px-8 py-3 w-fit font-semibold hover:bg-amber-600 transition">
+                        SHOP SALE
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Trending Section -->
+    <section class="py-20 bg-gray-950">
+        <div class="container mx-auto px-4">
+            <h2 class="text-4xl font-bold text-center mb-16 uppercase tracking-widest">Trending</h2>
+            
+            <!-- Products Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <% trendingWatches.forEach(watch => { %>
+                    <!-- Product Card -->
+                    <div class="bg-gray-900 border-2 border-gray-800 hover:border-blue-600 transition p-4 group cursor-pointer">
+                        <!-- Product Image -->
+                        <div class="relative mb-4 overflow-hidden h-64 bg-gray-800">
+                            <img src="<%= watch.image %>" alt="<%= watch.name %>" class="w-full h-full object-cover group-hover:scale-105 transition">
+                        </div>
+                        
+                        <!-- Product Info -->
+                        <h3 class="text-lg font-semibold mb-2"><%= watch.name %></h3>
+                        <p class="text-sm text-gray-400 mb-3"><%= watch.model %></p>
+                        
+                        <!-- Rating -->
+                        <div class="flex items-center gap-1 mb-4">
+                            <% for(let i = 0; i < 5; i++) { %>
+                                <span class="<%= i < watch.rating ? 'text-amber-500' : 'text-gray-600' %>">★</span>
+                            <% } %>
+                            <span class="text-xs text-gray-500">(<%= watch.reviews %>)</span>
+                        </div>
+                        
+                        <!-- Price -->
+                        <p class="text-amber-500 font-bold text-xl">$<%= watch.price %></p>
+                    </div>
+                <% }); %>
+            </div>
+        </div>
+    </section>
+
+    <!-- Explore More Section -->
+    <section class="py-20 bg-gray-900">
+        <div class="container mx-auto px-4">
+            <h2 class="text-4xl font-bold text-center mb-16 uppercase tracking-widest">Explore More</h2>
+            
+            <!-- Products Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <% exploreWatches.forEach(watch => { %>
+                    <!-- Product Card -->
+                    <div class="bg-gray-900 border-2 border-gray-800 hover:border-blue-600 transition p-4 group cursor-pointer">
+                        <!-- Product Image -->
+                        <div class="relative mb-4 overflow-hidden h-64 bg-gray-800">
+                            <img src="<%= watch.image %>" alt="<%= watch.name %>" class="w-full h-full object-cover group-hover:scale-105 transition">
+                        </div>
+                        
+                        <!-- Product Info -->
+                        <h3 class="text-lg font-semibold mb-2"><%= watch.name %></h3>
+                        <p class="text-sm text-gray-400 mb-3"><%= watch.model %></p>
+                        
+                        <!-- Rating -->
+                        <div class="flex items-center gap-1 mb-4">
+                            <% for(let i = 0; i < 5; i++) { %>
+                                <span class="<%= i < watch.rating ? 'text-amber-500' : 'text-gray-600' %>">★</span>
+                            <% } %>
+                            <span class="text-xs text-gray-500">(<%= watch.reviews %>)</span>
+                        </div>
+                        
+                        <!-- Price -->
+                        <p class="text-amber-500 font-bold text-xl">$<%= watch.price %></p>
+                    </div>
+                <% }); %>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-950 border-t border-gray-800 py-16">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-8 mb-12">
+                <!-- Company Info -->
+                <div>
+                    <h3 class="text-white font-bold mb-4">ABOUT US</h3>
+                    <p class="text-gray-400 text-sm leading-relaxed mb-4">
+                        <%= companyInfo.description %>
+                    </p>
+                    <a href="#" class="inline-block border border-amber-500 text-amber-500 px-4 py-2 text-sm hover:bg-amber-500 hover:text-gray-950 transition">
+                        LEARN MORE
+                    </a>
+                </div>
+
+                <!-- Customer Service -->
+                <div>
+                    <h3 class="text-white font-bold mb-4">CUSTOMER SERVICE</h3>
+                    <ul class="text-gray-400 text-sm space-y-2">
+                        <li><a href="#" class="hover:text-amber-500 transition">Contact Us</a></li>
+                        <li><a href="#" class="hover:text-amber-500 transition">Shipping Info</a></li>
+                        <li><a href="#" class="hover:text-amber-500 transition">Returns</a></li>
+                        <li><a href="#" class="hover:text-amber-500 transition">FAQ</a></li>
+                    </ul>
+                </div>
+
+                <!-- Information -->
+                <div>
+                    <h3 class="text-white font-bold mb-4">INFORMATION</h3>
+                    <ul class="text-gray-400 text-sm space-y-2">
+                        <li><a href="#" class="hover:text-amber-500 transition">About Us</a></li>
+                        <li><a href="#" class="hover:text-amber-500 transition">Privacy Policy</a></li>
+                        <li><a href="#" class="hover:text-amber-500 transition">Terms & Conditions</a></li>
+                        <li><a href="#" class="hover:text-amber-500 transition">Blog</a></li>
+                    </ul>
+                </div>
+
+                <!-- Quick Links -->
+                <div>
+                    <h3 class="text-white font-bold mb-4">QUICK LINKS</h3>
+                    <ul class="text-gray-400 text-sm space-y-2">
+                        <li><a href="#" class="hover:text-amber-500 transition">New Arrivals</a></li>
+                        <li><a href="#" class="hover:text-amber-500 transition">Best Sellers</a></li>
+                        <li><a href="#" class="hover:text-amber-500 transition">Sale</a></li>
+                        <li><a href="#" class="hover:text-amber-500 transition">Gift Cards</a></li>
+                    </ul>
+                </div>
+
+                <!-- Newsletter -->
+                <div>
+                    <h3 class="text-white font-bold mb-4">FOLLOW US</h3>
+                    <p class="text-gray-400 text-sm mb-4">Subscribe to our newsletter for exclusive offers</p>
+                    <form method="POST" action="/subscribe" class="mb-4">
+                        <input type="email" name="email" placeholder="Enter your email" class="w-full bg-gray-800 border border-gray-700 px-3 py-2 text-white text-sm placeholder-gray-500 mb-2">
+                        <button type="submit" class="w-full bg-amber-500 text-gray-950 py-2 font-semibold hover:bg-amber-600 transition">
+                            SUBSCRIBE
+                        </button>
+                    </form>
+                    
+                    <!-- Social Icons -->
+                    <div class="flex gap-3">
+                        <a href="#" class="text-gray-400 hover:text-amber-500 transition">f</a>
+                        <a href="#" class="text-gray-400 hover:text-amber-500 transition">𝕏</a>
+                        <a href="#" class="text-gray-400 hover:text-amber-500 transition">📷</a>
+                        <a href="#" class="text-gray-400 hover:text-amber-500 transition">in</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer Bottom -->
+            <div class="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center text-gray-400 text-sm">
+                <p>&copy; 2025 ChronoMy. All rights reserved.</p>
+                <div class="flex gap-4 mt-4 md:mt-0">
+                    <img src="https://img.shields.io/badge/visa-1434CB?style=flat" alt="Visa" class="h-6">
+                    <img src="https://img.shields.io/badge/mastercard-FF5F00?style=flat" alt="Mastercard" class="h-6">
+                    <img src="https://img.shields.io/badge/amex-006FCF?style=flat" alt="Amex" class="h-6">
+                </div>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>

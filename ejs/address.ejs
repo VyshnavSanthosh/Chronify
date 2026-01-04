@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Address - Chronify</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="./css/address.css">
+</head>
+<body class="bg-dark-blue">
+    
+    <!-- Header -->
+    <header class="navbar navbar-expand-lg navbar-dark bg-header-dark py-3 border-bottom border-primary">
+        <div class="container-fluid px-4">
+            <a class="navbar-brand fw-bold fs-5" href="/">
+                <i class="bi bi-clock"></i> Chronify
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <div class="ms-auto d-flex gap-3 align-items-center">
+                    <a href="/wishlist" class="text-light"><i class="bi bi-heart"></i></a>
+                    <a href="/cart" class="text-light"><i class="bi bi-cart"></i></a>
+                    <a href="/profile" class="text-light"><i class="bi bi-person-circle"></i></a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="min-vh-100 py-5">
+        <div class="container-fluid">
+            <div class="row">
+                <!-- Left Sidebar Menu -->
+                <div class="col-lg-3 mb-4">
+                    <div class="card bg-sidebar-dark border-0 shadow-lg profile-sidebar">
+                        <div class="card-body p-4">
+                            <!-- User Profile Section -->
+                            <div class="text-center mb-4 pb-3 border-bottom border-secondary">
+                                <div class="avatar-circle mx-auto mb-3">
+                                    <i class="bi bi-person"></i>
+                                </div>
+                                <h5 class="text-white fw-bold mb-0"><%= user.firstName || 'Vyshnav' %></h5>
+                                <small class="text-muted"><%= user.email || 'user@email.com' %></small>
+                            </div>
+
+                            <!-- Navigation Menu -->
+                            <ul class="list-unstyled">
+                                <li class="mb-3">
+                                    <a href="/my-profile" class="menu-link">
+                                        <i class="bi bi-person-lines-fill"></i> My Profile
+                                    </a>
+                                </li>
+                                <li class="mb-3">
+                                    <a href="/my-addresses" class="menu-link active">
+                                        <i class="bi bi-geo-alt"></i> My Address
+                                    </a>
+                                </li>
+                                <li class="mb-3">
+                                    <a href="/my-orders" class="menu-link">
+                                        <i class="bi bi-bag"></i> My Order
+                                    </a>
+                                </li>
+                                <li class="mb-3">
+                                    <a href="/wishlist" class="menu-link">
+                                        <i class="bi bi-heart"></i> My Wishlist
+                                        <span class="badge bg-primary ms-2"><%= wishlistCount || 4 %></span>
+                                    </a>
+                                </li>
+                                <li class="mb-3">
+                                    <a href="/my-wallet" class="menu-link">
+                                        <i class="bi bi-wallet2"></i> My Wallet
+                                    </a>
+                                </li>
+                                <li class="mb-3">
+                                    <a href="/my-coupons" class="menu-link">
+                                        <i class="bi bi-ticket"></i> My Coupon
+                                    </a>
+                                </li>
+                                <li class="mb-3">
+                                    <a href="/change-password" class="menu-link">
+                                        <i class="bi bi-lock"></i> Change password
+                                    </a>
+                                </li>
+                                <li class="mb-0 pt-3 border-top border-secondary">
+                                    <a href="/logout" class="menu-link text-danger">
+                                        <i class="bi bi-box-arrow-right"></i> Log out
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Content Area -->
+                <div class="col-lg-9">
+                    <div class="card bg-content-dark border-0 shadow-lg">
+                        <div class="card-body p-5">
+                            <!-- Page Title -->
+                            <h3 class="text-white fw-bold mb-4">Delivery Address</h3>
+
+                            <!-- Address Cards Grid -->
+                            <div class="row g-4 mb-5">
+                                <% if (addresses && addresses.length > 0) { %>
+                                    <% addresses.forEach(function(address) { %>
+                                        <div class="col-md-6">
+                                            <div class="address-card">
+                                                <div class="address-header d-flex justify-content-between align-items-start mb-3">
+                                                    <div>
+                                                        <h5 class="text-white fw-bold mb-1"><%= address.name %></h5>
+                                                    </div>
+                                                    <a href="/edit-address/<%= address.id %>" class="btn-edit" title="Edit Address">
+                                                        <i class="bi bi-pencil"></i>
+                                                    </a>
+                                                </div>
+
+                                                <!-- Address Details -->
+                                                <p class="text-muted small mb-3">
+                                                    <%= address.street %><br>
+                                                    <%= address.city %>, <%= address.state %><br>
+                                                    <%= address.zipcode %><br>
+                                                    <%= address.country %>
+                                                </p>
+
+                                                <!-- Delete Button -->
+                                                <div class="address-footer text-end">
+                                                    <button class="btn btn-delete btn-sm" onclick="deleteAddress('<%= address.id %>')">
+                                                        DELETE
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    <% }); %>
+                                <% } else { %>
+                                    <div class="col-12 text-center py-5">
+                                        <p class="text-muted">No addresses saved yet.</p>
+                                    </div>
+                                <% } %>
+                            </div>
+
+                            <!-- Add New Address Button -->
+                            <div class="text-center pt-4 border-top border-secondary">
+                                <a href="/add-address" class="btn btn-primary btn-lg px-5">
+                                    <i class="bi bi-plus-circle"></i> Add New Address
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-footer-dark text-light pt-5 pb-3 border-top border-primary mt-5">
+        <div class="container">
+            <div class="row mb-4">
+                <!-- Exclusive Section -->
+                <div class="col-md-2 mb-4">
+                    <h6 class="fw-bold mb-3">Exclusive</h6>
+                    <p class="small text-muted">Subscribe</p>
+                    <p class="small mb-2">Get 50% off your first order</p>
+                    <form class="d-flex gap-2">
+                        <input type="email" class="form-control form-control-sm" placeholder="Enter your email">
+                        <button type="submit" class="btn btn-outline-light btn-sm px-2">
+                            <i class="bi bi-arrow-right"></i>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Support Section -->
+                <div class="col-md-2 mb-4">
+                    <h6 class="fw-bold mb-3">Support</h6>
+                    <p class="small text-muted mb-2">9th Floor, Orion<br>Business Park, Thane<br>West Mumbai,<br>Maharashtra 400607</p>
+                    <p class="small text-muted mb-2">necrotech@gmail.com<br>+91 22 4973 4581</p>
+                </div>
+
+                <!-- Account Section -->
+                <div class="col-md-2 mb-4">
+                    <h6 class="fw-bold mb-3">Account</h6>
+                    <ul class="list-unstyled small text-muted">
+                        <li class="mb-2"><a href="/profile" class="text-decoration-none text-muted">My Account</a></li>
+                        <li class="mb-2"><a href="/auth/login" class="text-decoration-none text-muted">Login / Register</a></li>
+                        <li class="mb-2"><a href="/cart" class="text-decoration-none text-muted">Cart</a></li>
+                        <li class="mb-2"><a href="/wishlist" class="text-decoration-none text-muted">Wishlist</a></li>
+                        <li><a href="/shop" class="text-decoration-none text-muted">Shop</a></li>
+                    </ul>
+                </div>
+
+                <!-- Quick Link Section -->
+                <div class="col-md-2 mb-4">
+                    <h6 class="fw-bold mb-3">Quick Link</h6>
+                    <ul class="list-unstyled small text-muted">
+                        <li class="mb-2"><a href="/privacy" class="text-decoration-none text-muted">Privacy Policy</a></li>
+                        <li class="mb-2"><a href="/terms" class="text-decoration-none text-muted">Terms of Use</a></li>
+                        <li class="mb-2"><a href="/faq" class="text-decoration-none text-muted">FAQ</a></li>
+                        <li><a href="/contact" class="text-decoration-none text-muted">Contact</a></li>
+                    </ul>
+                </div>
+
+                <!-- Download App Section -->
+                <div class="col-md-2">
+                    <h6 class="fw-bold mb-3">Download App</h6>
+                    <p class="small text-muted mb-2">Save up to 50% from the app only</p>
+                    <div class="d-flex flex-column gap-2">
+                        <img src="/images/qr-code.png" alt="QR Code" style="width: 80px; height: 80px;">
+                        <small>
+                            <a href="#" class="text-light text-decoration-none me-2">
+                                <i class="bi bi-google-play"></i> Google Play
+                            </a>
+                        </small>
+                        <small>
+                            <a href="#" class="text-light text-decoration-none">
+                                <i class="bi bi-apple"></i> App Store
+                            </a>
+                        </small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Social Links & Copyright -->
+            <div class="row border-top border-secondary pt-3">
+                <div class="col-md-6">
+                    <p class="small text-muted mb-0">© Copyright Chronify 2025. All rights reserved</p>
+                </div>
+                <div class="col-md-6 text-end">
+                    <div class="d-flex gap-3 justify-content-end">
+                        <a href="#" class="text-light text-decoration-none"><i class="bi bi-facebook"></i></a>
+                        <a href="#" class="text-light text-decoration-none"><i class="bi bi-twitter"></i></a>
+                        <a href="#" class="text-light text-decoration-none"><i class="bi bi-instagram"></i></a>
+                        <a href="#" class="text-light text-decoration-none"><i class="bi bi-linkedin"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Delete Address Script -->
+    <script>
+        function deleteAddress(addressId) {
+            if (confirm('Are you sure you want to delete this address?')) {
+                fetch(`/api/address/${addressId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert('Error deleting address');
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            }
+        }
+    </script>
+</body>
+</html>

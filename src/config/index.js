@@ -1,0 +1,22 @@
+require("dotenv").config();
+module.exports = {
+    port: process.env.PORT,
+    mongoUri: process.env.MONGO_URI,
+    session_secret: process.env.SESSION_SECRET,
+    redis_host: process.env.REDIS_HOST,
+    redis_port: process.env.REDIS_PORT,
+    mail_user: process.env.MAIL_USER,
+    mail_pass: process.env.MAIL_PASS,
+    mail_host: process.env.MAIL_HOST,
+    mail_port: process.env.MAIL_PORT,
+    jwt_access_secret: process.env.JWT_ACCESS_SECRET,
+    jwt_refresh_secret: process.env.JWT_REFRESH_SECRET,
+    jwt_access_expiry: process.env.JWT_ACCESS_EXPIRY,
+    jwt_refresh_expiry: process.env.JWT_REFRESH_EXPIRY,
+    jwt_google_client_id: process.env.GOOGLE_CLIENT_ID,
+    google_client_secret: process.env.GOOGLE_CLIENT_SECRET,
+    google_callback_url: process.env.GOOGLE_CALLBACK_URL,
+    cloudinary_name: process.env.CLOUDINARY_NAME,
+    cloudinary_api_key: process.env.CLOUDINARY_API_KEY,
+    cloudinary_api_secret: process.env.CLOUDINARY_API_SECRET,
+};

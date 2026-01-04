@@ -1,0 +1,299 @@
+/* Dark Theme Colors */
+:root {
+  --bg-dark-blue: #0f1f35;
+  --bg-sidebar: #1a2a42;
+  --bg-content: #1a2a42;
+  --bg-form-input: #0f1f35;
+  --border-primary: #3b82f6;
+  --text-light: #ffffff;
+  --text-muted: #9ca3af;
+  --btn-primary: #3b82f6;
+  --btn-primary-hover: #2563eb;
+  --btn-danger: #ef4444;
+}
+
+body {
+  background-color: var(--bg-dark-blue);
+  color: var(--text-light);
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Header Styles */
+.bg-header-dark {
+  background-color: var(--bg-dark-blue) !important;
+}
+
+.navbar-brand {
+  letter-spacing: 1px;
+}
+
+/* Sidebar Styles */
+.bg-sidebar-dark {
+  background: linear-gradient(135deg, var(--bg-sidebar), var(--bg-dark-blue));
+}
+
+.profile-sidebar {
+  position: sticky;
+  top: 100px;
+}
+
+.avatar-circle {
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, var(--border-primary), #06b6d4);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+  color: white;
+}
+
+.menu-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--text-muted);
+  text-decoration: none;
+  padding: 10px 12px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.menu-link:hover {
+  color: var(--text-light);
+  background-color: rgba(59, 130, 246, 0.1);
+  padding-left: 16px;
+}
+
+.menu-link.active {
+  color: var(--border-primary);
+  background-color: rgba(59, 130, 246, 0.15);
+  border-left: 3px solid var(--border-primary);
+  padding-left: 12px;
+}
+
+.menu-link.text-danger:hover {
+  color: var(--btn-danger);
+  background-color: rgba(239, 68, 68, 0.1);
+}
+
+.badge {
+  font-size: 11px;
+  padding: 4px 8px;
+}
+
+/* Content Card Styles */
+.bg-content-dark {
+  background: linear-gradient(135deg, var(--bg-content), var(--bg-dark-blue));
+}
+
+/* Address Card Styles */
+.address-card {
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  border-radius: 12px;
+  padding: 20px;
+  background: rgba(15, 31, 53, 0.5);
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.address-card:hover {
+  border-color: var(--border-primary);
+  background: rgba(59, 130, 246, 0.08);
+  box-shadow: 0 8px 16px rgba(59, 130, 246, 0.15);
+}
+
+.address-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.btn-edit {
+  background: none;
+  border: none;
+  color: var(--border-primary);
+  cursor: pointer;
+  font-size: 18px;
+  transition: all 0.3s ease;
+  padding: 0;
+}
+
+.btn-edit:hover {
+  color: var(--btn-primary-hover);
+  transform: scale(1.1);
+}
+
+.address-footer {
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.btn-delete {
+  background-color: transparent;
+  border: 1px solid var(--btn-danger);
+  color: var(--btn-danger);
+  padding: 6px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+.btn-delete:hover {
+  background-color: var(--btn-danger);
+  color: white;
+}
+
+/* Form Styles */
+.form-control,
+.form-select {
+  background-color: var(--bg-form-input) !important;
+  border-color: var(--border-primary) !important;
+  color: var(--text-light) !important;
+  transition: all 0.3s ease;
+}
+
+.form-control:focus,
+.form-select:focus {
+  background-color: var(--bg-form-input) !important;
+  border-color: var(--btn-primary-hover) !important;
+  box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25);
+  color: var(--text-light) !important;
+}
+
+.form-control::placeholder {
+  color: var(--text-muted);
+}
+
+.form-label {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+/* Button Styles */
+.btn-primary {
+  background-color: var(--btn-primary);
+  border-color: var(--btn-primary);
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+  background-color: var(--btn-primary-hover);
+  border-color: var(--btn-primary-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 12px rgba(59, 130, 246, 0.3);
+}
+
+.btn-outline-primary {
+  color: var(--btn-primary);
+  border-color: var(--btn-primary);
+  transition: all 0.3s ease;
+}
+
+.btn-outline-primary:hover {
+  background-color: var(--btn-primary);
+  border-color: var(--btn-primary);
+  transform: translateY(-2px);
+}
+
+.btn-outline-secondary {
+  color: var(--text-muted);
+  border-color: var(--text-muted);
+}
+
+.btn-outline-secondary:hover {
+  background-color: transparent;
+  color: var(--text-light);
+  border-color: var(--text-light);
+}
+
+/* Footer Styles */
+.bg-footer-dark {
+  background-color: #000000;
+}
+
+.text-muted a {
+  transition: color 0.3s ease;
+}
+
+.text-muted a:hover {
+  color: var(--border-primary) !important;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 991.98px) {
+  .profile-sidebar {
+    position: static;
+    margin-bottom: 2rem;
+  }
+
+  .card-body {
+    padding: 2rem 1rem !important;
+  }
+}
+
+@media (max-width: 576px) {
+  .avatar-circle {
+    width: 60px;
+    height: 60px;
+    font-size: 30px;
+  }
+
+  .row {
+    gap: 1rem;
+  }
+
+  .col-md-6 {
+    flex: 0 0 100%;
+  }
+
+  .btn-lg {
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+  }
+
+  h3 {
+    font-size: 1.25rem;
+  }
+
+  .address-card {
+    padding: 15px;
+  }
+}
+
+/* Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.card {
+  animation: fadeIn 0.5s ease-in;
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(59, 130, 246, 0.1);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(59, 130, 246, 0.5);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(59, 130, 246, 0.7);
+}

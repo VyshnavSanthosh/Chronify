@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= product.name %> | ChronoMy</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/css/product_detail.css">
+</head>
+<body class="bg-gray-950 text-white font-sans">
+
+    <!-- Header -->
+    <header class="bg-gray-900 border-b border-gray-800 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+            <!-- Logo & Menu -->
+            <div class="flex items-center gap-8">
+                <div class="text-xl font-bold tracking-wider">CHRONIFY</div>
+                <nav class="hidden md:flex gap-6 text-sm">
+                    <a href="/" class="hover:text-blue-400">HOME</a>
+                </nav>
+            </div>
+            <!-- Search & Icons -->
+            <div class="flex items-center gap-4">
+                <input type="text" placeholder="Search watches..." class="hidden sm:block bg-gray-800 px-4 py-2 rounded text-sm text-white placeholder-gray-500">
+                <svg class="w-5 h-5 cursor-pointer hover:text-blue-400">
+                    <path fill="currentColor" d="M9 2C5.13 2 2 5.13 2 9s3.13 7 7 7 7-3.13 7-7-3.13-7-7-7zm0 12c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm3.5-9c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/>
+                </svg>
+                <svg class="w-5 h-5 cursor-pointer hover:text-blue-400">
+                    <path fill="currentColor" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                </svg>
+                <svg class="w-5 h-5 cursor-pointer hover:text-blue-400">
+                    <path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
+                </svg>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 py-8">
+        <!-- Product Main Section -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-12 mb-16">
+            <!-- Product Image Gallery -->
+            <div class="flex flex-col items-center justify-center">
+                <div class="w-full h-96 bg-gray-800 rounded-lg flex items-center justify-center mb-6 overflow-hidden">
+                    <img src="<%= product.mainImage %>" alt="<%= product.name %>" class="w-full h-full object-cover">
+                </div>
+                <!-- Thumbnail Images -->
+                <div class="flex gap-3">
+                    <% for(let i = 0; i < (product.images?.length || 4); i++) { %>
+                        <div class="w-16 h-16 bg-gray-800 rounded cursor-pointer hover:border-blue-500 border-2 border-transparent transition">
+                            <img src="<%= product.images?.[i] || product.mainImage %>" alt="thumbnail" class="w-full h-full object-cover">
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+
+            <!-- Product Info -->
+            <div>
+                <!-- Title and Price -->
+                <h1 class="text-3xl md:text-4xl font-bold mb-2"><%= product.name %></h1>
+                <p class="text-gray-400 mb-4">Model Code: <%= product.modelCode || "RM55-01" %></p>
+                
+                <!-- Rating -->
+                <div class="flex items-center gap-2 mb-6">
+                    <div class="flex text-yellow-500">
+                        <% for(let i = 0; i < 5; i++) { %>
+                            <span class="<%= i < Math.floor(product.rating) ? '' : 'opacity-50' %>">★</span>
+                        <% } %>
+                    </div>
+                    <span class="text-lg font-semibold"><%= product.rating || 4.8 %></span>
+                    <span class="text-gray-400">(<%= product.reviews || 1246 %> reviews)</span>
+                </div>
+
+                <!-- Price -->
+                <div class="bg-gray-800 p-6 rounded-lg mb-8">
+                    <p class="text-gray-400 text-sm mb-2">Price</p>
+                    <p class="text-3xl font-bold text-blue-400">$<%= product.price?.toLocaleString() || "249,000" %></p>
+                </div>
+
+                <!-- Quantity Selector -->
+                <div class="mb-6">
+                    <label class="block text-sm font-semibold mb-3">Quantity</label>
+                    <div class="flex items-center gap-3">
+                        <button class="bg-gray-800 px-4 py-2 rounded hover:bg-gray-700">−</button>
+                        <input type="number" value="1" min="1" class="w-16 bg-gray-800 text-center py-2 rounded">
+                        <button class="bg-gray-800 px-4 py-2 rounded hover:bg-gray-700">+</button>
+                    </div>
+                </div>
+
+                <!-- Color Selection -->
+                <div class="mb-8">
+                    <label class="block text-sm font-semibold mb-3">Color</label>
+                    <div class="flex gap-3">
+                        <% 
+                        const colors = product.colors || ["#d4af37", "#c0c0c0", "#000000", "#4169e1"]; 
+                        colors.forEach((color, idx) => { 
+                        %>
+                            <div class="w-10 h-10 rounded-full cursor-pointer border-2 transition hover:border-blue-400 <%= idx === 0 ? 'border-blue-400' : 'border-gray-600' %>" style="background-color: <%= color %>"></div>
+                        <% }); %>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex flex-col sm:flex-row gap-3 mb-8">
+                    <button class="flex-1 bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded font-semibold transition">
+                        Add to Cart
+                    </button>
+                    <button class="px-6 py-3 border-2 border-gray-600 hover:border-blue-400 rounded transition">
+                        ♡ Add to Wishlist
+                    </button>
+                </div>
+
+                <!-- Product Description -->
+                <p class="text-gray-300 text-sm leading-relaxed mb-6">
+                    <%= product.description || "A luxury timepiece featuring precision engineering and exquisite craftsmanship. This watch combines technical excellence with sophisticated design for the discerning collector." %>
+                </p>
+
+                <!-- SKU -->
+                <div class="text-gray-500 text-sm">
+                    SKU: <%= product.sku || "CHR-RM55-01-2024" %>
+                </div>
+            </div>
+        </div>
+
+        <!-- Specifications & Reviews Container -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-12 mb-16">
+            <!-- Specifications (Left) -->
+            <div class="lg:col-span-1">
+                <h2 class="text-2xl font-bold mb-6">Specifications</h2>
+                
+                <!-- Watch Data -->
+                <div class="mb-8">
+                    <h3 class="text-lg font-semibold text-gray-300 mb-4">Watch Data</h3>
+                    <ul class="space-y-3 text-sm text-gray-400">
+                        <li class="flex justify-between">
+                            <span>Case Diameter:</span>
+                            <span class="text-white"><%= product.specs?.caseDiameter || "50.0 mm" %></span>
+                        </li>
+                        <li class="flex justify-between">
+                            <span>Water Resistance:</span>
+                            <span class="text-white"><%= product.specs?.waterResistance || "50 m" %></span>
+                        </li>
+                        <li class="flex justify-between">
+                            <span>Movement:</span>
+                            <span class="text-white"><%= product.specs?.movement || "Automatic" %></span>
+                        </li>
+                        <li class="flex justify-between">
+                            <span>Power Reserve:</span>
+                            <span class="text-white"><%= product.specs?.powerReserve || "70 hours" %></span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Case & Bezel -->
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-300 mb-4">Case & Bezel</h3>
+                    <ul class="space-y-3 text-sm text-gray-400">
+                        <li class="flex justify-between">
+                            <span>Material:</span>
+                            <span class="text-white"><%= product.specs?.material || "18K Rose Gold" %></span>
+                        </li>
+                        <li class="flex justify-between">
+                            <span>Bezel Type:</span>
+                            <span class="text-white"><%= product.specs?.bezelType || "Tachymeter" %></span>
+                        </li>
+                        <li class="flex justify-between">
+                            <span>Crystal:</span>
+                            <span class="text-white"><%= product.specs?.crystal || "Sapphire" %></span>
+                        </li>
+                        <li class="flex justify-between">
+                            <span>Weight:</span>
+                            <span class="text-white"><%= product.specs?.weight || "175g" %></span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Product Reviews (Right) -->
+            <div class="lg:col-span-2">
+                <h2 class="text-2xl font-bold mb-6">Product Reviews</h2>
+
+                <!-- Review Stats -->
+                <div class="mb-8 pb-8 border-b border-gray-800">
+                    <div class="flex items-center gap-6 mb-6">
+                        <div>
+                            <p class="text-4xl font-bold"><%= product.averageRating || 4.8 %></p>
+                            <div class="flex text-yellow-500">★★★★★</div>
+                            <p class="text-gray-400 text-sm"><%= product.totalReviews || 1246 %> verified reviews</p>
+                        </div>
+                        <div class="flex-1 space-y-2">
+                            <% 
+                            const ratingDistribution = {
+                                5: 75,
+                                4: 15,
+                                3: 6,
+                                2: 3,
+                                1: 1
+                            };
+                            for (let i = 5; i >= 1; i--) { 
+                            %>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-sm text-gray-400"><%= i %>★</span>
+                                    <div class="flex-1 h-2 bg-gray-800 rounded">
+                                        <div class="h-full bg-yellow-500 rounded" style="width: <%= ratingDistribution[i] %>%"></div>
+                                    </div>
+                                    <span class="text-xs text-gray-400 w-10 text-right"><%= ratingDistribution[i] %>%</span>
+                                </div>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Individual Reviews -->
+                <div class="space-y-6">
+                    <% const reviews = product.reviews || [
+                        { author: "James Mitchell", rating: 5, date: "2024-01-15", title: "Exceptional Quality", text: "Outstanding craftsmanship and precision. Highly recommended for collectors.", helpful: 234 },
+                        { author: "Sarah Chen", rating: 5, date: "2024-01-10", title: "Best Purchase", text: "Exceeded my expectations. The attention to detail is remarkable.", helpful: 187 },
+                        { author: "Michael Torres", rating: 4, date: "2024-01-05", title: "Great Value", text: "Excellent timepiece. Minor issue with delivery but resolved quickly.", helpful: 92 }
+                    ]; %>
+                    
+                    <% reviews.forEach(review => { %>
+                        <div class="border-b border-gray-800 pb-6">
+                            <div class="flex items-start justify-between mb-3">
+                                <div>
+                                    <p class="font-semibold"><%= review.author %></p>
+                                    <div class="flex items-center gap-2 text-sm text-gray-400">
+                                        <div class="flex text-yellow-500">
+                                            <% for(let i = 0; i < review.rating; i++) { %>★<% } %>
+                                        </div>
+                                        <span><%= new Date(review.date).toLocaleDateString() %></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="font-semibold text-white mb-2"><%= review.title %></p>
+                            <p class="text-gray-300 text-sm mb-4"><%= review.text %></p>
+                            <div class="flex items-center gap-4 text-sm text-gray-400">
+                                <span>Helpful? (<%= review.helpful %>)</span>
+                                <button class="hover:text-blue-400">👍</button>
+                                <button class="hover:text-blue-400">👎</button>
+                            </div>
+                        </div>
+                    <% }); %>
+                </div>
+
+                <!-- Show More Reviews -->
+                <button class="mt-6 text-blue-400 hover:text-blue-300 text-sm font-semibold">
+                    Show More Reviews →
+                </button>
+            </div>
+        </div>
+
+        <!-- Related Products -->
+        <section class="mb-16">
+            <h2 class="text-2xl font-bold mb-8">Related Products</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <% const relatedProducts = product.relatedProducts || [
+                    { name: "Audemars Piguet", code: "AP-RO-001", price: "285,000", image: "/placeholder.svg?height=200&width=200", rating: 4.9 },
+                    { name: "Patek Philippe", code: "PP-AQ-001", price: "320,000", image: "/placeholder.svg?height=200&width=200", rating: 4.8 },
+                    { name: "Rolex Submariner", code: "RX-SUB-001", price: "195,000", image: "/placeholder.svg?height=200&width=200", rating: 4.7 },
+                    { name: "Omega Speedmaster", code: "OM-SPD-001", price: "165,000", image: "/placeholder.svg?height=200&width=200", rating: 4.8 }
+                ]; %>
+
+                <% relatedProducts.forEach(item => { %>
+                    <div class="bg-gradient-to-b from-gray-800 to-gray-900 rounded-lg overflow-hidden hover:from-gray-700 hover:to-gray-800 transition cursor-pointer">
+                        <div class="h-40 bg-gray-700 flex items-center justify-center overflow-hidden">
+                            <img src="<%= item.image %>" alt="<%= item.name %>" class="w-full h-full object-cover">
+                        </div>
+                        <div class="p-4">
+                            <h3 class="font-semibold text-white mb-1"><%= item.name %></h3>
+                            <p class="text-xs text-gray-400 mb-3">Model: <%= item.code %></p>
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="text-yellow-500 text-sm">★ <%= item.rating %></span>
+                                <span class="text-gray-400 text-xs">(<%= Math.floor(Math.random() * 1000) %> reviews)</span>
+                            </div>
+                            <p class="text-blue-400 font-bold">$<%= item.price %></p>
+                        </div>
+                    </div>
+                <% }); %>
+            </div>
+            <!-- Pagination Dots -->
+            <div class="flex justify-center gap-2 mt-8">
+                <div class="w-3 h-3 bg-blue-400 rounded-full"></div>
+                <div class="w-3 h-3 bg-gray-700 rounded-full cursor-pointer hover:bg-gray-600"></div>
+                <div class="w-3 h-3 bg-gray-700 rounded-full cursor-pointer hover:bg-gray-600"></div>
+                <div class="w-3 h-3 bg-gray-700 rounded-full cursor-pointer hover:bg-gray-600"></div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 border-t border-gray-800 mt-16">
+        <div class="max-w-7xl mx-auto px-4 py-12 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-8 mb-8">
+            <!-- Exclusive -->
+            <div>
+                <h4 class="font-bold mb-4">Exclusive</h4>
+                <p class="text-gray-400 text-sm mb-4">Subscribe to our newsletter for exclusive offers</p>
+                <div class="flex">
+                    <input type="email" placeholder="Enter email" class="flex-1 bg-gray-800 px-3 py-2 text-sm rounded-l text-white placeholder-gray-600">
+                    <button class="bg-blue-600 px-3 py-2 rounded-r text-white hover:bg-blue-700">→</button>
+                </div>
+            </div>
+
+            <!-- Support -->
+            <div>
+                <h4 class="font-bold mb-4">Support</h4>
+                <ul class="space-y-2 text-gray-400 text-sm">
+                    <li><a href="#" class="hover:text-blue-400">Help Center</a></li>
+                    <li><a href="#" class="hover:text-blue-400">Shipping Info</a></li>
+                    <li><a href="#" class="hover:text-blue-400">Track Order</a></li>
+                    <li><a href="#" class="hover:text-blue-400">Return Policy</a></li>
+                </ul>
+            </div>
+
+            <!-- Account -->
+            <div>
+                <h4 class="font-bold mb-4">Account</h4>
+                <ul class="space-y-2 text-gray-400 text-sm">
+                    <li><a href="#" class="hover:text-blue-400">My Account</a></li>
+                    <li><a href="#" class="hover:text-blue-400">Wishlist</a></li>
+                    <li><a href="#" class="hover:text-blue-400">Cart</a></li>
+                </ul>
+            </div>
+
+            <!-- Quick Links -->
+            <div>
+                <h4 class="font-bold mb-4">Quick Links</h4>
+                <ul class="space-y-2 text-gray-400 text-sm">
+                    <li><a href="#" class="hover:text-blue-400">Privacy Policy</a></li>
+                    <li><a href="#" class="hover:text-blue-400">Terms of Service</a></li>
+                </ul>
+            </div>
+
+            <!-- Download App -->
+            <div>
+                <h4 class="font-bold mb-4">Download App</h4>
+                <div class="space-y-2 mb-4">
+                    <button class="w-full bg-gray-800 hover:bg-gray-700 px-3 py-2 rounded text-sm">📱 App Store</button>
+                    <button class="w-full bg-gray-800 hover:bg-gray-700 px-3 py-2 rounded text-sm">🔗 Google Play</button>
+                </div>
+                <!-- Social Icons -->
+                <div class="flex gap-3 text-gray-400">
+                    <a href="#" class="hover:text-blue-400">f</a>
+                    <a href="#" class="hover:text-blue-400">𝕏</a>
+                    <a href="#" class="hover:text-blue-400">📷</a>
+                    <a href="#" class="hover:text-blue-400">in</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Copyright -->
+        <div class="border-t border-gray-800 pt-8 text-center text-gray-500 text-sm pb-8">
+            <p>&copy; 2025 ChronoMy. All rights reserved.</p>
+        </div>
+    </footer>
+
+</body>
+</html>
