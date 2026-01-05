@@ -6,10 +6,21 @@ const {verifyToken} = require("../../middleware/vendorJwt")
 // Controller
 const addProductControllerFile = require("../../controllers/vendor/products/addProductController")
 
+// Services
+const addProductServiceFile = require("../../service/vendor/product/addProductService")
+
+// Repositories
+const categoryRepositoryFile = require("../../repository/admin/category")
+
+
+
 
 // Dependency injection
 
-const addProductController = new addProductControllerFile()
+const categoryRepository = new categoryRepositoryFile()
+
+const addProductService = new addProductServiceFile(categoryRepository)
+const addProductController = new addProductControllerFile(addProductService)
 
 
 // multer config
@@ -21,7 +32,7 @@ console.log("imgUpload type:", typeof imgUpload);
 
 //   add product route 
 router.route("/products/add")
-    .get(verifyToken, addProductController.renderAddProductPage.bind(addProductController))
+    .get(addProductController.renderAddProductPage.bind(addProductController))
     // .post(verifyToken, imgUpload.fields([
     //     { name: 'gstDocument', maxCount: 1 },
     //     { name: 'panCard', maxCount: 1 },

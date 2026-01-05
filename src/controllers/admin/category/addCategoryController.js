@@ -7,7 +7,14 @@ module.exports = class AddCategoryController {
 
     renderAddCategoryPage(req,res){
         try {
-            return res.render("admin/category/addCategory");
+            return res.status(200).render("admin/category/addCategory",{
+                errors: {},
+                categoryName: "",
+                description: "",
+                discountType: "",
+                discountValue: "",
+                maxRedeemable: ""
+            });
             } 
         catch (error) {
                 console.error("Render add category page error:", error);
@@ -27,22 +34,32 @@ module.exports = class AddCategoryController {
                 errors[detail.context.key] = detail.message
             });
 
-            return res.status(400).json({
-                success: false,
-                message: 'Validation failed',
+            return res.status(400).render("admin/category/addCategory",{
                 errors,
-            });
+                categoryName: value.categoryName || "",
+                description: value.description || "",
+                isListed: value.isListed || "",
+                discountType: value.discountType || "",
+                discountValue: value.discountValue || "",
+                maxRedeemable: value.maxRedeemable || "",
+            })
         }
 
         const categoryObj =  {...value}
-
-        console.log("controller",categoryObj)
         
         try {
-            const category = await this.addCategoryService.saveCategoryToDb(categoryObj)
-
+            const savedCategory = await this.addCategoryService.saveCategoryToDb(categoryObj)
+            return res.status(201).redirect("/admin/category");
         } catch (error) {
-            
+            errors.general = error.message
+            return res.status(500).render("admin/category/addCategory",{
+                errors,
+                categoryName: req.body?.categoryName || "",
+                description: req.body?.description || "",
+                discountType: req.body?.discountType || "",
+                discountValue: req.body?.discountValue || "",
+                maxRedeemable: req.body?.maxRedeemable || "",
+            })
         }
         
         

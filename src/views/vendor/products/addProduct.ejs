@@ -169,10 +169,10 @@
                         <div class="w-full md:w-1/2">
                             <label class="block text-sm font-medium text-gray-300 mb-4">Select category</label>
                             <div class="relative">
-                                <select name="category" class="w-full bg-transparent border border-gray-700 text-white px-4 py-3 rounded-lg appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <select name="category" class="w-full bg-white border border-gray-700 text-black px-4 py-3 rounded-lg appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500">
                                     <% if (locals.categories) { %>
                                         <% locals.categories.forEach(cat => { %>
-                                            <option value="<%= cat._id || cat.id %>"><%= cat.name %></option>
+                                            <option value="<%= cat._id || cat.id %>"><%= cat.categoryName %></option>
                                         <% }); %>
                                     <% } else { %>
                                         <option value="automatic">Automatic</option>
@@ -252,20 +252,20 @@
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-300 mb-2">Add colour</label>
-                                    <input type="text" name="variant[0][color]" value="Silver" class="w-full input-outline-dark px-4 py-3 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500">
+                                    <input type="text" name="variant[0][color]" class="w-full input-outline-dark px-4 py-3 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500">
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-300 mb-2">Stock Quantity</label>
-                                    <input type="text" name="variant[0][stock]" value="450" class="w-full input-outline-dark px-4 py-3 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500">
+                                    <input type="text" name="variant[0][stock]" class="w-full input-outline-dark px-4 py-3 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500">
                                 </div>
                                 <div>
                                     <!-- Replaced the Strap Material dropdown with a text input box -->
                                     <label class="block text-sm font-medium text-gray-300 mb-2">Select Strap Material</label>
-                                    <input type="text" name="variant[0][strapMaterial]" value="Metal" placeholder="e.g. Metal, Leather" class="w-full input-outline-dark px-4 py-3 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500">
+                                    <input type="text" name="variant[0][strapMaterial]" placeholder="Ex. Metal, Leather" class="w-full input-outline-dark px-4 py-3 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500">
                                 </div>
                                 <div class="md:w-1/2">
                                     <label class="block text-sm font-medium text-gray-300 mb-2">Offer</label>
-                                    <input type="text" name="variant[0][offer]" value="10%" class="w-full input-outline-dark px-4 py-3 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500">
+                                    <input type="text" name="variant[0][offer]" placeholder="EX.  10%"class="w-full input-outline-dark px-4 py-3 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500">
                                 </div>
                             </div>
                         </div>
@@ -281,34 +281,34 @@
 
                 <!-- Section 3: Product Specifications -->
                 <div class="space-y-6">
-                    <h3 class="text-xl font-semibold">Product Specifications</h3>
+                    <h3 class="text-xl font-semibold">Additional Information</h3>
                     <div class="custom-dark-card rounded-3xl p-8 md:p-10 shadow-xl space-y-10">
                         <div>
                             <label class="block text-sm font-medium text-gray-300 mb-2">Weight</label>
-                            <input type="text" name="weight" value="150g" class="w-full input-dark px-4 py-3 rounded-lg focus:outline-none">
+                            <input type="text" name="weight"  class="w-full input-dark px-4 py-3 rounded-lg focus:outline-none">
                         </div>
 
                         <!-- Specifications List -->
                         <div class="bg-white rounded-3xl p-6 md:p-10 space-y-4">
                             <% 
-                                const specs = locals.specifications || [
-                                    'Dial Color: Matt Black,Dial Material: Arabic Numerals',
+                                const specs = [
+                                    'Dial Color: Matt Black, Dial Material: Arabic Numerals',
                                     'Closure: Double Fold Over Clasp',
                                     'Water Resistance: 50 meters / 165 feet'
                                 ];
                             %>
-                            <% specs.forEach((spec, index) => { %>
-                            <div class="w-full bg-gray-100 text-gray-500 px-6 py-4 rounded-xl text-sm">
-                                <%= spec %>
-                            </div>
-                            <% }); %>
 
-                            <div class="flex justify-center pt-6">
-                                <button type="button" class="px-10 py-3 bg-black text-white text-xs font-bold uppercase tracking-widest rounded-lg hover:bg-gray-900 transition-colors">
-                                    add related information
-                                </button>
-                            </div>
+                            <% specs.forEach((spec) => { %>
+                                <input
+                                    type="text"
+                                    name="specifications[]"
+                                    placeholder="<%= spec %>"
+                                    class="w-full bg-gray-100 text-gray-500 px-6 py-4 rounded-xl text-sm outline-none focus:ring-2 focus:ring-gray-300"
+                                />
+                            <% }); %>
                         </div>
+
+
                     </div>
                 </div>
 

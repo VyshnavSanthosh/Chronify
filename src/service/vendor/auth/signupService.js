@@ -38,5 +38,4 @@ module.exports = class VendorAuthService{
             throw err; // let controller handle messaging
         }
     }
-
 }

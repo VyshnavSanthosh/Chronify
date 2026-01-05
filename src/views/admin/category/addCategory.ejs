@@ -126,12 +126,7 @@
                     <!-- Dynamic Data: User Role -->
                     <p class="text-xs text-gray-400 uppercase tracking-tighter"><%= locals.userRole || 'Admin' %></p>
                 </div>
-                <div class="relative">
-                    <img src="<%= locals.userAvatar || '/placeholder.svg?height=40&width=40' %>" alt="Profile" class="w-10 h-10 rounded-full border border-teal-400">
-                    <div class="absolute -right-5 top-1/2 -translate-y-1/2 text-gray-400">
-                        <i class="fa-solid fa-chevron-down text-[10px]"></i>
-                    </div>
-                </div>
+                
             </div>
         </header>
 
@@ -141,22 +136,37 @@
             <div class="w-full max-w-5xl space-y-12">
                 <h2 class="text-3xl font-bold tracking-wider text-white">ADD A CATEGORY</h2>
 
+                <!-- General Error Message -->
+                <% if (locals.errorMessage) { %>
+                    <div class="bg-red-500/20 border border-red-500 text-red-400 px-6 py-4 rounded-lg">
+                        <div class="flex items-center space-x-2">
+                            <i class="fa-solid fa-circle-exclamation"></i>
+                            <span><%= errorMessage %></span>
+                        </div>
+                    </div>
+                <% } %>
+
                 <form id="categoryForm" action="/admin/category/add" method="POST" class="space-y-8">
                     
                     <!-- Category Name -->
                     <div class="space-y-2">
                         <label class="text-sm font-medium text-gray-400">Category Name</label>
                         <input type="text" name="categoryName" placeholder="Type category name here. . ." 
-                            class="w-full bg-[#f3f4f6] text-black px-6 py-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg shadow-sm">
-                        <div id="categoryNameError" class="error-message"></div>
+                            value="<%= locals.categoryName || '' %>"
+                            class="w-full bg-[#f3f4f6] text-black px-6 py-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg shadow-sm <%= locals.errors?.categoryName ? 'ring-2 ring-red-500' : '' %>">
+                        <% if (locals.errors?.categoryName) { %>
+                            <div class="error-message"><%= errors.categoryName %></div>
+                        <% } %>
                     </div>
 
                     <!-- Description -->
                     <div class="space-y-2">
                         <label class="text-sm font-medium text-gray-400">Description</label>
                         <textarea name="description" rows="10" placeholder="Type category description here. . ." 
-                            class="w-full bg-[#f3f4f6] text-black px-6 py-6 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg shadow-sm resize-none"></textarea>
-                        <div id="descriptionError" class="error-message"></div>
+                            class="w-full bg-[#f3f4f6] text-black px-6 py-6 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg shadow-sm resize-none <%= locals.errors?.description ? 'ring-2 ring-red-500' : '' %>"><%= locals.description || '' %></textarea>
+                        <% if (locals.errors?.description) { %>
+                            <div class="error-message"><%= errors.description %></div>
+                        <% } %>
                     </div>
 
                     <!-- Discount Type and Value Row -->
@@ -164,28 +174,54 @@
                         <div class="flex flex-col space-y-2">
                             <label class="text-sm font-medium text-gray-400">Discount Type</label>
                             <select name="discountType" 
-                                class="bg-[#f3f4f6] text-black px-6 py-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg shadow-sm">
+                                class="bg-[#f3f4f6] text-black px-6 py-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg shadow-sm <%= locals.errors?.discountType ? 'ring-2 ring-red-500' : '' %>">
                                 <option value="">Select discount type</option>
-                                <option value="percentage">Percentage (%)</option>
-                                <option value="flat">Flat Amount (Rs.)</option>
+                                <option value="percentage" <%= locals.discountType === 'percentage' ? 'selected' : '' %>>Percentage (%)</option>
+                                <option value="flat" <%= locals.discountType === 'flat' ? 'selected' : '' %>>Flat Amount (Rs.)</option>
                             </select>
-                            <div id="discountTypeError" class="error-message"></div>
+                            <% if (locals.errors?.discountType) { %>
+                                <div class="error-message"><%= errors.discountType %></div>
+                            <% } %>
                         </div>
 
                         <div class="flex flex-col space-y-2">
                             <label class="text-sm font-medium text-gray-400">Discount Value</label>
                             <input type="number" name="discountValue" placeholder="Ex: 10 or 100" step="0.01"
-                                class="bg-[#f3f4f6] text-black px-6 py-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg shadow-sm">
-                            <div id="discountValueError" class="error-message"></div>
+                                value="<%= locals.discountValue || '' %>"
+                                class="bg-[#f3f4f6] text-black px-6 py-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg shadow-sm <%= locals.errors?.discountValue ? 'ring-2 ring-red-500' : '' %>">
+                            <% if (locals.errors?.discountValue) { %>
+                                <div class="error-message"><%= errors.discountValue %></div>
+                            <% } %>
                         </div>
                     </div>
 
                     <!-- Max Redeemable -->
                     <div class="space-y-2">
-                        <label class="text-sm font-medium text-gray-400">Max Redeemable Amount (Optional)</label>
+                        <label class="text-sm font-medium text-gray-400">Max Redeemable Amount <span id="maxRedeemableRequired" class="text-red-500" style="display: none;">*</span> <span class="text-gray-500">(Optional for Discount type Percentage )</span></label>
                         <input type="number" name="maxRedeemable" placeholder="Ex: 500 (leave empty if no limit)" step="0.01"
-                            class="w-full bg-[#f3f4f6] text-black px-6 py-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg shadow-sm">
-                        <div id="maxRedeemableError" class="error-message"></div>
+                            value="<%= locals.maxRedeemable || '' %>"
+                            class="w-full bg-[#f3f4f6] text-black px-6 py-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg shadow-sm <%= locals.errors?.maxRedeemable ? 'ring-2 ring-red-500' : '' %>"
+                            id="maxRedeemableInput">
+                        <% if (locals.errors?.maxRedeemable) { %>
+                            <div class="error-message"><%= errors.maxRedeemable %></div>
+                        <% } %>
+                        <div class="error-message" id="maxRedeemableError"></div>
+                        
+                        <!-- Info Note -->
+                        <div class="bg-blue-500/10 border border-blue-500/30 text-blue-300 px-4 py-3 rounded-lg text-sm">
+                            <div class="flex space-x-2">
+                                <i class="fa-solid fa-info-circle mt-0.5 flex-shrink-0"></i>
+                                <div>
+                                    <p class="font-semibold mb-2">Important for Fixed Discounts:</p>
+                                    <p class="leading-relaxed">
+                                        If the discount value is higher than the allowed percentage of the product price, only the maximum redeemable percentage will be applied.
+                                    </p>
+                                    <p class="mt-2 text-blue-400/80">
+                                        <span class="font-semibold">Example:</span> A ₹5000 fixed discount on a ₹9000 product with a 30% cap will apply only ₹2700.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Submit Button -->
@@ -201,6 +237,53 @@
         </div>
     </main>
 
+    <script>
+        const form = document.getElementById('categoryForm');
+        const discountTypeSelect = document.querySelector('select[name="discountType"]');
+        const maxRedeemableInput = document.getElementById('maxRedeemableInput');
+        const maxRedeemableRequiredLabel = document.getElementById('maxRedeemableRequired');
+        const maxRedeemableErrorDiv = document.getElementById('maxRedeemableError');
+
+        // Function to validate and update UI based on discount type
+        function updateMaxRedeemableRequirement() {
+            const isFixedDiscount = discountTypeSelect.value === 'flat';
+            
+            if (isFixedDiscount) {
+                // Make it required for fixed discounts
+                maxRedeemableInput.required = true;
+                maxRedeemableRequiredLabel.style.display = 'inline';
+            } else {
+                // Make it optional for percentage discounts
+                maxRedeemableInput.required = false;
+                maxRedeemableRequiredLabel.style.display = 'none';
+                maxRedeemableErrorDiv.textContent = ''; // Clear error
+            }
+        }
+
+        // Listen to discount type changes
+        discountTypeSelect.addEventListener('change', updateMaxRedeemableRequirement);
+
+        // Initial check on page load
+        updateMaxRedeemableRequirement();
+
+        // Form submission validation
+        form.addEventListener('submit', (e) => {
+            const isFixedDiscount = discountTypeSelect.value === 'flat';
+            const maxRedeemableValue = maxRedeemableInput.value.trim();
+
+            if (isFixedDiscount && !maxRedeemableValue) {
+                e.preventDefault();
+                maxRedeemableErrorDiv.textContent = 'Max redeemable amount is required for fixed discounts';
+                maxRedeemableInput.classList.add('ring-2', 'ring-red-500');
+                maxRedeemableInput.focus();
+                return false;
+            }
+
+            // Clear error if validation passes
+            maxRedeemableErrorDiv.textContent = '';
+            maxRedeemableInput.classList.remove('ring-2', 'ring-red-500');
+        });
+    </script>
 
 </body>
 </html>

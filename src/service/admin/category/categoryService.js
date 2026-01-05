@@ -7,15 +7,19 @@ module.exports = class CategoryService {
 
     async saveCategoryToDb(categoryObj) {
         
-        const exist = await this.categoryRepository.findByName(categoryObj.categoryName)
+        const exists = await this.categoryRepository.findByName(categoryObj.categoryName)
+
         if (exists) {
             throw new Error("Category already exists");
         }
         try {
-            const category = await this.categoryRepository.save(categoryObj)
-            await this.categoryRepository.save(categoryObj)
+            const category = await this.categoryRepository.createCategory(categoryObj)
+
+            return category
+
         } catch (error) {
-            
+            throw error;
         }
     }
+
 }

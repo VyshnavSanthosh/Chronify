@@ -33,8 +33,10 @@ async function verifyToken(req, res, next) {
         // Attach user to request object
         req.user = user;
 
-        // Pass control to next middleware/controller
-        next();
+        if (!user.isBlocked) {
+            next();
+        }
+
 
     } catch (err) {
         // Token expired or invalid

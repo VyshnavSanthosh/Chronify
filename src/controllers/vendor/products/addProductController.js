@@ -3,8 +3,24 @@ module.exports = class AddProductController {
         this.addProductService = addProductService
     }
 
-    renderAddProductPage(req,res){
-        return res.render("vendor/products/addProduct")
+    async renderAddProductPage(req,res){
+        try {
+            const categories = await this.addProductService.getAllCategories()
+            console.log(categories)
+            
+            return res.render("vendor/products/addProduct",{
+                errors: {},
+                productName: "",
+                description: "",
+                categories,
+                
+                
+            })
+        } catch (error) {
+            console.log("error in loading",error)
+            
+        }
+
     }
 
     async handleAddProducts(req,res){

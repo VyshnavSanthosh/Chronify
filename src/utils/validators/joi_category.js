@@ -6,13 +6,13 @@ module.exports = Joi.object({
         .trim()
         .min(2)
         .max(100)
-        .pattern(/^[a-zA-Z0-9\s\-&().,]+$/)
+        .pattern(/^[a-zA-Z\s\-]+$/)
         .required()
         .messages({
             "string.empty": "Category name is required",
             "string.min": "Category name must be at least 2 characters",
             "string.max": "Category name must be at most 100 characters",
-            "string.pattern.base": "Category name can only contain letters, numbers, spaces, hyphens, and basic punctuation",
+            "string.pattern.base": "Category name can only contain letters, spaces, and hyphens",
             "any.required": "Category name is required"
         }),
 
@@ -21,11 +21,13 @@ module.exports = Joi.object({
         .trim()
         .min(10)
         .max(1000)
+        .pattern(/^[a-zA-Z\s\-,]+$/)
         .required()
         .messages({
             "string.empty": "Description is required",
             "string.min": "Description must be at least 10 characters",
             "string.max": "Description must be at most 1000 characters",
+            "string.pattern.base": "Description can only contain letters, spaces, hyphens, and commas",
             "any.required": "Description is required"
         }),
 
