@@ -8,7 +8,7 @@ module.exports = class AddProductController {
             const categories = await this.addProductService.getAllCategories()
             console.log(categories)
             
-            return res.render("vendor/products/addProduct",{
+            return res.status(200).render("vendor/products/addProduct",{
                 errors: {},
                 productName: "",
                 description: "",

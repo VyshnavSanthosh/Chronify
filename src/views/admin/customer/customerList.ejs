@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer List - Chronify</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #050a14;
+        }
+        .sidebar-item-active {
+            background-color: #4b5563;
+        }
+        .custom-dark-card {
+            background-color: #0a1425;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .customer-title {
+            font-family: 'Playfair Display', serif;
+        }
+        /* Table scrollbar */
+        .table-container::-webkit-scrollbar {
+            height: 6px;
+        }
+        .table-container::-webkit-scrollbar-thumb {
+            background: #1f2937;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="text-white min-h-screen flex">
+
+    <!-- Sidebar (Same as dashboard) -->
+    <aside class="w-64 bg-[#0a1425] flex flex-col border-r border-gray-800 hidden md:flex shrink-0">
+        <div class="p-6">
+            <h1 class="text-2xl font-bold tracking-widest text-white uppercase italic">
+                Chronify
+            </h1>
+        </div>
+
+        <nav class="flex-1 px-4 space-y-2 overflow-y-auto">
+            <a href="/admin/dashboard" class="flex items-center justify-between px-4 py-3 rounded-lg transition-colors text-gray-400 hover:bg-gray-800 hover:text-white">
+                <div class="flex items-center space-x-3">
+                    <i class="fa-solid fa-house w-5 text-center"></i>
+                    <span class="text-sm font-medium">Dashboard</span>
+                </div>
+            </a>
+
+            <a href="/products" class="flex items-center justify-between px-4 py-3 rounded-lg transition-colors text-gray-400 hover:bg-gray-800 hover:text-white">
+                <div class="flex items-center space-x-3">
+                    <i class="fa-solid fa-briefcase w-5 text-center"></i>
+                    <span class="text-sm font-medium">Products</span>
+                </div>
+                <i class="fa-solid fa-chevron-right text-[10px]"></i>
+            </a>
+
+            <a href="/orders" class="flex items-center justify-between px-4 py-3 rounded-lg transition-colors text-gray-400 hover:bg-gray-800 hover:text-white">
+                <div class="flex items-center space-x-3">
+                    <i class="fa-solid fa-list-ul w-5 text-center"></i>
+                    <span class="text-sm font-medium">Order List</span>
+                </div>
+                <i class="fa-solid fa-chevron-right text-[10px]"></i>
+            </a>
+
+            <a href="/customers" class="flex items-center justify-between px-4 py-3 rounded-lg transition-colors sidebar-item-active text-white">
+                <div class="flex items-center space-x-3">
+                    <i class="fa-solid fa-circle-user w-5 text-center"></i>
+                    <span class="text-sm font-medium">Customer</span>
+                </div>
+                <i class="fa-solid fa-chevron-right text-[10px]"></i>
+            </a>
+
+            <a href="/sales" class="flex items-center justify-between px-4 py-3 rounded-lg transition-colors text-gray-400 hover:bg-gray-800 hover:text-white">
+                <div class="flex items-center space-x-3">
+                    <i class="fa-solid fa-hand-holding-dollar w-5 text-center"></i>
+                    <span class="text-sm font-medium">Sales</span>
+                </div>
+                <i class="fa-solid fa-chevron-right text-[10px]"></i>
+            </a>
+
+            <a href="/categories" class="flex items-center justify-between px-4 py-3 rounded-lg transition-colors text-gray-400 hover:bg-gray-800 hover:text-white">
+                <div class="flex items-center space-x-3">
+                    <i class="fa-solid fa-table-cells-large w-5 text-center"></i>
+                    <span class="text-sm font-medium">Category</span>
+                </div>
+                <i class="fa-solid fa-chevron-right text-[10px]"></i>
+            </a>
+
+            <a href="/coupons" class="flex items-center justify-between px-4 py-3 rounded-lg transition-colors text-gray-400 hover:bg-gray-800 hover:text-white">
+                <div class="flex items-center space-x-3">
+                    <i class="fa-solid fa-ticket w-5 text-center"></i>
+                    <span class="text-sm font-medium">Coupons</span>
+                </div>
+                <i class="fa-solid fa-chevron-right text-[10px]"></i>
+            </a>
+
+            <a href="/vendors" class="flex items-center justify-between px-4 py-3 rounded-lg transition-colors text-gray-400 hover:bg-gray-800 hover:text-white">
+                <div class="flex items-center space-x-3">
+                    <i class="fa-solid fa-users-gear w-5 text-center"></i>
+                    <span class="text-sm font-medium">Vendors</span>
+                </div>
+                <i class="fa-solid fa-chevron-right text-[10px]"></i>
+            </a>
+        </nav>
+
+        <div class="p-6 space-y-4">
+            <button class="w-full py-2 border border-gray-600 text-white font-medium rounded-md hover:bg-gray-800 transition-colors">
+                Account
+            </button>
+            <button class="w-full py-2 bg-white text-black font-semibold rounded-md hover:bg-gray-200 transition-colors">
+                Logout
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col overflow-x-hidden">
+        
+        <!-- Header -->
+        <header class="h-16 flex items-center justify-end px-8 border-b border-gray-800 bg-[#050a14] sticky top-0 z-10">
+            <div class="flex items-center space-x-3">
+                <div class="text-right">
+                    <p class="text-sm font-semibold"><%= locals.userName || 'Vyshnav' %></p>
+                    <p class="text-xs text-gray-400 uppercase tracking-tighter"><%= locals.userRole || 'Admin' %></p>
+                </div>
+                <img src="<%= locals.userAvatar || '/placeholder.svg?height=40&width=40' %>" alt="Profile" class="w-10 h-10 rounded-full border border-teal-400">
+            </div>
+        </header>
+
+        <!-- Content Area -->
+        <div class="p-8 lg:p-12 space-y-8">
+            
+            <!-- Breadcrumbs and Title -->
+            <div class="space-y-4">
+                <h2 class="customer-title text-4xl font-bold tracking-tight">CUSTOMER LIST</h2>
+                <nav class="flex text-sm text-gray-400 space-x-2">
+                    <a href="/admin/dashboard" class="hover:text-white">Dashboard</a>
+                    <span><i class="fa-solid fa-chevron-right text-[8px] mx-1"></i></span>
+                    <span class="text-white">Customer List</span>
+                </nav>
+            </div>
+
+            <!-- Filters Section -->
+            <div class="flex flex-col md:flex-row gap-4 items-center justify-between">
+                <!-- Search Bar -->
+                <div class="relative w-full max-w-md">
+                    <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
+                    <input type="text" 
+                           id="searchInput"
+                           placeholder="Search customer. . ." 
+                           class="w-full bg-[#0a1425] border border-gray-800 rounded-lg py-3 pl-12 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                </div>
+
+                <div class="flex gap-4 w-full md:w-auto">
+                    <!-- Status Filter -->
+                    <div class="relative w-full md:w-40">
+                        <select id="statusFilter" class="w-full appearance-none bg-[#0a1425] border border-gray-800 rounded-lg px-4 py-3 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer">
+                            <option value="">All Status</option>
+                            <option value="false">Active</option>
+                            <option value="true">Blocked</option>
+                        </select>
+                        <i class="fa-solid fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-[10px] pointer-events-none text-gray-400"></i>
+                    </div>
+
+                    <!-- Sort Filter -->
+                    <div class="relative w-full md:w-40">
+                        <select id="sortFilter" class="w-full appearance-none bg-[#0a1425] border border-gray-800 rounded-lg px-4 py-3 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer">
+                            <option value="">Sort By</option>
+                            <option value="az">A-Z</option>
+                            <option value="za">Z-A</option>
+                        </select>
+                        <i class="fa-solid fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-[10px] pointer-events-none text-gray-400"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Table Container -->
+            <div class="table-container overflow-x-auto rounded-xl border border-gray-800">
+                <table class="w-full text-left border-collapse min-w-[1000px]">
+                    <thead>
+                        <tr class="bg-blue-600 text-white uppercase text-xs font-semibold tracking-wider">
+                            <th class="px-6 py-4 border-r border-blue-500/30">Customer Name</th>
+                            <th class="px-6 py-4 border-r border-blue-500/30">Phone</th>
+                            <th class="px-6 py-4 border-r border-blue-500/30">Orders</th>
+                            <th class="px-6 py-4 border-r border-blue-500/30">Balance</th>
+                            <th class="px-6 py-4 border-r border-blue-500/30">Status</th>
+                            <th class="px-6 py-4">Block/Unblock</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-800" id="customerTableBody">
+                        <% (locals.customers || []).forEach((customer) => { %>
+                            <tr class="bg-[#050a14] hover:bg-gray-800/50 transition-colors text-sm customer-row" data-customer-id="<%= customer._id %>">
+                                <td class="px-6 py-4 border-r border-gray-800">
+                                    <div class="flex flex-col">
+                                        <span class="font-medium customer-name"><%= customer.firstName %> <%= customer.lastName %></span>
+                                        <span class="text-xs text-gray-500"><%= customer.email %></span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 border-r border-gray-800 customer-phone"><%= customer.phone || 'N/A' %></td>
+                                <td class="px-6 py-4 border-r border-gray-800 customer-orders"><%= customer.orders || 0 %></td>
+                                <td class="px-6 py-4 border-r border-gray-800 customer-balance"><%= customer.balance || 0 %></td>
+                                <td class="px-6 py-4 border-r border-gray-800 font-bold tracking-tight">
+                                    <span class="customer-status <%= customer.isBlocked ? 'text-red-500' : 'text-emerald-500' %>">
+                                        <%= customer.isBlocked ? 'Blocked' : 'Active' %>
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <!-- Block/Unblock Toggle -->
+                                    <div class="flex items-center">
+                                        <label class="relative inline-flex items-center cursor-pointer group">
+                                            <input type="checkbox" 
+                                                    class="sr-only peer toggle-block-checkbox" 
+                                                    data-customer-id="<%= customer._id %>"
+                                                    <%= customer.isBlocked ? 'checked' : '' %>>
+                                            <div class="w-11 h-6 bg-emerald-500 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-500"></div>
+                                        </label>
+                                    </div>
+                                </td>
+                            </tr>
+                        <% }); %>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="flex flex-col sm:flex-row items-center justify-between pt-4 gap-4">
+                <p class="text-sm text-gray-400">
+                    Showing <span id="paginationStart">1</span>-<span id="paginationEnd">10</span> from <span id="paginationTotal">0</span>
+                </p>
+                <div class="flex items-center space-x-2" id="paginationContainer">
+                    <button class="w-8 h-8 flex items-center justify-center rounded-lg bg-gray-800 hover:bg-gray-700 transition-colors text-xs" id="prevBtn">
+                        <i class="fa-solid fa-chevron-left"></i>
+                    </button>
+                    <div id="pageButtons"></div>
+                    <button class="w-8 h-8 flex items-center justify-center rounded-lg bg-gray-800 hover:bg-gray-700 transition-colors text-xs" id="nextBtn">
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+<script>
+    // Initialize from server data - use EJS to inject values
+    var currentPage = <%= locals.currentPage || 1 %>;
+    var totalCustomers = <%= locals.totalCustomers || 0 %>;
+    var itemsPerPage = 10;
+    var totalPages = Math.ceil(totalCustomers / itemsPerPage);
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('Page loaded - currentPage:', currentPage, 'totalCustomers:', totalCustomers, 'totalPages:', totalPages);
+        attachToggleListeners();
+        attachFilterListeners();
+        updatePaginationInfo();
+    });
+
+    // Attach toggle listeners
+    function attachToggleListeners() {
+        document.querySelectorAll('.toggle-block-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', handleToggleBlock);
+        });
+    }
+
+    // Handle toggle block/unblock
+    async function handleToggleBlock(event) {
+        const checkbox = event.target;
+        const customerId = checkbox.getAttribute('data-customer-id');
+        const isBlocked = checkbox.checked;
+        const row = checkbox.closest('.customer-row');
+        
+        console.log('Toggle clicked - customerId:', customerId, 'isBlocked:', isBlocked);
+        
+        // Disable checkbox during request
+        checkbox.disabled = true;
+
+        try {
+            const url = `/admin/customers/${customerId}/toggle-block`;
+            console.log('Fetching URL:', url);
+            
+            const response = await fetch(url, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    isBlocked: isBlocked
+                })
+            });
+
+            console.log('Response status:', response.status);
+            const data = await response.json();
+            console.log('Response data:', data);
+
+            if (data.success) {
+                // Update status text and color
+                const statusSpan = row.querySelector('.customer-status');
+                statusSpan.textContent = isBlocked ? 'Blocked' : 'Active';
+                statusSpan.className = `customer-status ${isBlocked ? 'text-red-500' : 'text-emerald-500'}`;
+
+                console.log('Success:', data.message);
+                alert(data.message);
+            } else {
+                // Revert toggle on error
+                checkbox.checked = !isBlocked;
+                console.error('API Error:', data.message);
+                alert('Error: ' + (data.message || 'Failed to update status'));
+            }
+        } catch (error) {
+            // Revert toggle on error
+            checkbox.checked = !isBlocked;
+            console.error('Fetch Error:', error);
+            alert('Failed to update customer status. Please try again.');
+        } finally {
+            // Re-enable checkbox
+            checkbox.disabled = false;
+        }
+    }
+
+    // Attach filter listeners
+    function attachFilterListeners() {
+        document.getElementById('searchInput').addEventListener('keyup', debounce(applyFilters, 500));
+        document.getElementById('statusFilter').addEventListener('change', applyFilters);
+        document.getElementById('sortFilter').addEventListener('change', applyFilters);
+    }
+
+    // Debounce function for search
+    function debounce(func, delay) {
+        var timeoutId;
+        return function(...args) {
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(() => func.apply(this, args), delay);
+        };
+    }
+
+    // Apply filters and reload data
+    async function applyFilters() {
+        const search = document.getElementById('searchInput').value;
+        const status = document.getElementById('statusFilter').value;
+        const sort = document.getElementById('sortFilter').value;
+        
+        currentPage = 1;
+        
+        try {
+            const params = new URLSearchParams();
+            if (search) params.append('search', search);
+            if (status !== '') params.append('status', status);
+            if (sort) params.append('sort', sort);
+            params.append('page', currentPage);
+
+            const response = await fetch(`/admin/customers?${params.toString()}`);
+            const html = await response.text();
+            
+            // Parse the response and extract the table body
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const newTableBody = doc.getElementById('customerTableBody');
+            
+            document.getElementById('customerTableBody').innerHTML = newTableBody.innerHTML;
+            
+            // Extract totalCustomers from the response
+            const scriptMatch = html.match(/var totalCustomers = (\d+);/);
+            if (scriptMatch) {
+                totalCustomers = parseInt(scriptMatch[1]);
+                totalPages = Math.ceil(totalCustomers / itemsPerPage);
+                console.log('Updated totals - customers:', totalCustomers, 'pages:', totalPages);
+            }
+            
+            attachToggleListeners();
+            updatePaginationInfo();
+        } catch (error) {
+            console.error('Error applying filters:', error);
+            alert('Failed to apply filters. Please try again.');
+        }
+    }
+
+    // Update pagination
+    function updatePaginationInfo() {
+        const pageButtons = document.getElementById('pageButtons');
+        
+        console.log('Updating pagination - currentPage:', currentPage, 'totalPages:', totalPages, 'totalCustomers:', totalCustomers);
+        
+        // Calculate start and end
+        const start = totalCustomers > 0 ? ((currentPage - 1) * itemsPerPage) + 1 : 0;
+        const end = Math.min(currentPage * itemsPerPage, totalCustomers);
+        
+        document.getElementById('paginationStart').textContent = start;
+        document.getElementById('paginationEnd').textContent = end;
+        document.getElementById('paginationTotal').textContent = totalCustomers;
+        
+        // Generate page buttons
+        pageButtons.innerHTML = '';
+        
+        if (totalPages === 0) {
+            return; // Don't show pagination if no results
+        }
+        
+        const maxVisiblePages = 5;
+        var startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+        var endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+        
+        // Adjust startPage if we're near the end
+        if (endPage - startPage < maxVisiblePages - 1) {
+            startPage = Math.max(1, endPage - maxVisiblePages + 1);
+        }
+        
+        for (var i = startPage; i <= endPage; i++) {
+            const btn = document.createElement('button');
+            const pageNum = i; // Store in const for closure
+            btn.className = `w-8 h-8 flex items-center justify-center rounded-lg font-bold text-xs transition-colors ${pageNum === currentPage ? 'bg-blue-600 text-white' : 'bg-white text-black hover:bg-gray-200'}`;
+            btn.textContent = pageNum;
+            btn.addEventListener('click', function() {
+                goToPage(pageNum);
+            });
+            pageButtons.appendChild(btn);
+        }
+        
+        if (endPage < totalPages) {
+            const span = document.createElement('span');
+            span.className = 'px-2 text-gray-500';
+            span.textContent = '...';
+            pageButtons.appendChild(span);
+        }
+
+        // Update prev/next button state
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        
+        prevBtn.disabled = currentPage === 1;
+        nextBtn.disabled = currentPage >= totalPages;
+        
+        // Add visual feedback for disabled state
+        if (prevBtn.disabled) {
+            prevBtn.classList.add('opacity-50', 'cursor-not-allowed');
+        } else {
+            prevBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+        }
+        
+        if (nextBtn.disabled) {
+            nextBtn.classList.add('opacity-50', 'cursor-not-allowed');
+        } else {
+            nextBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+        }
+    }
+
+    // Go to page
+    function goToPage(page) {
+        if (page === currentPage || page < 1 || page > totalPages) {
+            console.log('Invalid page navigation attempt:', page);
+            return;
+        }
+        
+        console.log('Navigating to page:', page);
+        
+        const search = document.getElementById('searchInput').value;
+        const status = document.getElementById('statusFilter').value;
+        const sort = document.getElementById('sortFilter').value;
+        
+        const params = new URLSearchParams();
+        if (search) params.append('search', search);
+        if (status !== '') params.append('status', status);
+        if (sort) params.append('sort', sort);
+        params.append('page', page);
+
+        window.location.href = `/admin/customers?${params.toString()}`;
+    }
+
+    // Previous button
+    document.getElementById('prevBtn').addEventListener('click', function() {
+        if (currentPage > 1) {
+            goToPage(currentPage - 1);
+        }
+    });
+
+    // Next button
+    document.getElementById('nextBtn').addEventListener('click', function() {
+        if (currentPage < totalPages) {
+            goToPage(currentPage + 1);
+        }
+    });
+</script>
+
+</body>
+</html>

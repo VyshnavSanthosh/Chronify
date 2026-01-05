@@ -32,6 +32,7 @@ const adminloginRoutes = require("./routes/admin/auth/loginRoutes")
 
 const adminCategoryRoutes = require("./routes/admin/category/categoryRoutes")
 
+const adminCustomerRoutes = require("./routes/admin/customer/customerListRoutes")
 
 // Body parsers
 app.use(express.json());
@@ -66,16 +67,18 @@ app.set("views", path.join(__dirname, "views"));
 
 app.use(express.static(path.join(__dirname, "public")));
 
-// ========== User Auth Routes ==========
+// ========== User Routes ==========
 
+// User Auth Routes 
 app.use("/auth", signupRoutes);      // Signup routes
 app.use("/auth", loginRoutes);     // Login routes
 app.use("/auth", forgotPasswordRoutes);    // Forgot password routes
 
 
 
-
 // ==========  Vendor Routes ==========
+
+
 app.use("/vendor/auth", vendorSignupRoutes)
 app.use("/vendor/auth", vendorLoginRoutes)
 app.use("/vendor/auth", vendorForgotPasswordRoutes)
@@ -91,11 +94,17 @@ app.use("/vendor", vendorDashboardRoutes)
 app.use("/vendor", vendorAddProductRoute)
 
 
-
-
 // ==========  Admin Routes ==========
+
+
 app.use("/admin/auth", adminloginRoutes)
 
 // admin Category
 app.use("/admin", adminCategoryRoutes)
+
+// admin customerList
+app.use("/admin", adminCustomerRoutes)
+
+
+
 module.exports = app;

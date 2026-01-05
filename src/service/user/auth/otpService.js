@@ -10,7 +10,7 @@ module.exports = class OtpService {
         try {
             await this.redis.set(`otp:${user._id}`, otp, "EX", 120)
     
-            console.log(`DEBUG: enqueueing OTP job for user ${user._id} (email: ${user.email})`);
+            console.log(`DEBUG: enqueueing OTP job for user ${user._id} (email: ${user.email}) with otp: ${otp}`);
 
             await this.emailQueue.add("otp", {
                 email: user.email,

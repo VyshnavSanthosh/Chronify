@@ -32,7 +32,8 @@ async function verifyToken(req, res, next) {
 
         // Attach user to request object
         req.user = user;
-
+        console.log(user.isBlocked)
+        
         if (!user.isBlocked) {
             next();
         }

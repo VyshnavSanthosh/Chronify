@@ -10,6 +10,32 @@ module.exports = class UserRepository{
         return await User.findOne({ referralCode: code})
     }
 
+    async getAllCustomers(limit, skip, sortOrder, search, status){
+        const query = {
+            role: { $ne: "admin" }
+        }
+        if (status == "true") {
+            query.isBlocked = true
+        }
+        else if (status == "false") {
+            query.isBlocked = false
+        }
+        if (search) {
+            query.$or = [
+                { firstName: { $regex: search, $options: "i" } },
+                { lastName: { $regex: search, $options: "i" } }
+            ]
+        }
+        const customers = await User.find(query)
+        .sort({ firstName: sortOrder }) 
+        .skip(skip)                     
+        .limit(limit);
+        
+        const totalCustomers = await User.countDocuments(query);
+
+        return {customers, totalCustomers};
+    }
+
     async createUser(userData) {
         try {
             const user = new User(userData);
@@ -81,6 +107,24 @@ module.exports = class UserRepository{
     async deleteById(userId) {
         return await User.findByIdAndDelete(userId);
     }
+
+    async updateCustomerBlockStatus(customerId, isBlocked) {
+    try {
+        const updatedCustomer = await User.findByIdAndUpdate(
+            customerId,
+            { isBlocked: isBlocked },
+            { new: true } // Returns the updated document
+        )
+
+        if (!updatedCustomer) {
+            throw new Error("Customer not found")
+        }
+
+        return updatedCustomer
+    } catch (error) {
+        throw new Error(`Error updating customer block status: ${error.message}`)
+    }
+}
 
 }
 

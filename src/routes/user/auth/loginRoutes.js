@@ -75,4 +75,7 @@ router.post("/logout",
     loginController.logout.bind(loginController)
 );
 
+router.get("/home",verifyToken,((req,res)=>{
+    res.send("home page")
+}))
 module.exports = router;
