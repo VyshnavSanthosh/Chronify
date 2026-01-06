@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Category - Chronify</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #050a14;
+        }
+        .sidebar-item-active {
+            background-color: #4b5563;
+        }
+        .custom-dark-card {
+            background-color: #0a1425;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        input::placeholder, textarea::placeholder {
+            color: #9ca3af;
+            font-size: 0.875rem;
+        }
+        .error-message {
+            color: #ef4444;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+    </style>
+</head>
+<body class="text-white min-h-screen flex">
+
+    <!-- Sidebar -->
+    <aside class="w-64 bg-[#0a1425] flex flex-col border-r border-gray-800 hidden md:flex shrink-0">
+        <div class="p-6">
+            <h1 class="text-2xl font-bold tracking-widest text-white uppercase italic">
+                Chronify
+            </h1>
+        </div>
+
+        <nav class="flex-1 px-4 space-y-2 overflow-y-auto">
+            <a href="/dashboard" class="flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition-colors">
+                <i class="fa-solid fa-house w-5 text-center"></i>
+                <span class="text-sm font-medium">Dashboard</span>
+            </a>
+
+            <a href="/products" class="flex items-center justify-between px-4 py-3 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition-colors">
+                <div class="flex items-center space-x-3">
+                    <i class="fa-solid fa-briefcase w-5 text-center"></i>
+                    <span class="text-sm font-medium">Products</span>
+                </div>
+                <i class="fa-solid fa-chevron-right text-[10px]"></i>
+            </a>
+
+            <a href="/orders" class="flex items-center justify-between px-4 py-3 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition-colors">
+                <div class="flex items-center space-x-3">
+                    <i class="fa-solid fa-list-ul w-5 text-center"></i>
+                    <span class="text-sm font-medium">Order List</span>
+                </div>
+                <i class="fa-solid fa-chevron-right text-[10px]"></i>
+            </a>
+
+            <a href="/customers" class="flex items-center justify-between px-4 py-3 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition-colors">
+                <div class="flex items-center space-x-3">
+                    <i class="fa-solid fa-circle-user w-5 text-center"></i>
+                    <span class="text-sm font-medium">Customer</span>
+                </div>
+                <i class="fa-solid fa-chevron-right text-[10px]"></i>
+            </a>
+
+            <a href="/sales" class="flex items-center justify-between px-4 py-3 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition-colors">
+                <div class="flex items-center space-x-3">
+                    <i class="fa-solid fa-sack-dollar w-5 text-center"></i>
+                    <span class="text-sm font-medium">Sales</span>
+                </div>
+                <i class="fa-solid fa-chevron-right text-[10px]"></i>
+            </a>
+
+            <!-- Active Item: Category -->
+            <a href="/categories" class="flex items-center justify-between px-4 py-3 rounded-lg sidebar-item-active text-white transition-colors">
+                <div class="flex items-center space-x-3">
+                    <i class="fa-solid fa-table-cells-large w-5 text-center"></i>
+                    <span class="text-sm font-medium">Category</span>
+                </div>
+                <i class="fa-solid fa-chevron-right text-[10px]"></i>
+            </a>
+
+            <a href="/coupons" class="flex items-center justify-between px-4 py-3 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition-colors">
+                <div class="flex items-center space-x-3">
+                    <i class="fa-solid fa-ticket w-5 text-center"></i>
+                    <span class="text-sm font-medium">Coupons</span>
+                </div>
+                <i class="fa-solid fa-chevron-right text-[10px]"></i>
+            </a>
+
+            <a href="/vendors" class="flex items-center justify-between px-4 py-3 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition-colors">
+                <div class="flex items-center space-x-3">
+                    <i class="fa-solid fa-circle-user w-5 text-center"></i>
+                    <span class="text-sm font-medium">Vendors</span>
+                </div>
+                <i class="fa-solid fa-chevron-right text-[10px]"></i>
+            </a>
+        </nav>
+
+        <div class="p-6 space-y-3">
+            <button class="w-full py-2 bg-transparent border border-white text-white font-semibold rounded-md hover:bg-white/10 transition-colors">
+                Account
+            </button>
+            <button class="w-full py-2 bg-white text-black font-semibold rounded-md hover:bg-gray-200 transition-colors">
+                Logout
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col overflow-x-hidden">
+        
+        <!-- Header -->
+        <header class="h-16 flex items-center justify-end px-8 border-b border-gray-800 bg-[#050a14] sticky top-0 z-10">
+            <div class="flex items-center space-x-3">
+                <div class="text-right">
+                    <!-- Dynamic Data: User Name -->
+                    <p class="text-sm font-semibold"><%= locals.userName || 'Vyshnav' %></p>
+                    <!-- Dynamic Data: User Role -->
+                    <p class="text-xs text-gray-400 uppercase tracking-tighter"><%= locals.userRole || 'Admin' %></p>
+                </div>
+                
+            </div>
+        </header>
+
+        <!-- Content Area -->
+        <div class="p-8 lg:p-16 flex flex-col items-center">
+            
+            <div class="w-full max-w-5xl space-y-12">
+                <h2 class="text-3xl font-bold tracking-wider text-white">ADD A CATEGORY</h2>
+
+                <!-- General Error Message -->
+                <% if (locals.errorMessage) { %>
+                    <div class="bg-red-500/20 border border-red-500 text-red-400 px-6 py-4 rounded-lg">
+                        <div class="flex items-center space-x-2">
+                            <i class="fa-solid fa-circle-exclamation"></i>
+                            <span><%= errorMessage %></span>
+                        </div>
+                    </div>
+                <% } %>
+
+                <form id="categoryForm" action="/admin/category/edit/<%= category._id %>" method="POST" class="space-y-8">
+                    
+                    <!-- Category Name -->
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium text-gray-400">Category Name</label>
+                        <input type="text" name="categoryName" placeholder="Type category name here. . ." 
+                            value="<%= category?.categoryName || '' %>"
+                            class="w-full bg-[#f3f4f6] text-black px-6 py-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg shadow-sm <%= locals.errors?.categoryName ? 'ring-2 ring-red-500' : '' %>">
+                        <% if (locals.errors?.categoryName) { %>
+                            <div class="error-message"><%= errors.categoryName %></div>
+                        <% } %>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium text-gray-400">Description</label>
+                        <textarea name="description" rows="10" placeholder="Type category description here. . ." 
+                            class="w-full bg-[#f3f4f6] text-black px-6 py-6 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg shadow-sm resize-none <%= locals.errors?.description ? 'ring-2 ring-red-500' : '' %>"><%= category?.description || '' %></textarea>
+                        <% if (locals.errors?.description) { %>
+                            <div class="error-message"><%= errors.description %></div>
+                        <% } %>
+                    </div>
+
+                    <!-- Discount Type and Value Row -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="flex flex-col space-y-2">
+                            <label class="text-sm font-medium text-gray-400">Discount Type</label>
+                            <select name="discountType" 
+                                class="bg-[#f3f4f6] text-black px-6 py-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg shadow-sm <%= locals.errors?.discountType ? 'ring-2 ring-red-500' : '' %>">
+                                <option value="">Select discount type</option>
+                                <option value="percentage" <%= category?.discountType === 'percentage' ? 'selected' : '' %>>Percentage (%)</option>
+                                <option value="flat" <%= category?.discountType === 'flat' ? 'selected' : '' %>>Flat Amount (Rs.)</option>
+                            </select>
+                            <% if (locals.errors?.discountType) { %>
+                                <div class="error-message"><%= errors.discountType %></div>
+                            <% } %>
+                        </div>
+
+                        <div class="flex flex-col space-y-2">
+                            <label class="text-sm font-medium text-gray-400">Discount Value</label>
+                            <input type="number" name="discountValue" placeholder="Ex: 10 or 100" step="0.01"
+                                value="<%= category?.discountValue || '' %>"
+                                class="bg-[#f3f4f6] text-black px-6 py-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg shadow-sm <%= locals.errors?.discountValue ? 'ring-2 ring-red-500' : '' %>">
+                            <% if (locals.errors?.discountValue) { %>
+                                <div class="error-message"><%= errors.discountValue %></div>
+                            <% } %>
+                        </div>
+                    </div>
+
+                    <!-- Max Redeemable -->
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium text-gray-400">Max Redeemable Amount <span id="maxRedeemableRequired" class="text-red-500" style="display: none;">*</span> <span class="text-gray-500">(Optional for Discount type Percentage )</span></label>
+                        <input type="number" name="maxRedeemable" placeholder="Ex: 500 (leave empty if no limit)" step="0.01"
+                            value="<%= category?.maxRedeemable || '' %>"
+                            class="w-full bg-[#f3f4f6] text-black px-6 py-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg shadow-sm <%= locals.errors?.maxRedeemable ? 'ring-2 ring-red-500' : '' %>"
+                            id="maxRedeemableInput">
+                        <% if (locals.errors?.maxRedeemable) { %>
+                            <div class="error-message"><%= errors.maxRedeemable %></div>
+                        <% } %>
+                        <div class="error-message" id="maxRedeemableError"></div>
+                        
+                        <!-- Info Note -->
+                        <div class="bg-blue-500/10 border border-blue-500/30 text-blue-300 px-4 py-3 rounded-lg text-sm">
+                            <div class="flex space-x-2">
+                                <i class="fa-solid fa-info-circle mt-0.5 flex-shrink-0"></i>
+                                <div>
+                                    <p class="font-semibold mb-2">Important for Fixed Discounts:</p>
+                                    <p class="leading-relaxed">
+                                        If the discount value is higher than the allowed percentage of the product price, only the maximum redeemable percentage will be applied.
+                                    </p>
+                                    <p class="mt-2 text-blue-400/80">
+                                        <span class="font-semibold">Example:</span> A ₹5000 fixed discount on a ₹9000 product with a 30% cap will apply only ₹2700.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="pt-8 flex justify-center">
+                        <button type="submit" class="bg-[#1d63c1] hover:bg-blue-700 text-white font-bold py-4 px-16 rounded-xl text-xl shadow-lg transition-all duration-300 transform hover:scale-105 active:scale-95">
+                            Save Changes
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        const form = document.getElementById('categoryForm');
+        const discountTypeSelect = document.querySelector('select[name="discountType"]');
+        const maxRedeemableInput = document.getElementById('maxRedeemableInput');
+        const maxRedeemableRequiredLabel = document.getElementById('maxRedeemableRequired');
+        const maxRedeemableErrorDiv = document.getElementById('maxRedeemableError');
+
+        // Function to validate and update UI based on discount type
+        function updateMaxRedeemableRequirement() {
+            const isFixedDiscount = discountTypeSelect.value === 'flat';
+            
+            if (isFixedDiscount) {
+                // Make it required for fixed discounts
+                maxRedeemableInput.required = true;
+                maxRedeemableRequiredLabel.style.display = 'inline';
+            } else {
+                // Make it optional for percentage discounts
+                maxRedeemableInput.required = false;
+                maxRedeemableRequiredLabel.style.display = 'none';
+                maxRedeemableErrorDiv.textContent = ''; // Clear error
+            }
+        }
+
+        // Listen to discount type changes
+        discountTypeSelect.addEventListener('change', updateMaxRedeemableRequirement);
+
+        // Initial check on page load
+        updateMaxRedeemableRequirement();
+
+        // Form submission validation
+        form.addEventListener('submit', (e) => {
+            const isFixedDiscount = discountTypeSelect.value === 'flat';
+            const maxRedeemableValue = maxRedeemableInput.value.trim();
+
+            if (isFixedDiscount && !maxRedeemableValue) {
+                e.preventDefault();
+                maxRedeemableErrorDiv.textContent = 'Max redeemable amount is required for fixed discounts';
+                maxRedeemableInput.classList.add('ring-2', 'ring-red-500');
+                maxRedeemableInput.focus();
+                return false;
+            }
+
+            // Clear error if validation passes
+            maxRedeemableErrorDiv.textContent = '';
+            maxRedeemableInput.classList.remove('ring-2', 'ring-red-500');
+        });
+    </script>
+
+</body>
+</html>

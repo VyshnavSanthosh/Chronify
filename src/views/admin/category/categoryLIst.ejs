@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Customer List - Chronify</title>
+    <title>Category List - Chronify</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -15,11 +15,7 @@
         .sidebar-item-active {
             background-color: #4b5563;
         }
-        .custom-dark-card {
-            background-color: #0a1425;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-        .customer-title {
+        .category-title {
             font-family: 'Playfair Display', serif;
         }
         /* Table scrollbar */
@@ -30,11 +26,66 @@
             background: #1f2937;
             border-radius: 10px;
         }
+        /* Custom List/Unlist Toggle styling */
+        .toggle-btn {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            width: 76px;
+            height: 32px;
+            border-radius: 9999px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+        .toggle-btn.listed {
+            background-color: #65a30d;
+            justify-content: flex-start;
+            padding-left: 8px;
+        }
+        .toggle-btn.unlisted {
+            background-color: #ef4444;
+            justify-content: flex-start;
+            padding-left: 12px;
+        }
+        .toggle-circle {
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            background-color: white;
+            border-radius: 50%;
+            top: 4px;
+            transition: all 0.3s;
+            right: 4px;
+        }
+        /* Offer badge styling */
+        .offer-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        .offer-badge.percentage {
+            background-color: #10b981;
+            color: white;
+        }
+        .offer-badge.flat {
+            background-color: #3b82f6;
+            color: white;
+        }
+        .offer-badge.none {
+            background-color: #6b7280;
+            color: white;
+        }
     </style>
 </head>
 <body class="text-white min-h-screen flex">
 
-    <!-- Sidebar (Same as dashboard) -->
+    <!-- Sidebar -->
     <aside class="w-64 bg-[#0a1425] flex flex-col border-r border-gray-800 hidden md:flex shrink-0">
         <div class="p-6">
             <h1 class="text-2xl font-bold tracking-widest text-white uppercase italic">
@@ -50,7 +101,7 @@
                 </div>
             </a>
 
-            <a href="/products" class="flex items-center justify-between px-4 py-3 rounded-lg transition-colors text-gray-400 hover:bg-gray-800 hover:text-white">
+            <a href="/admin/products" class="flex items-center justify-between px-4 py-3 rounded-lg transition-colors text-gray-400 hover:bg-gray-800 hover:text-white">
                 <div class="flex items-center space-x-3">
                     <i class="fa-solid fa-briefcase w-5 text-center"></i>
                     <span class="text-sm font-medium">Products</span>
@@ -58,7 +109,7 @@
                 <i class="fa-solid fa-chevron-right text-[10px]"></i>
             </a>
 
-            <a href="/orders" class="flex items-center justify-between px-4 py-3 rounded-lg transition-colors text-gray-400 hover:bg-gray-800 hover:text-white">
+            <a href="/admin/orders" class="flex items-center justify-between px-4 py-3 rounded-lg transition-colors text-gray-400 hover:bg-gray-800 hover:text-white">
                 <div class="flex items-center space-x-3">
                     <i class="fa-solid fa-list-ul w-5 text-center"></i>
                     <span class="text-sm font-medium">Order List</span>
@@ -66,7 +117,7 @@
                 <i class="fa-solid fa-chevron-right text-[10px]"></i>
             </a>
 
-            <a href="/customers" class="flex items-center justify-between px-4 py-3 rounded-lg transition-colors sidebar-item-active text-white">
+            <a href="/admin/customers" class="flex items-center justify-between px-4 py-3 rounded-lg transition-colors text-gray-400 hover:bg-gray-800 hover:text-white">
                 <div class="flex items-center space-x-3">
                     <i class="fa-solid fa-circle-user w-5 text-center"></i>
                     <span class="text-sm font-medium">Customer</span>
@@ -74,7 +125,7 @@
                 <i class="fa-solid fa-chevron-right text-[10px]"></i>
             </a>
 
-            <a href="/sales" class="flex items-center justify-between px-4 py-3 rounded-lg transition-colors text-gray-400 hover:bg-gray-800 hover:text-white">
+            <a href="/admin/sales" class="flex items-center justify-between px-4 py-3 rounded-lg transition-colors text-gray-400 hover:bg-gray-800 hover:text-white">
                 <div class="flex items-center space-x-3">
                     <i class="fa-solid fa-hand-holding-dollar w-5 text-center"></i>
                     <span class="text-sm font-medium">Sales</span>
@@ -82,7 +133,7 @@
                 <i class="fa-solid fa-chevron-right text-[10px]"></i>
             </a>
 
-            <a href="/categories" class="flex items-center justify-between px-4 py-3 rounded-lg transition-colors text-gray-400 hover:bg-gray-800 hover:text-white">
+            <a href="/admin/category" class="flex items-center justify-between px-4 py-3 rounded-lg transition-colors sidebar-item-active text-white">
                 <div class="flex items-center space-x-3">
                     <i class="fa-solid fa-table-cells-large w-5 text-center"></i>
                     <span class="text-sm font-medium">Category</span>
@@ -90,7 +141,7 @@
                 <i class="fa-solid fa-chevron-right text-[10px]"></i>
             </a>
 
-            <a href="/coupons" class="flex items-center justify-between px-4 py-3 rounded-lg transition-colors text-gray-400 hover:bg-gray-800 hover:text-white">
+            <a href="/admin/coupons" class="flex items-center justify-between px-4 py-3 rounded-lg transition-colors text-gray-400 hover:bg-gray-800 hover:text-white">
                 <div class="flex items-center space-x-3">
                     <i class="fa-solid fa-ticket w-5 text-center"></i>
                     <span class="text-sm font-medium">Coupons</span>
@@ -98,7 +149,7 @@
                 <i class="fa-solid fa-chevron-right text-[10px]"></i>
             </a>
 
-            <a href="/vendors" class="flex items-center justify-between px-4 py-3 rounded-lg transition-colors text-gray-400 hover:bg-gray-800 hover:text-white">
+            <a href="/admin/vendors" class="flex items-center justify-between px-4 py-3 rounded-lg transition-colors text-gray-400 hover:bg-gray-800 hover:text-white">
                 <div class="flex items-center space-x-3">
                     <i class="fa-solid fa-users-gear w-5 text-center"></i>
                     <span class="text-sm font-medium">Vendors</span>
@@ -127,31 +178,37 @@
                     <p class="text-sm font-semibold"><%= locals.userName || 'Vyshnav' %></p>
                     <p class="text-xs text-gray-400 uppercase tracking-tighter"><%= locals.userRole || 'Admin' %></p>
                 </div>
-                <img src="<%= locals.userAvatar || '/placeholder.svg?height=40&width=40' %>" alt="Profile" class="w-10 h-10 rounded-full border border-teal-400">
             </div>
         </header>
 
         <!-- Content Area -->
-        <div class="p-8 lg:p-12 space-y-8">
+        <div class="p-8 lg:p-12 space-y-8 relative">
             
-            <!-- Breadcrumbs and Title -->
-            <div class="space-y-4">
-                <h2 class="customer-title text-4xl font-bold tracking-tight">CUSTOMER LIST</h2>
+            <!-- Add Category Button (Absolute top right of container) -->
+            <div class="absolute right-8 lg:right-12 top-8 lg:top-12">
+                <a href="/admin/category/add" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-md transition-all inline-block shadow-lg">
+                    Add Category
+                </a>
+            </div>
+
+            <!-- Page Title and Breadcrumbs -->
+            <div class="space-y-4 pt-4">
+                <h2 class="category-title text-4xl font-bold tracking-tight uppercase">CATEGORY LIST</h2>
                 <nav class="flex text-sm text-gray-400 space-x-2">
-                    <a href="/admin/dashboard" class="hover:text-white">Dashboard</a>
+                    <a href="/admin/dashboard" class="hover:text-white capitalize">Dashboard</a>
                     <span><i class="fa-solid fa-chevron-right text-[8px] mx-1"></i></span>
-                    <span class="text-white">Customer List</span>
+                    <span class="text-white capitalize">Category List</span>
                 </nav>
             </div>
 
             <!-- Filters Section -->
-            <div class="flex flex-col md:flex-row gap-4 items-center justify-between">
+            <div class="flex flex-col md:flex-row gap-4 items-center justify-between pt-4">
                 <!-- Search Bar -->
                 <div class="relative w-full max-w-md">
                     <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
                     <input type="text" 
                            id="searchInput"
-                           placeholder="Search customer. . ." 
+                           placeholder="Search Category. . ." 
                            class="w-full bg-[#0a1425] border border-gray-800 rounded-lg py-3 pl-12 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
                 </div>
 
@@ -160,8 +217,8 @@
                     <div class="relative w-full md:w-40">
                         <select id="statusFilter" class="w-full appearance-none bg-[#0a1425] border border-gray-800 rounded-lg px-4 py-3 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer">
                             <option value="">All Status</option>
-                            <option value="false">Active</option>
-                            <option value="true">Blocked</option>
+                            <option value="true">Listed</option>
+                            <option value="false">Unlisted</option>
                         </select>
                         <i class="fa-solid fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-[10px] pointer-events-none text-gray-400"></i>
                     </div>
@@ -178,53 +235,75 @@
                 </div>
             </div>
 
-            <!-- Table Container -->
-            <div class="table-container overflow-x-auto rounded-xl border border-gray-800">
-                <table class="w-full text-left border-collapse min-w-[1000px]">
-                    <thead>
-                        <tr class="bg-blue-600 text-white uppercase text-xs font-semibold tracking-wider">
-                            <th class="px-6 py-4 border-r border-blue-500/30">Customer Name</th>
-                            <th class="px-6 py-4 border-r border-blue-500/30">Phone</th>
-                            <th class="px-6 py-4 border-r border-blue-500/30">Orders</th>
-                            <th class="px-6 py-4 border-r border-blue-500/30">Balance</th>
-                            <th class="px-6 py-4 border-r border-blue-500/30">Status</th>
-                            <th class="px-6 py-4">Block/Unblock</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-800" id="customerTableBody">
-                        <% (locals.customers || []).forEach((customer) => { %>
-                            <tr class="bg-[#050a14] hover:bg-gray-800/50 transition-colors text-sm customer-row" data-customer-id="<%= customer._id %>">
-                                <td class="px-6 py-4 border-r border-gray-800">
-                                    <div class="flex flex-col">
-                                        <span class="font-medium customer-name"><%= customer.firstName %> <%= customer.lastName %></span>
-                                        <span class="text-xs text-gray-500"><%= customer.email %></span>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 border-r border-gray-800 customer-phone"><%= customer.phone || 'N/A' %></td>
-                                <td class="px-6 py-4 border-r border-gray-800 customer-orders"><%= customer.orders || 0 %></td>
-                                <td class="px-6 py-4 border-r border-gray-800 customer-balance"><%= customer.balance || 0 %></td>
-                                <td class="px-6 py-4 border-r border-gray-800 font-bold tracking-tight">
-                                    <span class="customer-status <%= customer.isBlocked ? 'text-red-500' : 'text-emerald-500' %>">
-                                        <%= customer.isBlocked ? 'Blocked' : 'Active' %>
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <!-- Block/Unblock Toggle -->
-                                    <div class="flex items-center">
-                                        <label class="relative inline-flex items-center cursor-pointer group">
-                                            <input type="checkbox" 
-                                                    class="sr-only peer toggle-block-checkbox" 
-                                                    data-customer-id="<%= customer._id %>"
-                                                    <%= customer.isBlocked ? 'checked' : '' %>>
-                                            <div class="w-11 h-6 bg-emerald-500 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-500"></div>
-                                        </label>
-                                    </div>
-                                </td>
-                            </tr>
-                        <% }); %>
-                    </tbody>
-                </table>
-            </div>
+<!-- Table Container -->
+<div class="table-container overflow-x-auto rounded-xl border border-gray-800">
+    <table class="w-full text-left border-collapse min-w-[1200px]">
+        <thead>
+            <tr class="bg-[#4169a1] text-white text-xs font-semibold tracking-wider">
+                <th class="px-6 py-4 border-r border-white/10 text-center w-20 uppercase">SNO</th>
+                <th class="px-6 py-4 border-r border-white/10 uppercase">Category Name</th>
+                <th class="px-6 py-4 border-r border-white/10 uppercase">Description</th>
+                <th class="px-6 py-4 border-r border-white/10 uppercase text-center">Offer Type</th>
+                <th class="px-6 py-4 border-r border-white/10 uppercase text-center">Offer</th>
+                <th class="px-6 py-4 border-r border-white/10 uppercase">Added</th>
+                <th class="px-6 py-4 border-r border-white/10 uppercase text-center">List / Unlist</th>
+                <th class="px-6 py-4 uppercase text-center">Edit</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-800" id="categoryTableBody">
+            <% (locals.categories || []).forEach((category, index) => { %>
+                <tr class="bg-[#050a14] hover:bg-gray-800/50 transition-colors text-sm category-row" data-category-id="<%= category._id %>">
+                    <td class="px-6 py-8 border-r border-gray-800 text-center font-bold">
+                        <%= ((locals.currentPage || 1) - 1) * 10 + index + 1 %>
+                    </td>
+                    <td class="px-6 py-8 border-r border-gray-800 font-medium category-name">
+                        <%= category.categoryName %>
+                    </td>
+                    <td class="px-6 py-8 border-r border-gray-800 font-medium text-gray-300">
+                        <%= category.description || 'N/A' %>
+                    </td>
+                    <td class="px-6 py-8 border-r border-gray-800 text-center">
+                        <% if (category.discountType) { %>
+                            <span class="offer-badge <%= category.offerType === 'percentage' ? 'percentage' : 'flat' %>">
+                                <%= category.discountType === 'percentage' ? 'Percentage' : 'Flat' %>
+                            </span>
+                        <% } else { %>
+                            <span class="offer-badge none">No Offer</span>
+                        <% } %>
+                    </td>
+                    <td class="px-6 py-8 border-r border-gray-800 text-center font-bold text-emerald-400">
+                        <% if (category.discountValue && category.discountValue > 0) { %>
+                            <%= category.discountType === 'percentage' ? category.discountValue + '%' : '₹' + category.discountValue %>
+                        <% } else { %>
+                            <span class="text-gray-500">-</span>
+                        <% } %>
+                    </td>
+                    <td class="px-6 py-8 border-r border-gray-800 font-medium text-gray-300">
+                        <%= new Date(category.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) %>
+                    </td>
+                    <td class="px-6 py-8 border-r border-gray-800">
+                        <div class="flex justify-center">
+                            <div class="toggle-btn <%= category.isListed ? 'listed' : 'unlisted' %> toggle-list-btn"
+                                 data-category-id="<%= category._id %>"
+                                 data-is-listed="<%= category.isListed %>">
+                                <span><%= category.isListed ? 'UNLIST' : 'LIST' %></span>
+                                <div class="toggle-circle"></div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-8">
+                        <div class="flex justify-center">
+                            <a href="/admin/category/edit/<%= category._id %>" 
+                               class="w-10 h-10 flex items-center justify-center rounded-lg bg-gray-800/50 border border-gray-700 hover:bg-gray-700 transition-all text-gray-400 hover:text-white">
+                                <i class="fa-regular fa-pen-to-square"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+            <% }); %>
+        </tbody>
+    </table>
+</div>
 
             <!-- Pagination -->
             <div class="flex flex-col sm:flex-row items-center justify-between pt-4 gap-4">
@@ -245,15 +324,15 @@
     </main>
 
 <script>
-    // Initialize from server data - use EJS to inject values
+    // Initialize from server data
     var currentPage = <%= locals.currentPage || 1 %>;
-    var totalCustomers = <%= locals.totalCustomers || 0 %>;
+    var totalCategories = <%= locals.totalCategories || 0 %>;
     var itemsPerPage = 10;
-    var totalPages = Math.ceil(totalCustomers / itemsPerPage);
+    var totalPages = Math.ceil(totalCategories / itemsPerPage);
 
     // Initialize
     document.addEventListener('DOMContentLoaded', function() {
-        console.log('Page loaded - currentPage:', currentPage, 'totalCustomers:', totalCustomers, 'totalPages:', totalPages);
+        console.log('Page loaded - currentPage:', currentPage, 'totalCategories:', totalCategories, 'totalPages:', totalPages);
         attachToggleListeners();
         attachFilterListeners();
         updatePaginationInfo();
@@ -261,25 +340,27 @@
 
     // Attach toggle listeners
     function attachToggleListeners() {
-        document.querySelectorAll('.toggle-block-checkbox').forEach(checkbox => {
-            checkbox.addEventListener('change', handleToggleBlock);
+        document.querySelectorAll('.toggle-list-btn').forEach(toggle => {
+            toggle.addEventListener('click', handleToggleListing);
         });
     }
 
-    // Handle toggle block/unblock
-    async function handleToggleBlock(event) {
-        const checkbox = event.target;
-        const customerId = checkbox.getAttribute('data-customer-id');
-        const isBlocked = checkbox.checked;
-        const row = checkbox.closest('.customer-row');
+    // Handle toggle list/unlist
+    async function handleToggleListing(event) {
+        const toggle = event.currentTarget;
+        const categoryId = toggle.getAttribute('data-category-id');
+        const currentStatus = toggle.getAttribute('data-is-listed') === 'true';
+        const newStatus = !currentStatus;
+        const row = toggle.closest('.category-row');
         
-        console.log('Toggle clicked - customerId:', customerId, 'isBlocked:', isBlocked);
+        console.log('Toggle clicked - categoryId:', categoryId, 'newStatus:', newStatus);
         
-        // Disable checkbox during request
-        checkbox.disabled = true;
+        // Disable toggle during request
+        toggle.style.pointerEvents = 'none';
+        toggle.style.opacity = '0.6';
 
         try {
-            const url = `/admin/customers/${customerId}/toggle-block`;
+            const url = `/admin/category/${categoryId}/toggle-listing`;
             console.log('Fetching URL:', url);
             
             const response = await fetch(url, {
@@ -288,7 +369,7 @@
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    isBlocked: isBlocked
+                    isListed: newStatus
                 })
             });
 
@@ -297,27 +378,24 @@
             console.log('Response data:', data);
 
             if (data.success) {
-                // Update status text and color
-                const statusSpan = row.querySelector('.customer-status');
-                statusSpan.textContent = isBlocked ? 'Blocked' : 'Active';
-                statusSpan.className = `customer-status ${isBlocked ? 'text-red-500' : 'text-emerald-500'}`;
+                // Update toggle appearance
+                toggle.setAttribute('data-is-listed', newStatus);
+                toggle.className = `toggle-btn ${newStatus ? 'listed' : 'unlisted'} toggle-list-btn`;
+                toggle.querySelector('span').textContent = newStatus ? 'UNLIST' : 'LIST';
 
                 console.log('Success:', data.message);
                 alert(data.message);
             } else {
-                // Revert toggle on error
-                checkbox.checked = !isBlocked;
                 console.error('API Error:', data.message);
                 alert('Error: ' + (data.message || 'Failed to update status'));
             }
         } catch (error) {
-            // Revert toggle on error
-            checkbox.checked = !isBlocked;
             console.error('Fetch Error:', error);
-            alert('Failed to update customer status. Please try again.');
+            alert('Failed to update category status. Please try again.');
         } finally {
-            // Re-enable checkbox
-            checkbox.disabled = false;
+            // Re-enable toggle
+            toggle.style.pointerEvents = '';
+            toggle.style.opacity = '';
         }
     }
 
@@ -352,22 +430,22 @@
             if (sort) params.append('sort', sort);
             params.append('page', currentPage);
 
-            const response = await fetch(`/admin/customers?${params.toString()}`);
+            const response = await fetch(`/admin/category?${params.toString()}`);
             const html = await response.text();
             
             // Parse the response and extract the table body
             const parser = new DOMParser();
             const doc = parser.parseFromString(html, 'text/html');
-            const newTableBody = doc.getElementById('customerTableBody');
+            const newTableBody = doc.getElementById('categoryTableBody');
             
-            document.getElementById('customerTableBody').innerHTML = newTableBody.innerHTML;
+            document.getElementById('categoryTableBody').innerHTML = newTableBody.innerHTML;
             
-            // Extract totalCustomers from the response
-            const scriptMatch = html.match(/var totalCustomers = (\d+);/);
+            // Extract totalCategories from the response
+            const scriptMatch = html.match(/var totalCategories = (\d+);/);
             if (scriptMatch) {
-                totalCustomers = parseInt(scriptMatch[1]);
-                totalPages = Math.ceil(totalCustomers / itemsPerPage);
-                console.log('Updated totals - customers:', totalCustomers, 'pages:', totalPages);
+                totalCategories = parseInt(scriptMatch[1]);
+                totalPages = Math.ceil(totalCategories / itemsPerPage);
+                console.log('Updated totals - categories:', totalCategories, 'pages:', totalPages);
             }
             
             attachToggleListeners();
@@ -382,15 +460,15 @@
     function updatePaginationInfo() {
         const pageButtons = document.getElementById('pageButtons');
         
-        console.log('Updating pagination - currentPage:', currentPage, 'totalPages:', totalPages, 'totalCustomers:', totalCustomers);
+        console.log('Updating pagination - currentPage:', currentPage, 'totalPages:', totalPages, 'totalCategories:', totalCategories);
         
         // Calculate start and end
-        const start = totalCustomers > 0 ? ((currentPage - 1) * itemsPerPage) + 1 : 0;
-        const end = Math.min(currentPage * itemsPerPage, totalCustomers);
+        const start = totalCategories > 0 ? ((currentPage - 1) * itemsPerPage) + 1 : 0;
+        const end = Math.min(currentPage * itemsPerPage, totalCategories);
         
         document.getElementById('paginationStart').textContent = start;
         document.getElementById('paginationEnd').textContent = end;
-        document.getElementById('paginationTotal').textContent = totalCustomers;
+        document.getElementById('paginationTotal').textContent = totalCategories;
         
         // Generate page buttons
         pageButtons.innerHTML = '';
@@ -410,7 +488,7 @@
         
         for (var i = startPage; i <= endPage; i++) {
             const btn = document.createElement('button');
-            const pageNum = i; // Store in const for closure
+            const pageNum = i;
             btn.className = `w-8 h-8 flex items-center justify-center rounded-lg font-bold text-xs transition-colors ${pageNum === currentPage ? 'bg-blue-600 text-white' : 'bg-white text-black hover:bg-gray-200'}`;
             btn.textContent = pageNum;
             btn.addEventListener('click', function() {
@@ -466,7 +544,7 @@
         if (sort) params.append('sort', sort);
         params.append('page', page);
 
-        window.location.href = `/admin/customers?${params.toString()}`;
+        window.location.href = `/admin/category?${params.toString()}`;
     }
 
     // Previous button

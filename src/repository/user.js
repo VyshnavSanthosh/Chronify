@@ -10,7 +10,7 @@ module.exports = class UserRepository{
         return await User.findOne({ referralCode: code})
     }
 
-    async getAllCustomers(limit, skip, sortOrder, search, status){
+    async getAllCustomers(limit, skip, sortOrder, search, status,sortField){
         const query = {
             role: { $ne: "admin" }
         }
@@ -26,8 +26,12 @@ module.exports = class UserRepository{
                 { lastName: { $regex: search, $options: "i" } }
             ]
         }
+
+        const sortObj = {};
+        sortObj[sortField] = sortOrder;
+
         const customers = await User.find(query)
-        .sort({ firstName: sortOrder }) 
+        .sort(sortObj) 
         .skip(skip)                     
         .limit(limit);
         

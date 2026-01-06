@@ -58,4 +58,49 @@ module.exports = class VendorRepository{
         return await Vendor.findByIdAndDelete(vendorId);
     }
 
+    async getAllVendors(limit, skip, sortOrder, search, status,sortField){
+        const query = {
+            isApproved: true
+        }
+        if (status == "true") {
+            query.isBlocked = true
+        }
+        else if (status == "false") {
+            query.isBlocked = false
+        }
+
+        if (search) {
+            query.brandName = { $regex: search, $options: "i" }
+        }
+
+        const sortObj = {};
+        sortObj[sortField] = sortOrder;
+
+        const vendors = await Vendor.find(query)
+        .sort(sortObj) 
+        .skip(skip)                     
+        .limit(limit);
+        
+        const totalVendors = await Vendor.countDocuments(query);
+
+        return {vendors, totalVendors};
+    }
+
+    async updateVendorBlockStatus(vendorId, isBlocked) {
+        try {
+            const updatedVendor = await Vendor.findByIdAndUpdate(
+                vendorId,
+                { isBlocked: isBlocked },
+                { new: true }
+            )
+
+            if (!updatedVendor) {
+                throw new Error("Vendor not found")
+            }
+
+            return updatedVendor
+        } catch (error) {
+            throw new Error(`Error updating vendor block status: ${error.message}`)
+        }
+    }
 }

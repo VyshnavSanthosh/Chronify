@@ -34,6 +34,8 @@ const adminCategoryRoutes = require("./routes/admin/category/categoryRoutes")
 
 const adminCustomerRoutes = require("./routes/admin/customer/customerListRoutes")
 
+const adminVendorRoutes = require("./routes/admin/vendorList/vendorLIstRoutes")
+
 // Body parsers
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -105,6 +107,8 @@ app.use("/admin", adminCategoryRoutes)
 // admin customerList
 app.use("/admin", adminCustomerRoutes)
 
+// admin Vendor list
+app.use("/admin", adminVendorRoutes)
 
 
 module.exports = app;

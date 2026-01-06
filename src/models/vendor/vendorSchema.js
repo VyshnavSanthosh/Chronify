@@ -30,10 +30,16 @@ const VendorSchema = new mongoose.Schema(
             default: "vendor",
         },
 
+        isBlocked: {
+            type: Boolean,
+            default: false
+        },
+
         isApproved: {
             type: Boolean,
             default: false
         },
+
 
         isVerified: {
             type: Boolean,

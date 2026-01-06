@@ -6,8 +6,33 @@ module.exports = class CategoryRepository {
         return await Category.findOne({categoryName})
     }
 
-    async getAllCategies(){
-        return await Category.find({})
+    async findById(categoryId){
+        return await Category.findById(categoryId)
+    }
+    async getAllCategories(limit, skip, sortOrder, search, status,sortField){
+        const query = {}
+        if (status == "true") {
+            query.isListed = true
+        }
+        else if (status == "false") {
+            query.isListed = false
+        }
+
+        if (search) {
+            query.categoryName = { $regex: search, $options: "i"}
+        }
+
+        const sortObj = {}
+        sortObj[sortField] = sortOrder;
+
+        const categories = await Category.find(query)
+            .sort(sortObj)
+            .skip(skip)
+            .limit(limit)
+        
+        const totalCategories = await Category.countDocuments(query)
+        
+        return {categories, totalCategories}
     }
     
     async createCategory(categoryObj){
@@ -33,5 +58,29 @@ module.exports = class CategoryRepository {
         )
     }
 
+    async updatedCategoryListingStatus(categoryId, isListed){
+        try {
+            const updatedCategory = await Category.findByIdAndUpdate(
+                categoryId,
+                { isListed: isListed },
+                { new: true }
+                )
+            return updatedCategory
+        } catch (error) {
+            throw new Error(`Error updating category listing status: ${error.message}`)
+        }
+    }
 
+    async editCategoryinDb(categoryId,categoryObj){
+        try {
+            await Category.findByIdAndUpdate(
+                categoryId,
+                { $set: categoryObj },
+                { new: true, runValidators: true }
+            )
+        } catch (error) {
+            throw new Error("Problem while updating in db", error);
+            
+        }
+    }
 }
