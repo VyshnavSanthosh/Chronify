@@ -1,8 +1,8 @@
-const multer = require('multer');
-const path = require('path');
+import multer from "multer";
+import path from "path";
 
 // FIX: Add file type presets
-const FILE_TYPES = {
+export const FILE_TYPES = {
     PDF: ['application/pdf'],
     IMAGES: ['image/jpeg', 'image/png', 'image/gif', 'image/webp'],
     IMAGES_AND_PDF: [
@@ -31,7 +31,7 @@ function createUploader(
 
     const storage = multer.diskStorage({
         destination: (req, file, cb) => {
-            cb(null, uploadPath); 
+            cb(null, uploadPath);
         },
         filename: (req, file, cb) => {
             const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
@@ -59,5 +59,4 @@ function createUploader(
     });
 }
 
-module.exports = createUploader;
-module.exports.FILE_TYPES = FILE_TYPES;
+export default createUploader;

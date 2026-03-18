@@ -1,4 +1,4 @@
-module.exports = class OtpService {
+export default class OtpService {
     constructor(vendorRepository, redisClient, emailQueue, otpGenerator) {
         this.vendorRepository = vendorRepository;
         this.redis = redisClient;
@@ -6,12 +6,12 @@ module.exports = class OtpService {
         this.otpGenerator = otpGenerator;
     }
 
-    async sendOtp(vendor){
+    async sendOtp(vendor) {
         const otp = this.otpGenerator()
         try {
             await this.redis.set(`otp:${vendor._id}`, otp, "EX", 120)
-        
-            await this.emailQueue.add("vendor-otp",{
+
+            await this.emailQueue.add("vendor-otp", {
                 email: vendor.brandEmail,
                 otp
             })
@@ -23,7 +23,7 @@ module.exports = class OtpService {
 
     }
 
-    async verifyOtp(vendorId, otp){
+    async verifyOtp(vendorId, otp) {
 
         const attemptsKey = `otp:attempts:${vendorId}`;
         const attempts = Number(await this.redis.get(attemptsKey)) || 0;
@@ -35,7 +35,7 @@ module.exports = class OtpService {
         const storedOtp = await this.redis.get(`otp:${vendorId}`)
 
         if (!storedOtp) {
-                throw new Error("Otp expired or not found");
+            throw new Error("Otp expired or not found");
         }
 
         if (storedOtp != otp) {
@@ -43,7 +43,7 @@ module.exports = class OtpService {
             await this.redis.expire(attemptsKey, 120);
             throw new Error("Invalid input");
         }
-        
+
 
         await this.redis.del(`otp:${vendorId}`)
         await this.redis.del(attemptsKey);
@@ -52,7 +52,7 @@ module.exports = class OtpService {
         return true;
     }
 
-    async resendOtp(vendor){
+    async resendOtp(vendor) {
         const newOtp = this.otpGenerator();
         await this.redis.set(`otp:${vendor._id}`, newOtp, "EX", 120)
         await this.emailQueue.add("otp", {

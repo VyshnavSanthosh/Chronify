@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Orders - Chronify | Luxury Watches</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <%- include('../partials/userStyles') %>
+    <%- include('../partials/logoutScript') %>
+    <style>
+        .order-card {
+            background: linear-gradient(135deg, #1a2855 0%, #0f1a35 100%);
+            border: 1px solid #2a3f66;
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .order-card:hover {
+            border-color: #3b82f6;
+        }
+
+        .order-image {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+            background: #000;
+        }
+
+        .order-info {
+            flex: 1;
+            margin-left: 20px;
+        }
+
+        .order-name {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .order-qty {
+            font-size: 12px;
+            color: #b0b5c8;
+        }
+
+        .order-status {
+            padding: 6px 16px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: capitalize;
+            color: #fff;
+        }
+
+        .order-actions {
+            display: flex;
+            gap: 8px;
+            margin-left: 16px;
+        }
+
+        .btn-action {
+            background: #3b82f6;
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-action:hover {
+            background: #2563eb;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            margin-top: 32px;
+        }
+
+        .pagination button {
+            background: transparent;
+            border: 1px solid #2a3f66;
+            color: #fff;
+            width: 36px;
+            height: 36px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        .pagination button:hover {
+            border-color: #3b82f6;
+            color: #3b82f6;
+        }
+
+        .pagination button.active {
+            background: #fff;
+            color: #000;
+            border-color: #fff;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo" style="cursor: pointer;" onclick="window.location.href='/'">CHRONIFY</div>
+        <div class="header-center">
+            <a href="/" style="color: #fff; text-decoration: none;">Home</a>
+            <a href="/products" style="color: #fff; text-decoration: none;">Shop</a>
+        </div>
+
+        <div class="header-icons">
+            <button class="icon-btn" title="Wishlist" onclick="window.location.href='/wishlist'">
+                <i class="far fa-heart"></i>
+                <% if (locals.wishlistCount > 0) { %>
+                    <span class="badge wishlist-badge"><%= wishlistCount %></span>
+                <% } %>
+            </button>
+            <button class="icon-btn" title="Cart" onclick="window.location.href='/cart'">
+                <i class="fas fa-shopping-cart"></i>
+                <% if (locals.cartCount > 0) { %>
+                    <span class="badge cart-badge"><%= cartCount %></span>
+                <% } %>
+            </button>
+            <button class="icon-btn" title="Account" onclick="window.location.href='/profile'">
+                <i class="far fa-user-circle"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container">
+        <%- include('../partials/userSidebar', { user, activePage: 'orders', wishlistCount: 0 }) %>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <h2 style="font-size: 20px; font-weight: 600; margin-bottom: 32px;">My Orders</h2>
+
+            <!-- Orders List -->
+            <div>
+                <% const orderList = orders || []; %>
+                
+                <% orderList.forEach(order => { %>
+                    <div class="order-card">
+                        <!-- Order Item Info -->
+                        <div style="display: flex; align-items: center; flex: 1;">
+                            <!-- Product Image -->
+                            <img src="<%= order.items[0].mainImage %>" alt="<%= order.product %>" class="order-image">
+                            
+                            <!-- Product Details -->
+                            <div class="order-info">
+                                <div class="order-name">
+                                    <% if(order.items && order.items.length){ %>
+                                        <%= order.items[0].name %>
+                                        <% if(order.items.length > 1){ %>
+                                            +<%= order.items.length - 1 %> more items
+                                        <% } %>
+                                    <% } %>
+                                </div>
+                                <div class="order-qty">Qty: <%= order.items[0].quantity %></div>
+                            </div>
+                        </div>
+
+                        <!-- Status and Actions -->
+                        <div style="display: flex; align-items: center; gap: 16px;">
+                            <%
+                            const statusColorMap = {
+                                pending: "#f59e0b",
+                                confirmed: "#3b82f6",
+                                packed: "#6366f1",
+                                shipped: "#0ea5e9",
+                                out_for_delivery: "#8b5cf6",
+                                delivered: "#10b981",
+                                cancelled: "#ef4444",
+                                returned: "#f97316",
+                                refunded: "#6b7280"
+                            };
+                            const currentStatusColor = statusColorMap[order.orderStatus] || "#6b7280";
+                            %>
+
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span style="color: #b0b5c8; font-size: 12px;">Status:</span>
+                                <span class="order-status" style="background: <%= currentStatusColor %>;">
+                                    <%= order.orderStatus.replaceAll('_',' ') %>
+                                </span>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="order-actions">
+
+                                <button onclick='viewOrderDetails("<%= order._id %>")' class="btn-action">
+                                    <i class="fa-solid fa-eye"></i> View Details
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                <% }); %>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination">
+                <% if (currentPage > 1) { %>
+                    <button onclick="goToPage(<%= currentPage - 1 %>)">
+                        <i class="fa-solid fa-chevron-left"></i>
+                    </button>
+                <% } %>
+
+                <% 
+                let startPage = Math.max(1, currentPage - 2);
+                let endPage = Math.min(totalPages, startPage + 4);
+                
+                if (endPage - startPage < 4) {
+                    startPage = Math.max(1, endPage - 4);
+                }
+                %>
+
+                <% for(let i = startPage; i <= endPage; i++) { %>
+                    <button onclick="goToPage(<%= i %>)" class="<%= i === currentPage ? 'active' : '' %>">
+                        <%= i %>
+                    </button>
+                <% } %>
+
+                <% if (currentPage < totalPages) { %>
+                    <button onclick="goToPage(<%= currentPage + 1 %>)">
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                <% } %>
+            </div>
+        </main>
+    </div>
+
+    <%- include('../partials/userFooter') %>
+
+    <!-- JavaScript -->
+    <script>
+        // Download invoice
+        function downloadInvoice(orderId) {
+            console.log('[v0] Downloading invoice for order:', orderId);
+            window.open('/invoice/' + orderId, '_blank');
+        }
+
+        // View order details
+        function viewOrderDetails(orderId) {
+            console.log('[v0] Viewing details for order:', orderId);
+            window.location.href = '/orders/' + orderId;
+        }
+
+        // Go to specific page
+        function goToPage(pageNum) {
+            window.location.href = `/orders?page=${pageNum}`;
+        }
+
+
+    </script>
+</body>
+</html>

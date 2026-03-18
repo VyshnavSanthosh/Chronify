@@ -1,6 +1,7 @@
-const nodemailer = require("nodemailer");
-require('dotenv').config();
-const { mail_host, mail_port, mail_user, mail_pass } = require("../config/index")
+import nodemailer from "nodemailer";
+import dotenv from "dotenv";
+dotenv.config();
+import { mail_host, mail_port, mail_user, mail_pass } from "../config/index.js";
 const transporter = nodemailer.createTransport({
     host: mail_host,
     port: parseInt(mail_port),
@@ -11,4 +12,4 @@ const transporter = nodemailer.createTransport({
     }
 });
 
-module.exports = transporter;
+export default transporter;

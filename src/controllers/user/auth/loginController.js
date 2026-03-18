@@ -1,4 +1,4 @@
-module.exports = class LoginController {
+export default class LoginController {
     constructor(loginService, googleOauthService, jwtService, userRepository, joi_login, validator) {
         this.loginService = loginService;
         this.googleOauthService = googleOauthService;
@@ -8,112 +8,150 @@ module.exports = class LoginController {
         this.validator = validator;
     }
 
+    renderLogin(req, res) {
+        const successMessage = req.session.successMessage || null;
+        req.session.successMessage = null;
 
-    renderLogin(req,res){
-        return res.render("user/auth/login",{
+        return res.render("user/auth/login", {
             error: null,
             email: "",
-            query: req.query
-        })
+            query: req.query,
+            success: successMessage,
+            info: null
+        });
     }
 
-    async handleLogin(req,res){
-        const {error, value} = this.validator.validate(this.joi_login, req.body);
+    async handleLogin(req, res) {
+        const { error, value } = this.validator.validate(this.joi_login, req.body);
+
         if (error) {
             const errorMessage = error.details[0].message;
             return res.render("user/auth/login", {
                 error: errorMessage,
                 email: req.body.email || "",
-                query: req.query
+                query: req.query,
+                success: null,
+                info: null
             });
         }
 
-        const {email, password} = value;
-        try {
-            const {user, accessToken, refreshToken} = await this.loginService.login(email, password)
+        const { email, password } = value;
 
-             // Set HTTP-only cookies
-            this.setAuthCookies(res, accessToken, refreshToken);
+        try {
+            const { user, userAccessToken, userRefreshToken } = await this.loginService.login(email, password);
+
+            // Check if user is blocked
+            if (user.isBlocked) {
+                return res.render("user/auth/login", {
+                    error: "Your account has been blocked. Please contact support.",
+                    email: email,
+                    query: req.query,
+                    success: null,
+                    info: null
+                });
+            }
+
+            // Set HTTP-only cookies
+            this.setAuthCookies(res, userAccessToken, userRefreshToken);
 
             // Redirect to home
-            return res.redirect("/home");
+            return res.redirect("/");
 
         } catch (err) {
             return res.render("user/auth/login", {
                 error: err.message,
                 email: email,
-                query: req.query
+                query: req.query,
+                success: null,
+                info: null
             });
         }
     }
 
-
     async handleGoogleCallback(req, res) {
         try {
-            // Passport attaches Google profile to req.user
+            console.log("Google callback initiated");
             const googleProfile = req.user;
 
             if (!googleProfile) {
+                console.error("Google authentication failed - no profile in req.user");
                 throw new Error("Google authentication failed");
             }
 
-            // Process Google login
+            console.log(`Processing Google login for: ${googleProfile.emails?.[0]?.value || 'ID: ' + googleProfile.id}`);
             const user = await this.googleOauthService.handleGoogleLogin(googleProfile);
 
-            // Generate JWT tokens
+            // Check if user is blocked
+            if (user.isBlocked) {
+                console.warn(`Blocked user attempted Google login: ${user.email}`);
+                return res.render("user/auth/login", {
+                    error: "Your account has been blocked. Please contact support.",
+                    email: user.email,
+                    query: req.query,
+                    success: null,
+                    info: null
+                });
+            }
+
             const { accessToken, refreshToken } = this.jwtService.generateTokens(
                 user._id.toString(),
-                user.email
+                user.email,
+                user.role
             );
 
-            // Save refresh token in database
-            await this.userRepository.updateRefreshToken(user._id, refreshToken);
+            console.log(`JWT tokens generated for user: ${user.email}`);
 
-            // Set HTTP-only cookies
-            this.setAuthCookies(res, accessToken, refreshToken);
+            const userAccessToken = accessToken
+            const userRefreshToken = refreshToken
+            await this.userRepository.updateRefreshToken(user._id, userRefreshToken);
 
-            // Redirect to home
-            return res.redirect("/home");
+            this.setAuthCookies(res, userAccessToken, userRefreshToken);
+
+            console.log("Authentication cookies set, redirecting to home");
+            return res.redirect("/");
 
         } catch (err) {
-            console.error("Google OAuth Error:", err);
-            return res.redirect("/user/auth/login?error=google_auth_failed");
+            console.error("Detailed Google OAuth Error:", err);
+            return res.redirect(`/auth/login?error=google_auth_failed&message=${encodeURIComponent(err.message)}`);
         }
     }
 
-    setAuthCookies(res, accessToken, refreshToken) {
-        res.cookie("accessToken", accessToken, {
+    setAuthCookies(res, userAccessToken, userRefreshToken) {
+        console.log("Setting auth cookies with path '/'");
+        res.cookie("userAccessToken", userAccessToken, {
             httpOnly: true,
-            secure: false, 
+            secure: false, // Set to true in production
             sameSite: "lax",
+            path: "/",
             maxAge: 15 * 60 * 1000 // 15 minutes
         });
 
-        // Refresh token cookie (7 days)
-        res.cookie("refreshToken", refreshToken, {
+        res.cookie("userRefreshToken", userRefreshToken, {
             httpOnly: true,
-            secure: false,
+            secure: false, // Set to true in production
             sameSite: "lax",
+            path: "/",
             maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
         });
     }
-    
+
     async refreshToken(req, res) {
         try {
-            const { refreshToken } = req.cookies;
+            const { userRefreshToken } = req.cookies;
 
-            if (!refreshToken) {
+            if (!userRefreshToken) {
                 return res.status(401).json({
                     success: false,
-                    error: "Refresh token not found. Please login again."
+                    error: "Refresh token not found. Please login again.",
+                    code: "NO_REFRESH_TOKEN"
                 });
             }
 
             // Get new tokens
-            const newTokens = await this.loginService.refreshAccessToken(refreshToken);
+            const newTokens = await this.loginService.refreshAccessToken(userRefreshToken);
 
             // Set new cookies
-            this.setAuthCookies(res, newTokens.accessToken, newTokens.refreshToken);
+            this.setAuthCookies(res, newTokens.userAccessToken, newTokens.userRefreshToken);
 
             return res.json({
                 success: true,
@@ -121,17 +159,19 @@ module.exports = class LoginController {
             });
 
         } catch (err) {
+            console.error("Token refresh error:", err.message);
+
             // Clear invalid cookies
-            res.clearCookie("accessToken");
-            res.clearCookie("refreshToken");
+            res.clearCookie("userAccessToken");
+            res.clearCookie("userRefreshToken");
 
             return res.status(401).json({
                 success: false,
-                error: err.message
+                error: err.message,
+                code: "REFRESH_FAILED"
             });
         }
     }
-
 
     async logout(req, res) {
         try {
@@ -142,20 +182,19 @@ module.exports = class LoginController {
             await this.loginService.logout(userId);
 
             // Clear cookies
-            res.clearCookie("accessToken");
-            res.clearCookie("refreshToken");
+            res.clearCookie("userAccessToken");
+            res.clearCookie("userRefreshToken");
 
-            return res.redirect("/user/auth/login");
+            return res.redirect("/auth/login?logout=success");
 
         } catch (err) {
             console.error("Logout Error:", err);
-            return res.status(500).json({
-                success: false,
-                error: "Logout failed"
-            });
+
+            // Even if DB update fails, clear cookies
+            res.clearCookie("userAccessToken");
+            res.clearCookie("userRefreshToken");
+
+            return res.redirect("/auth/login?logout=success");
         }
     }
-
-
-    
 }

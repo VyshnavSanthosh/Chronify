@@ -1,18 +1,18 @@
-const express = require("express");
+import express from "express";
 const router = express.Router();
-const {verifyToken} = require("../../middleware/vendorJwt") 
+import noCache from "../../middleware/nocache.js";
+router.use(noCache);
+import vendorJwtMiddlewareFile from "../../middleware/vendorJwt.js";
 
-// Controller
-
-const dashboardControllerFile = require("../../controllers/vendor/dashboard/dashboardController")
+import DashboardController from "../../controllers/vendor/dashboard/dashboardController.js";
 
 // ========== Dependency Injection ==========
 
-const dashboardController = new dashboardControllerFile()
-
+const dashboardController = new DashboardController()
+const vendorJwtMiddleware = new vendorJwtMiddlewareFile();
 // Routes
 
 router.route("/dashboard")
-    .get(verifyToken, dashboardController.rendorDashboardPage.bind(dashboardController))
+    .get(vendorJwtMiddleware.verifyToken.bind(vendorJwtMiddleware), dashboardController.rendorDashboardPage.bind(dashboardController))
 
-module.exports = router;
+export default router;

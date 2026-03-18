@@ -1,0 +1,472 @@
+<% layout('admin/layout/adminLayout') %>
+
+<% block('styles', `
+    <style>
+        .page-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 32px;
+            font-weight: 700;
+            color: #ffffff;
+            padding-bottom: 2rem;
+            text-decoration: underline;
+        }
+        .controls-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            gap: 20px;
+        }
+        .search-box {
+            flex: 0 1 350px;
+        }
+        .search-box input {
+            width: 100%;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 6px;
+            background-color: #ffffff;
+            color: #050a14;
+            font-size: 14px;
+        }
+        .search-box input::placeholder {
+            color: #999;
+        }
+        .buttons-group {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        .pending-btn {
+            background-color: #2d5a8c;
+            color: #ffffff;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: background-color 0.3s ease;
+        }
+        .pending-btn:hover {
+            background-color: #3d6fa8;
+        }
+        .filters-row {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+        .filter-label {
+            font-size: 13px;
+            font-weight: 500;
+            color: #b0c4de;
+        }
+        .filter-dropdown {
+            padding: 8px 12px;
+            border: 1px solid #1a2d4a;
+            border-radius: 6px;
+            background-color: #000B1B;
+            color: #ffffff;
+            cursor: pointer;
+            font-size: 13px;
+            min-width: 120px;
+        }
+        .filter-dropdown:focus {
+            outline: none;
+            border-color: #4a7ba7;
+        }
+        .table-container {
+            overflow-x: auto;
+            background-color: #0f1e2e;
+            border-radius: 8px;
+            border: 1px solid #1a2d4a;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th {
+            background-color: #1a3a52;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 13px;
+            color: #ffffff;
+            border-bottom: 1px solid #0f2438;
+        }
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #0f2438;
+            font-size: 13px;
+        }
+        tr:hover {
+            background-color: #0a1425;
+        }
+        .product-image {
+            width: 50px;
+            height: 50px;
+            border-radius: 6px;
+            object-fit: cover;
+            background-color: #1a2d4a;
+        }
+        .pagination {
+            display: flex;
+            justify-content: end;
+            gap: 8px;
+            margin-top: 30px;
+        }
+        .pagination button {
+            width: 36px;
+            height: 36px;
+            border: 1px solid #1a2d4a;
+            background-color: transparent;
+            color: #b0c4de;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+        .pagination button:hover:not(:disabled) {
+            background-color: #1a2d4a;
+            color: #ffffff;
+        }
+        .pagination button.active {
+            background-color: #2d5a8c;
+            color: #ffffff;
+            border-color: #2d5a8c;
+        }
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .pagination-info {
+            text-align: left;
+            font-size: 12px;
+            color: #6b7c93;
+            margin-top: 15px;
+        }
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #b0c4de;
+        }
+    </style>
+`) %>
+
+<!-- Content Area -->
+<div class="p-8">
+    <div class="breadcrumb text-sm text-gray-400 mb-4">
+        <a href="/admin/dashboard" class="hover:text-white">Dashboard</a> > <a href="/admin/products" class="text-white">Products</a>
+    </div>
+    <div>
+        <h1 class="page-title">Products</h1>
+    </div>
+
+    <!-- Controls Row -->
+    <div class="controls-row">
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Search product..." value="<%= locals.search || '' %>">
+        </div>
+        <div class="buttons-group">
+            <button class="pending-btn" onclick="window.location.href='/admin/products/pendings'">
+                Product Pendings
+            </button>
+        </div>
+    </div>
+
+    <!-- Filters Row -->
+    <div class="filters-row">
+        <label class="filter-label">Filter By</label>
+        <select class="filter-dropdown" id="categoryFilter">
+            <option value="">All Categories</option>
+            <% if (categories && categories.length > 0) { %>
+                <% categories.forEach(cat => { %>
+                    <option value="<%= cat.categoryName %>" <%= locals.category === cat.categoryName ? 'selected' : '' %>>
+                        <%= cat.categoryName %>
+                    </option>
+                <% }); %>
+            <% } %>
+        </select>
+
+        <select class="filter-dropdown" id="brandFilter">
+            <option value="">All Brands</option>
+            <% if (brands && brands.length > 0) { %>
+                <% brands.forEach(brandItem => { %>
+                    <option value="<%= brandItem %>" <%= locals.brand === brandItem ? 'selected' : '' %>>
+                        <%= brandItem %>
+                    </option>
+                <% }); %>
+            <% } %>
+        </select>
+
+        <label class="filter-label">Sort By</label>
+        <select class="filter-dropdown" id="sortFilter">
+            <option value="newest" <%= locals.sort === 'newest' || !locals.sort ? 'selected' : '' %>>Newest</option>
+            <option value="oldest" <%= locals.sort === 'oldest' ? 'selected' : '' %>>Oldest</option>
+            <option value="az" <%= locals.sort === 'az' ? 'selected' : '' %>>A-Z</option>
+            <option value="za" <%= locals.sort === 'za' ? 'selected' : '' %>>Z-A</option>
+            <option value="Low-High" <%= locals.sort === 'Low-High' ? 'selected' : '' %>>Price: Low-High</option>
+            <option value="High-Low" <%= locals.sort === 'High-Low' ? 'selected' : '' %>>Price: High-Low</option>
+        </select>
+    </div>
+
+    <!-- Products Table -->
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Image</th>
+                    <th>Product Name</th>
+                    <th>Category</th>
+                    <th>Price</th>
+                    <th>Stock</th>
+                    <th>Offer %</th>
+                    <th>Brand Name</th>
+                    <th>Vendor Name</th>
+                </tr>
+            </thead>
+            <tbody id="productTableBody">
+                <% if (products && products.length > 0) { %>
+                    <% products.forEach(product => { %>
+                        <tr>
+                            <td onclick="viewProduct('<%= product._id %>')" style="cursor: pointer;">
+                                <% if (product.variants && product.variants.length > 0 && product.variants[0].mainImage) { %>
+                                    <img src="<%= product.variants[0].mainImage.url %>" alt="<%= product.name %>" class="product-image">
+                                <% } else { %>
+                                    <div class="product-image" style="display: flex; align-items: center; justify-content: center; background: #1a2d4a; font-size: 10px; color: #6b7c93;">No Image</div>
+                                <% } %>
+                            </td>
+                            <td onclick="viewProduct('<%= product._id %>')" style="cursor: pointer;"><%= product.name %></td>
+                            <td onclick="viewProduct('<%= product._id %>')" style="cursor: pointer;"><%= product.category ? product.category.categoryName : 'N/A' %></td>
+                            <td onclick="viewProduct('<%= product._id %>')" style="cursor: pointer;">
+                                <% if (product.variants && product.variants.length > 0) { %>
+                                    ₹ <%= product.variants[0].price.toLocaleString() %>
+                                <% } else { %>
+                                    N/A
+                                <% } %>
+                            </td>
+                            <td onclick="viewProduct('<%= product._id %>')" style="cursor: pointer;">
+                                <% if (product.variants && product.variants.length > 0) { %>
+                                    <%= product.variants.reduce((sum, v) => sum + v.quantity, 0) %>
+                                <% } else { %>
+                                    0
+                                <% } %>
+                            </td>
+                            <td onclick="viewProduct('<%= product._id %>')" style="cursor: pointer;">
+                                <% if (product.variants && product.variants.length > 0) { %>
+                                    <%= product.variants[0].offer %>%
+                                <% } else { %>
+                                    0%
+                                <% } %>
+                            </td>
+                            <td onclick="viewProduct('<%= product._id %>')" style="cursor: pointer;"><%= product.brand %></td>
+                            <td onclick="viewProduct('<%= product._id %>')" style="cursor: pointer;"><%= product.vendorId ? product.vendorId.brandName : 'N/A' %></td>
+                        </tr>
+                    <% }); %>
+                <% } else { %>
+                    <tr>
+                        <td colspan="8" style="text-align: center; padding: 40px; color: #6b7c93;">No products found</td>
+                    </tr>
+                <% } %>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination-info" id="paginationInfo">
+        Showing <span id="showingStart">1</span>-<span id="showingEnd">10</span> from <span id="totalCount"><%= locals.totalProducts || 0 %></span>
+    </div>
+    <div class="pagination" id="paginationContainer">
+        <!-- Pagination buttons will be generated by JavaScript -->
+    </div>
+</div>
+
+<% block('scripts', `
+<script>
+    // State management
+    let currentPage = ${locals.page || 1};
+    let totalProducts = ${locals.totalProducts || 0};
+    const itemsPerPage = 10;
+    let totalPages = Math.ceil(totalProducts / itemsPerPage);
+    let isLoading = false;
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        updatePaginationUI();
+        attachEventListeners();
+    });
+
+    // Attach event listeners
+    function attachEventListeners() {
+        // Search input with debounce
+        document.getElementById('searchInput').addEventListener('keyup', debounce(applyFilters, 500));
+        
+        // Filter dropdowns
+        document.getElementById('categoryFilter').addEventListener('change', applyFilters);
+        document.getElementById('brandFilter').addEventListener('change', applyFilters);
+        document.getElementById('sortFilter').addEventListener('change', applyFilters);
+    }
+
+    // Debounce function
+    function debounce(func, delay) {
+        let timeoutId;
+        return function(...args) {
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(() => func.apply(this, args), delay);
+        };
+    }
+
+    // Apply filters and fetch products
+    async function applyFilters() {
+        if (isLoading) return;
+        
+        currentPage = 1; // Reset to first page on filter change
+        await fetchProducts();
+    }
+
+    // Fetch products via AJAX
+    async function fetchProducts() {
+        if (isLoading) return;
+        isLoading = true;
+
+        const search = document.getElementById('searchInput').value;
+        const category = document.getElementById('categoryFilter').value;
+        const brand = document.getElementById('brandFilter').value;
+        const sort = document.getElementById('sortFilter').value;
+
+        // Build query parameters
+        const params = new URLSearchParams();
+        if (search) params.append('search', search);
+        if (category) params.append('category', category);
+        if (brand) params.append('brand', brand);
+        if (sort) params.append('sort', sort);
+        params.append('page', currentPage);
+
+        try {
+            // Show loading state
+            const tbody = document.getElementById('productTableBody');
+            tbody.innerHTML = '<tr><td colspan="8" class="loading"><i class="fa-solid fa-spinner fa-spin"></i> Loading...</td></tr>';
+
+            const response = await fetch("/admin/products?" + params.toString(), {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest' // Indicate AJAX request
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+
+            const html = await response.text();
+            
+            // Parse the HTML response
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            
+            // Extract the table body
+            const newTableBody = doc.getElementById('productTableBody');
+            if (newTableBody) {
+                tbody.innerHTML = newTableBody.innerHTML;
+            }
+
+            // Extract total products from the response
+            const totalCountElement = doc.getElementById('totalCount');
+            if (totalCountElement) {
+                totalProducts = parseInt(totalCountElement.textContent) || 0;
+                totalPages = Math.ceil(totalProducts / itemsPerPage);
+            }
+
+            // Update pagination
+            updatePaginationUI();
+
+            // Update URL without reload
+            const newUrl = "/admin/products?" + params.toString();
+            window.history.pushState({}, '', newUrl);
+
+        } catch (error) {
+            console.error('Error fetching products:', error);
+            const tbody = document.getElementById('productTableBody');
+            tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 40px; color: #ef4444;">Error loading products. Please try again.</td></tr>';
+        } finally {
+            isLoading = false;
+        }
+    }
+
+    // Update pagination UI
+    function updatePaginationUI() {
+        const container = document.getElementById('paginationContainer');
+        container.innerHTML = '';
+
+        // Calculate showing range
+        const start = totalProducts > 0 ? ((currentPage - 1) * itemsPerPage) + 1 : 0;
+        const end = Math.min(currentPage * itemsPerPage, totalProducts);
+        
+        document.getElementById('showingStart').textContent = start;
+        document.getElementById('showingEnd').textContent = end;
+        document.getElementById('totalCount').textContent = totalProducts;
+
+        if (totalPages === 0) return;
+
+        // Previous button
+        const prevBtn = document.createElement('button');
+        prevBtn.innerHTML = '‹';
+        prevBtn.disabled = currentPage === 1;
+        prevBtn.onclick = () => goToPage(currentPage - 1);
+        container.appendChild(prevBtn);
+
+        // Page buttons
+        const maxVisiblePages = 5;
+        let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+        let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+        // Adjust if near the end
+        if (endPage - startPage < maxVisiblePages - 1) {
+            startPage = Math.max(1, endPage - maxVisiblePages + 1);
+        }
+
+        for (let i = startPage; i <= endPage; i++) {
+            const pageBtn = document.createElement('button');
+            pageBtn.textContent = i;
+            pageBtn.className = i === currentPage ? 'active' : '';
+            pageBtn.onclick = () => goToPage(i);
+            container.appendChild(pageBtn);
+        }
+
+        // Ellipsis if needed
+        if (endPage < totalPages) {
+            const ellipsis = document.createElement('button');
+            ellipsis.textContent = '...';
+            ellipsis.disabled = true;
+            container.appendChild(ellipsis);
+        }
+
+        // Next button
+        const nextBtn = document.createElement('button');
+        nextBtn.innerHTML = '›';
+        nextBtn.disabled = currentPage === totalPages;
+        nextBtn.onclick = () => goToPage(currentPage + 1);
+        container.appendChild(nextBtn);
+    }
+
+    // Go to specific page
+    async function goToPage(page) {
+        if (page < 1 || page > totalPages || page === currentPage || isLoading) {
+            return;
+        }
+        currentPage = page;
+        await fetchProducts();
+    }
+
+    // Handle browser back/forward buttons
+    window.addEventListener('popstate', function() {
+        location.reload();
+    });
+
+    // View product detail
+    function viewProduct(productId) {
+        window.location.href = '/products/' + productId;
+    }
+</script>
+`) %>

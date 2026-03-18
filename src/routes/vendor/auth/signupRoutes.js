@@ -1,40 +1,31 @@
-const express = require("express");
+import express from "express";
 const router = express.Router();
+import noCache from "../../../middleware/nocache.js";
+router.use(noCache);
 
-// Controllers
-const signupControllerFile = require("../../../controllers/vendor/auth/signupController")
-const OtpController = require("../../../controllers/vendor/auth/otpController")
-
-// Validators
-const joi_VendorSignup = require('../../../utils/validators/joi_vendorSignup');
-const validator = require('../../../utils/validators/validator');
-
-// Services
-const signupServiceFile = require("../../../service/vendor/auth/signupService")
-const OtpService = require('../../../service/vendor/auth/otpService');
-
-// Repository
-const VendorRepository = require("../../../repository/vendor")
-
-// Utils
-const redis = require('../../../utils/redis');
-const generateOtp = require("../../../utils/generateOTP");
-
-// Queue
-const emailQueue = require('../../../queues/emailQueue');
+import VendorSignupController from "../../../controllers/vendor/auth/signupController.js";
+import OtpController from "../../../controllers/vendor/auth/otpController.js";
+import joi_VendorSignup from "../../../utils/validators/joi_vendorSignup.js";
+import validator from "../../../utils/validators/validator.js";
+import VendorSignupService from "../../../service/vendor/auth/signupService.js";
+import OtpService from "../../../service/vendor/auth/otpService.js";
+import VendorRepository from "../../../repository/vendor.js";
+import redis from "../../../utils/redis.js";
+import generateOtp from "../../../utils/generateOTP.js";
+import emailQueue from "../../../queues/emailQueue.js";
 
 
 // ========== Dependency Injection ==========
 
 const vendorRepository = new VendorRepository()
 
-const signupService = new signupServiceFile(vendorRepository)
+const signupService = new VendorSignupService(vendorRepository)
 
 // Create otpService BEFORE signupController
 const otpService = new OtpService(vendorRepository, redis, emailQueue, generateOtp)
 
 // Pass otpService instance (not the class) to signupController
-const signupController = new signupControllerFile(signupService, otpService, joi_VendorSignup, validator)
+const signupController = new VendorSignupController(signupService, otpService, joi_VendorSignup, validator)
 
 const otpController = new OtpController(otpService)
 
@@ -56,4 +47,4 @@ router.post("/resend-otp",
     otpController.resendOtp.bind(otpController)
 );
 
-module.exports = router;
+export default router;

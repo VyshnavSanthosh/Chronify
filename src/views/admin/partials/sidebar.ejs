@@ -1,0 +1,86 @@
+<!-- Sidebar -->
+<aside class="w-64 bg-[#0a1425] flex flex-col border-r border-gray-800 hidden md:flex shrink-0">
+    <div class="p-6">
+        <h1 class="text-2xl font-bold tracking-widest text-white uppercase italic">
+            Chronify
+        </h1>
+    </div>
+
+    <nav class="flex-1 px-4 space-y-2 overflow-y-auto">
+        <a href="/admin/dashboard" class="flex items-center justify-between px-4 py-3 rounded-lg transition-colors <%= activePage === 'dashboard' ? 'sidebar-item-active text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white' %>">
+            <div class="flex items-center space-x-3">
+                <i class="fa-solid fa-house w-5 text-center"></i>
+                <span class="text-sm font-medium">Dashboard</span>
+            </div>
+        </a>
+
+        <a href="/admin/products" class="flex items-center justify-between px-4 py-3 rounded-lg transition-colors <%= activePage === 'products' ? 'sidebar-item-active text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white' %>">
+            <div class="flex items-center space-x-3">
+                <i class="fa-solid fa-briefcase w-5 text-center"></i>
+                <span class="text-sm font-medium">Products</span>
+            </div>
+            <i class="fa-solid fa-chevron-right text-[10px]"></i>
+        </a>
+
+        <a href="/admin/orders" class="flex items-center justify-between px-4 py-3 rounded-lg transition-colors <%= activePage === 'orders' ? 'sidebar-item-active text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white' %>">
+            <div class="flex items-center space-x-3">
+                <i class="fa-solid fa-list-ul w-5 text-center"></i>
+                <span class="text-sm font-medium">Order List</span>
+            </div>
+            <i class="fa-solid fa-chevron-right text-[10px]"></i>
+        </a>
+
+        <a href="/admin/customers" class="flex items-center justify-between px-4 py-3 rounded-lg transition-colors <%= activePage === 'customers' ? 'sidebar-item-active text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white' %>">
+            <div class="flex items-center space-x-3">
+                <i class="fa-solid fa-circle-user w-5 text-center"></i>
+                <span class="text-sm font-medium">Customer</span>
+            </div>
+            <i class="fa-solid fa-chevron-right text-[10px]"></i>
+        </a>
+
+        <a href="/admin/sales-report" class="flex items-center justify-between px-4 py-3 rounded-lg transition-colors <%= activePage === 'sales' ? 'sidebar-item-active text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white' %>">
+            <div class="flex items-center space-x-3">
+                <i class="fa-solid fa-hand-holding-dollar w-5 text-center"></i>
+                <span class="text-sm font-medium">Sales</span>
+            </div>
+            <i class="fa-solid fa-chevron-right text-[10px]"></i>
+        </a>
+        <a href="/admin/profile" class="flex items-center justify-between px-4 py-3 rounded-lg transition-colors <%= activePage === 'profile' ? 'sidebar-item-active text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white' %>">
+            <div class="flex items-center space-x-3">
+                <i class="fa-solid fa-circle-user w-5 text-center"></i>
+                <span class="text-sm font-medium">Profile</span>
+            </div>
+            <i class="fa-solid fa-chevron-right text-[10px]"></i>
+        </a>
+        <a href="/admin/category" class="flex items-center justify-between px-4 py-3 rounded-lg transition-colors <%= activePage === 'category' ? 'sidebar-item-active text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white' %>">
+            <div class="flex items-center space-x-3">
+                <i class="fa-solid fa-table-cells-large w-5 text-center"></i>
+                <span class="text-sm font-medium">Category</span>
+            </div>
+            <i class="fa-solid fa-chevron-right text-[10px]"></i>
+        </a>
+
+        <a href="/admin/coupons" class="flex items-center justify-between px-4 py-3 rounded-lg transition-colors <%= activePage === 'coupons' ? 'sidebar-item-active text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white' %>">
+            <div class="flex items-center space-x-3">
+                <i class="fa-solid fa-ticket w-5 text-center"></i>
+                <span class="text-sm font-medium">Coupons</span>
+            </div>
+            <i class="fa-solid fa-chevron-right text-[10px]"></i>
+        </a>
+
+        <a href="/admin/vendors" class="flex items-center justify-between px-4 py-3 rounded-lg transition-colors <%= activePage === 'vendors' ? 'sidebar-item-active text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white' %>">
+            <div class="flex items-center space-x-3">
+                <i class="fa-solid fa-users-gear w-5 text-center"></i>
+                <span class="text-sm font-medium">Vendors</span>
+            </div>
+            <i class="fa-solid fa-chevron-right text-[10px]"></i>
+        </a>
+    </nav>
+
+    <div class="p-6 space-y-4">
+
+        <button id="adminLogoutBtn" class="w-full py-2 bg-white text-black font-semibold rounded-md hover:bg-gray-200 transition-colors">
+            Logout
+        </button>
+    </div>
+</aside>

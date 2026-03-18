@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Address - Chronify | Luxury Watches</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <%- include('../partials/userStyles') %>
+    <%- include('../partials/logoutScript') %>
+    <style>
+        .address-card {
+            background: linear-gradient(135deg, #1a2855 0%, #0f1a35 100%);
+            border: 1px solid #2a3f66;
+            border-radius: 12px;
+            padding: 32px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #b0b5c8;
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            background: #0a0e27;
+            border: 1px solid #2a3f66;
+            border-radius: 6px;
+            color: #fff;
+            font-size: 14px;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+
+        .btn-submit {
+            background: #3b82f6;
+            color: #fff;
+            border: none;
+            padding: 12px 32px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .btn-submit:hover {
+            background: #2563eb;
+        }
+
+        .btn-cancel {
+            background: #ef4444;
+            color: #fff;
+            border: none;
+            padding: 12px 32px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-cancel:hover {
+            background: #dc2626;
+        }
+
+        .error-text {
+            color: #ef4444;
+            font-size: 12px;
+            margin-top: 4px;
+        }
+    </style>
+</head>
+<body>
+
+    <%- include('../partials/userNavbar') %>
+
+    <!-- Main Content -->
+    <div class="container">
+        <%- include('../partials/userSidebar', { user, activePage: 'address', wishlistCount: 0 }) %>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <h2 style="font-size: 20px; font-weight: 600; margin-bottom: 32px;">Add New Address</h2>
+
+            <div class="address-card">
+                <form id="addressForm" action="/address/add" method="POST" novalidate>
+                    <!-- Name & Phone -->
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
+                        <div class="form-group">
+                            <label class="form-label">Full Name</label>
+                            <input type="text" id="name" name="name" class="form-input" value="<%= locals.addressData?.name || user?.firstName || '' %>" >
+                            <div id="nameError" class="error-text">
+                                <% if (locals.errors?.name) { %> <%= locals.errors.name %> <% } %>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Phone Number</label>
+                            <input type="tel" id="phone" name="phone" class="form-input" value="<%= locals.addressData?.phone || user?.phone || '' %>" >
+                            <div id="phoneError" class="error-text">
+                                <% if (locals.errors?.phone) { %> <%= locals.errors.phone %> <% } %>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Address -->
+                    <div class="form-group">
+                        <label class="form-label">Address</label>
+                        <input type="text" id="address" name="address" class="form-input" value="<%= locals.addressData?.address || '' %>" placeholder="House Name, House Number, Locality" >
+                        <div id="addressError" class="error-text">
+                            <% if (locals.errors?.address) { %> <%= locals.errors.address %> <% } %>
+                        </div>
+                    </div>
+
+                    <!-- Pin Code & District -->
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
+                        <div class="form-group">
+                            <label class="form-label">Pin Code</label>
+                            <input type="text" id="pinCode" name="pinCode" class="form-input" value="<%= locals.addressData?.pinCode || '' %>" placeholder="eg: 689230" >
+                            <div id="pinCodeError" class="error-text">
+                                <% if (locals.errors?.pinCode) { %> <%= locals.errors.pinCode %> <% } %>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">District / Town</label>
+                            <input type="text" id="district" name="district" class="form-input" value="<%= locals.addressData?.district || '' %>" placeholder="eg: Ernakulam" >
+                            <div id="districtError" class="error-text">
+                                <% if (locals.errors?.district) { %> <%= locals.errors.district %> <% } %>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- State & Landmark -->
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
+                        <div class="form-group">
+                            <label class="form-label">State</label>
+                            <input type="text" id="state" name="state" class="form-input" value="<%= locals.addressData?.state || '' %>" placeholder="eg: Kerala" >
+                            <div id="stateError" class="error-text">
+                                <% if (locals.errors?.state) { %> <%= locals.errors.state %> <% } %>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Landmark (optional)</label>
+                            <input type="text" id="landmark" name="landmark" class="form-input" value="<%= locals.addressData?.landmark || '' %>" placeholder="eg: Hospital">
+                            <div id="landmarkError" class="error-text">
+                                <% if (locals.errors?.landmark) { %> <%= locals.errors.landmark %> <% } %>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Address Type & Default -->
+                    <div style="display: flex; gap: 40px; margin-bottom: 24px; align-items: center;">
+                        <div>
+                            <label class="form-label">Address Type</label>
+                            <div style="display: flex; gap: 20px;">
+                                <label style="display: flex; align-items: center; gap: 8px; font-size: 14px;">
+                                    <input type="radio" name="addressType" value="home" <%= (locals.addressData?.addressType === 'home' || !locals.addressData?.addressType) ? 'checked' : '' %>> Home
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 8px; font-size: 14px;">
+                                    <input type="radio" name="addressType" value="work" <%= locals.addressData?.addressType === 'work' ? 'checked' : '' %>> Work
+                                </label>
+                            </div>
+                            <div id="addressTypeError" class="error-text">
+                                <% if (locals.errors?.addressType) { %> <%= locals.errors.addressType %> <% } %>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; align-items: center; gap: 8px; margin-top: 24px;">
+                            <input type="checkbox" id="makeDefault" name="makeDefault" <%= locals.addressData?.makeDefault ? 'checked' : '' %>>
+                            <label for="makeDefault" style="font-size: 14px; color: #b0b5c8;">Make this default</label>
+                        </div>
+                    </div>
+
+                    <!-- Buttons -->
+                    <div style="display: flex; justify-content: flex-end; gap: 16px; margin-top: 32px;">
+                        <a href="/address" class="btn-cancel">Cancel</a>
+                        <button type="submit" class="btn-submit">Add Address</button>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <%- include('../partials/userFooter') %>
+
+    <!-- PINCODE AUTOFILL & VALIDATION SCRIPT -->
+    <script>
+        const addressForm = document.getElementById("addressForm");
+        const pinInput = document.getElementById("pinCode");
+        const districtInput = document.getElementById("district");
+        const stateInput = document.getElementById("state");
+        const nameInput = document.getElementById("name");
+        const phoneInput = document.getElementById("phone");
+        const addressInput = document.getElementById("address");
+        const landmarkInput = document.getElementById("landmark");
+
+        const errors = {
+            name: document.getElementById("nameError"),
+            phone: document.getElementById("phoneError"),
+            address: document.getElementById("addressError"),
+            pinCode: document.getElementById("pinCodeError"),
+            district: document.getElementById("districtError"),
+            state: document.getElementById("stateError"),
+            landmark: document.getElementById("landmarkError")
+        };
+
+        const validateField = (id) => {
+            const input = document.getElementById(id);
+            const errorDiv = errors[id];
+            const value = input.value.trim();
+            let message = "";
+
+            switch(id) {
+                case "name":
+                    if (!value) message = "Name is required";
+                    else if (value.length < 2) message = "Name must be at least 2 characters";
+                    else if (value.length > 50) message = "Name must be at most 50 characters";
+                    else if (!/^[A-Za-z\s]+$/.test(value)) message = "Name must contain only letters and spaces";
+                    break;
+                case "phone":
+                    if (!value) message = "Phone number is required";
+                    else if (!/^[6-9][0-9]{9}$/.test(value)) message = "Phone number must be a valid 10-digit Indian mobile number";
+                    break;
+                case "address":
+                    if (!value) message = "Address is required";
+                    else if (value.length < 5) message = "Address must be at least 5 characters";
+                    else if (value.length > 200) message = "Address must be at most 200 characters";
+                    break;
+                case "pinCode":
+                    if (!value) message = "Pin code is required";
+                    else if (!/^[1-9][0-9]{5}$/.test(value)) message = "Pin code must be a valid 6-digit Indian postal code";
+                    break;
+                case "district":
+                    if (!value) message = "District is required";
+                    else if (value.length < 2) message = "District must be at least 2 characters";
+                    else if (value.length > 50) message = "District must be at most 50 characters";
+                    else if (!/^[A-Za-z\s]+$/.test(value)) message = "District must contain only letters and spaces";
+                    break;
+                case "state":
+                    if (!value) message = "State is required";
+                    else if (value.length < 2) message = "State must be at least 2 characters";
+                    else if (value.length > 50) message = "State must be at most 50 characters";
+                    else if (!/^[A-Za-z\s]+$/.test(value)) message = "State must contain only letters and spaces";
+                    break;
+                case "landmark":
+                    if (value && value.length < 2) message = "Landmark must be at least 2 characters";
+                    else if (value && value.length > 100) message = "Landmark must be at most 100 characters";
+                    break;
+            }
+
+            errorDiv.textContent = message;
+            return !message;
+        };
+
+        // Attach listeners for real-time validation
+        ["name", "phone", "address", "pinCode", "district", "state", "landmark"].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                el.addEventListener("input", () => validateField(id));
+                el.addEventListener("blur", () => validateField(id));
+            }
+        });
+
+        // Form submission validation
+        addressForm.addEventListener("submit", (e) => {
+            let isValid = true;
+            ["name", "phone", "address", "pinCode", "district", "state", "landmark"].forEach(id => {
+                if (!validateField(id)) isValid = false;
+            });
+
+            if (!isValid) {
+                e.preventDefault();
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Validation Error',
+                    text: 'Please fix the errors in the form before submitting.',
+                    confirmButtonColor: '#3b82f6'
+                });
+            }
+        });
+
+        // PINCODE AUTOFILL LOGIC
+        let debounceTimer = null;
+        pinInput.addEventListener("input", () => {
+            const pincode = pinInput.value.trim();
+            if (!/^\d{6}$/.test(pincode)) {
+                return;
+            }
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => {
+                fetchPincodeDetails(pincode);
+            }, 400);
+        });
+
+        async function fetchPincodeDetails(pincode) {
+            try {
+                districtInput.value = "Loading...";
+                stateInput.value = "Loading...";
+                const res = await fetch(`https://api.postalpincode.in/pincode/${pincode}`);
+                const data = await res.json();
+                if (data && data[0].Status === "Success") {
+                    const postOffice = data[0].PostOffice[0];
+                    districtInput.value = postOffice.District;
+                    stateInput.value = postOffice.State;
+                    validateField("district");
+                    validateField("state");
+                } else {
+                    districtInput.value = "";
+                    stateInput.value = "";
+                }
+            } catch (err) {
+                console.error("Pincode lookup failed:", err);
+                districtInput.value = "";
+                stateInput.value = "";
+            }
+        }
+    </script>
+</body>
+</html>

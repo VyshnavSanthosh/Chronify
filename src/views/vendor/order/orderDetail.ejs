@@ -1,0 +1,251 @@
+<% layout('vendor/layout/vendorLayout') %>
+
+<% block('styles', `
+    <style>
+        .section-card {
+            background: linear-gradient(135deg, #1a2855 0%, #0f1a35 100%);
+            border: 1px solid #2a3f66;
+            border-radius: 12px;
+            padding: 24px;
+        }
+        .status-badge-lg {
+            background: linear-gradient(135deg, #6b9dd9 0%, #4a7ab8 100%);
+            color: #fff;
+            padding: 8px 20px;
+            border-radius: 99px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .info-card {
+            background: #ffffff;
+            color: #1a202c;
+            border-radius: 12px;
+            padding: 20px;
+            height: 100%;
+        }
+        .order-item-row {
+            border: 1px solid #2a3f66;
+            border-radius: 12px;
+            padding: 16px;
+            transition: all 0.3s;
+        }
+        .order-item-row:hover {
+            border-color: #3b82f6;
+            background: rgba(59, 130, 246, 0.05);
+        }
+    </style>
+`) %>
+
+<div class="p-8 space-y-8">
+    <!-- Breadcrumbs -->
+    <nav class="flex items-center space-x-2 text-sm text-gray-400">
+        <a href="/vendor/dashboard" class="hover:text-white transition-colors">Dashboard</a>
+        <span>&gt;</span>
+        <a href="/vendor/orders" class="hover:text-white transition-colors">Order List</a>
+        <span>&gt;</span>
+        <span class="text-blue-400">Order Details</span>
+    </nav>
+
+    <!-- Main Section -->
+    <div class="section-card">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+            <div>
+                <h1 class="text-3xl font-bold text-white mb-2">Order Details</h1>
+                <p class="text-gray-400 font-mono">#<%= order._id %></p>
+                <p class="text-xs text-gray-500 mt-1">Placed on <%= new Date(order.createdAt).toLocaleString() %></p>
+            </div>
+            <div class="flex items-center gap-3">
+                <span class="status-badge-lg uppercase tracking-wider"><%= order.orderStatus.replace(/_/g, ' ') %></span>
+                <button onclick="downloadInvoice()" class="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-all">
+                    <i class="fa-solid fa-file-invoice mr-2"></i>Invoice
+                </button>
+            </div>
+        </div>
+
+        <!-- Order Info Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+            <!-- Shipping Address -->
+            <div class="info-card">
+                <h3 class="text-sm font-bold text-gray-500 uppercase tracking-widest mb-4">Shipping Address</h3>
+                <div class="space-y-1">
+                    <p class="font-bold text-lg"><%= order.address?.addressType || 'Home' %></p>
+                    <p class="text-gray-600"><%= order.address?.phone %></p>
+                    <p class="text-gray-700 leading-relaxed"><%= order.address?.address %></p>
+                    <p class="text-gray-600"><%= order.address?.district %> - <%= order.address?.pinCode %></p>
+                </div>
+            </div>
+
+            <!-- Payment Info -->
+            <div class="info-card">
+                <h3 class="text-sm font-bold text-gray-500 uppercase tracking-widest mb-4">Payment Information</h3>
+                <div class="space-y-4">
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-500">Method:</span>
+                        <span class="font-bold uppercase"><%= order.paymentMethod %></span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-500">Status:</span>
+                        <span class="px-3 py-1 rounded-full text-xs font-bold uppercase <%= order.paymentStatus === 'paid' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700' %>">
+                            <%= order.paymentStatus %>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Summary -->
+            <div class="info-card">
+                <h3 class="text-sm font-bold text-gray-500 uppercase tracking-widest mb-4">Order Summary</h3>
+                <div class="space-y-3">
+                    <% 
+                    let itemsTotal = 0;
+                    order.items.forEach(item => {
+                        if (item.status !== 'cancelled') {
+                            itemsTotal += (item.price * item.quantity * (1 - (item.offer || 0)/100));
+                        }
+                    });
+                    %>
+                    <div class="flex justify-between text-gray-600">
+                        <span>Items Total</span>
+                        <span>₹<%= itemsTotal.toFixed(2) %></span>
+                    </div>
+                    <% if (order.discountAmount && order.discountAmount > 0) { %>
+                    <div class="flex justify-between text-gray-600">
+                        <span>Coupon Discount <%= order.couponCode ? `(${order.couponCode})` : '' %></span>
+                        <span class="text-green-600">- ₹<%= order.discountAmount.toFixed(2) %></span>
+                    </div>
+                    <% } %>
+                    <div class="flex justify-between text-gray-600">
+                        <span>Shipping</span>
+                        <span>₹40.00</span>
+                    </div>
+                    <div class="pt-3 border-t border-gray-100 flex justify-between items-center">
+                        <span class="font-bold text-gray-900">Total</span>
+                        <span class="font-bold text-2xl text-blue-600">₹<%= order.total.toFixed(2) %></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Items Ordered -->
+        <div class="space-y-4 mb-10">
+            <h3 class="text-xl font-bold text-white mb-4">Items Ordered</h3>
+            <% order.items.forEach(item => { %>
+                <div class="order-item-row flex items-center gap-6">
+                    <div class="w-20 h-20 bg-white/5 rounded-lg overflow-hidden flex-shrink-0">
+                        <img src="<%= item.mainImage || '/images/default-watch.png' %>" alt="<%= item.name %>" class="w-full h-full object-cover">
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <h4 class="text-lg font-bold text-white truncate"><%= item.name %></h4>
+                        <p class="text-sm text-green-400 font-medium">Variant: <%= item.variant %></p>
+                        <div class="flex items-center gap-4 mt-2 text-sm text-gray-400">
+                            <span>Qty: <span class="text-white"><%= item.quantity %></span></span>
+                            <span>Price: <span class="text-white">₹<%= item.price %></span></span>
+                            <% if(item.offer) { %>
+                                <span class="text-rose-400 font-bold"><%= item.offer %>% OFF</span>
+                            <% } %>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-xl font-bold text-white">₹<%= (item.price * item.quantity * (1 - (item.offer || 0)/100)).toFixed(2) %></p>
+                    </div>
+                </div>
+            <% }); %>
+        </div>
+
+        <!-- Order Status Control -->
+        <% 
+            const statusHierarchy = ['pending', 'confirmed', 'packed', 'shipped', 'out_for_delivery', 'delivered'];
+            const currentStatusIndex = statusHierarchy.indexOf(order.orderStatus);
+            const isCancelled = order.orderStatus === 'cancelled';
+            const isDelivered = order.orderStatus === 'delivered';
+        %>
+        <div class="bg-white/5 border border-white/10 rounded-2xl p-8 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-blue-600/20 rounded-full flex items-center justify-center text-blue-500">
+                    <i class="fa-solid fa-truck-fast text-2xl"></i>
+                </div>
+                <div>
+                    <h4 class="text-lg font-bold text-white">Management Control</h4>
+                    <p class="text-gray-400 text-sm">Update shipping status for this order</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3 w-full md:w-auto">
+                <select id="orderStatusSelect" <%= (isCancelled || isDelivered) ? 'disabled' : '' %>
+                        class="flex-1 md:w-64 bg-[#1a2855] border border-[#2a3f66] text-white py-3 px-4 rounded-xl focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-50">
+                    <% statusHierarchy.forEach((status, index) => { %>
+                        <option value="<%= status %>" 
+                                <%= order.orderStatus === status ? 'selected' : '' %>
+                                <%= index <= currentStatusIndex ? 'disabled' : '' %>>
+                            <%= status.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()) %>
+                        </option>
+                    <% }); %>
+                    <option value="cancelled" <%= order.orderStatus === 'cancelled' ? 'selected' : '' %> <%= (currentStatusIndex >= 3 || isCancelled || isDelivered) ? 'disabled' : '' %>>Cancelled</option>
+                </select>
+                <button onclick="updateOrderStatus()" <%= (isCancelled || isDelivered) ? 'disabled' : '' %>
+                        class="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-700 text-white px-8 py-3 rounded-xl font-bold transition-all shadow-lg shadow-blue-900/40">
+                    Update
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<% block('scripts', `
+    <script>
+        function downloadInvoice() {
+            const orderId = '${order._id}';
+            window.open('/orders/' + orderId + '/invoice', '_blank');
+        }
+
+
+        async function updateOrderStatus() {
+            const statusSelect = document.getElementById('orderStatusSelect');
+            const status = statusSelect.value;
+            const statusText = statusSelect.options[statusSelect.selectedIndex].text;
+            const orderId = "${order._id}";
+
+            const result = await Swal.fire({
+                title: 'Update Status?',
+                text: "Confirm updating order status to '" + statusText + "'?",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#2563eb',
+                cancelButtonColor: '#374151',
+                confirmButtonText: 'Confirm Update',
+                background: '#0a1425',
+                color: '#fff'
+            });
+
+            if (!result.isConfirmed) return;
+
+            try {
+                const res = await fetch(\`/vendor/update-order-status/\${orderId}\`, {
+                    method: "PATCH",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ status })
+                });
+
+                const data = await res.json();
+                if (data.success) {
+                    await Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: 'Order status updated successfully',
+                        background: '#0a1425',
+                        color: '#fff'
+                    });
+                    location.reload();
+                } else throw new Error(data.message || 'Failed to update status');
+            } catch (err) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: err.message,
+                    background: '#0a1425',
+                    color: '#fff'
+                });
+            }
+        }
+    </script>
+`) %>

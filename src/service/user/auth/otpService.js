@@ -1,15 +1,15 @@
-module.exports = class OtpService {
+export default class OtpService {
     constructor(userRepository, redisClient, emailQueue, otpGenerator) {
         this.userRepository = userRepository;
         this.redis = redisClient;
         this.emailQueue = emailQueue;
         this.otpGenerator = otpGenerator;
     }
-    async sendOtp(user){
+    async sendOtp(user) {
         const otp = this.otpGenerator();
         try {
             await this.redis.set(`otp:${user._id}`, otp, "EX", 120)
-    
+
             console.log(`DEBUG: enqueueing OTP job for user ${user._id} (email: ${user.email}) with otp: ${otp}`);
 
             await this.emailQueue.add("otp", {
@@ -22,7 +22,7 @@ module.exports = class OtpService {
             await this.redis.del(`otp:${user._id}`);
             throw new Error("Failed to send OTP. Please try again.");
         }
-        
+
     }
 
     async verifyOtp(userId, otpInput) {
@@ -50,7 +50,7 @@ module.exports = class OtpService {
         return true;
     }
 
-    async resendOtp(user){
+    async resendOtp(user) {
         const newOtp = this.otpGenerator();
         await this.redis.set(`otp:${user._id}`, newOtp, "EX", 120)
         await this.emailQueue.add("otp", {
@@ -59,5 +59,8 @@ module.exports = class OtpService {
         })
         return true;
     }
+
+    async getUserById(userId){
+        return await this.userRepository.findById(userId)
+    }
 }
-1

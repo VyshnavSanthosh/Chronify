@@ -1,16 +1,16 @@
-const User = require('../models/user/userSchema');
+import User from "../models/user/userSchema.js";
 
-module.exports = class UserRepository{
+export default class UserRepository {
 
     async findByEmail(email) {
-        return await User.findOne({email})
+        return await User.findOne({ email })
     }
 
     async findByReferralCode(code) {
-        return await User.findOne({ referralCode: code})
+        return await User.findOne({ referralCode: code })
     }
 
-    async getAllCustomers(limit, skip, sortOrder, search, status,sortField){
+    async getAllCustomers(limit, skip, sortOrder, search, status, sortField) {
         const query = {
             role: { $ne: "admin" }
         }
@@ -31,13 +31,13 @@ module.exports = class UserRepository{
         sortObj[sortField] = sortOrder;
 
         const customers = await User.find(query)
-        .sort(sortObj) 
-        .skip(skip)                     
-        .limit(limit);
-        
+            .sort(sortObj)
+            .skip(skip)
+            .limit(limit);
+
         const totalCustomers = await User.countDocuments(query);
 
-        return {customers, totalCustomers};
+        return { customers, totalCustomers };
     }
 
     async createUser(userData) {
@@ -56,7 +56,7 @@ module.exports = class UserRepository{
             // Re-throw other errors
             throw error;
         }
-    }   
+    }
 
     async setVerified(userId) {
         return await User.findByIdAndUpdate(
@@ -68,6 +68,10 @@ module.exports = class UserRepository{
 
     async findById(userId) { // JWT purpose
         return await User.findById(userId).select('-passwordHash -refreshToken');
+    }
+
+    async findWithRefreshTokenById(userId) {
+        return await User.findById(userId).select('-passwordHash');
     }
 
     async findByGoogleId(googleId) {
@@ -113,23 +117,29 @@ module.exports = class UserRepository{
     }
 
     async updateCustomerBlockStatus(customerId, isBlocked) {
-    try {
-        const updatedCustomer = await User.findByIdAndUpdate(
-            customerId,
-            { isBlocked: isBlocked },
-            { new: true } // Returns the updated document
-        )
+        try {
+            const updatedCustomer = await User.findByIdAndUpdate(
+                customerId,
+                { isBlocked: isBlocked },
+                { new: true } // Returns the updated document
+            )
 
-        if (!updatedCustomer) {
-            throw new Error("Customer not found")
+            if (!updatedCustomer) {
+                throw new Error("Customer not found")
+            }
+
+            return updatedCustomer
+        } catch (error) {
+            throw new Error(`Error updating customer block status: ${error.message}`)
         }
+    }
 
-        return updatedCustomer
-    } catch (error) {
-        throw new Error(`Error updating customer block status: ${error.message}`)
+    async updateUserById(userId, userData){
+        return await User.findByIdAndUpdate(
+            userId,
+            {$set: userData},
+            {new: true}
+        )
     }
 }
-
-}
-
 

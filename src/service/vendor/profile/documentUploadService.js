@@ -1,18 +1,18 @@
-const { deleteFromCloudinary } = require("../../../utils/cloudinary");
+import { deleteFromCloudinary } from "../../../utils/cloudinary.js";
 
-module.exports = class DocumentUploadService {
+export default class DocumentUploadService {
     constructor(documentUploadRepository) {
         this.documentUploadRepository = documentUploadRepository
     }
 
-    async saveDocument(vendorId, uploadedDocuments){
+    async saveDocument(vendorId, uploadedDocuments) {
         try {
             const savedDocs = {}
-            for(const [docType, docData] of Object.entries(uploadedDocuments)){
-                
+            for (const [docType, docData] of Object.entries(uploadedDocuments)) {
+
                 if (!docData) {
                     throw new Error("Document data not found");
-                    
+
                 }
 
                 const existingDocument = await this.documentUploadRepository.findByDocumentType(vendorId, docType)
@@ -28,8 +28,8 @@ module.exports = class DocumentUploadService {
                     uploadedAt: docData.uploadedAt,
                     verifiedAt: null,
                     rejectionReason: null
-                }                
-                
+                }
+
                 let savedDoc
                 if (existingDocument) {
 
@@ -40,7 +40,7 @@ module.exports = class DocumentUploadService {
                         documentData
                     )
                 }
-                else{
+                else {
                     savedDoc = await this.documentUploadRepository.create(documentData)
                 }
 
@@ -58,7 +58,7 @@ module.exports = class DocumentUploadService {
                 }
             }
             console.log("✅ Documents saved in database")
-            
+
             return savedDocs
 
         } catch (error) {
@@ -67,7 +67,7 @@ module.exports = class DocumentUploadService {
         }
     }
 
-    async getVendorDocuments(vendorId){
+    async getVendorDocuments(vendorId) {
         return await this.documentUploadRepository.findByVendorId(vendorId)
     }
 }

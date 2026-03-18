@@ -1,0 +1,42 @@
+<%
+// Default values for parameters
+const activePage = typeof locals.activePage !== 'undefined' ? locals.activePage : '';
+const wishlistCount = typeof locals.wishlistCount !== 'undefined' ? locals.wishlistCount : 0;
+%>
+
+<!-- Sidebar -->
+<aside class="sidebar">
+    <!-- User Profile Card -->
+    <div style="background: linear-gradient(135deg, #1a2855 0%, #0f1a35 100%); border: 1px solid #2a3f66; border-radius: 16px; padding: 24px; text-align: center; margin-bottom: 24px;">
+        <div style="width: 60px; height: 60px; background: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; font-size: 24px; font-weight: 700; color: #000;">
+            <%= user?.firstName?.charAt(0).toUpperCase() || 'V' %>
+        </div>
+        <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 16px;"><%= user?.firstName || 'Vyshnav' %></h3>
+    </div>
+
+    <!-- Navigation Menu -->
+    <div style="display: flex; flex-direction: column; gap: 8px;">
+        <a href="/profile" style="display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 8px; <%= activePage === 'profile' ? 'background: #fff; color: #000; font-weight: 600;' : 'color: #fff;' %> text-decoration: none; font-size: 14px; transition: background 0.3s;">
+            <i class="fa-solid fa-user"></i> My Profile
+        </a>
+        <a href="/address" style="display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 8px; <%= activePage === 'address' ? 'background: #fff; color: #000; font-weight: 600;' : 'color: #fff;' %> text-decoration: none; font-size: 14px; transition: background 0.3s;">
+            <i class="fa-solid fa-location-dot"></i> My Address
+        </a>
+        <a href="/orders" style="display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 8px; <%= activePage === 'orders' ? 'background: #fff; color: #000; font-weight: 600;' : 'color: #fff;' %> text-decoration: none; font-size: 14px; transition: background 0.3s;">
+            <i class="fa-solid fa-bag-shopping"></i> My Order
+        </a>
+        <a href="/wishlist" style="display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 8px; <%= activePage === 'wishlist' ? 'background: #fff; color: #000; font-weight: 600;' : 'color: #fff;' %> text-decoration: none; font-size: 14px; transition: background 0.3s;">
+            <i class="fa-solid fa-heart"></i> My Wishlist 
+        </a>
+        <a href="/cart" style="display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 8px; <%= activePage === 'coupons' ? 'background: #fff; color: #000; font-weight: 600;' : 'color: #fff;' %> text-decoration: none; font-size: 14px; transition: background 0.3s;">
+             <i class="fa-solid fa-shopping-cart"></i> My Cart
+        </a>
+        <a href="/wallet" style="display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 8px; <%= activePage === 'wallet' ? 'background: #fff; color: #000; font-weight: 600;' : 'color: #fff;' %> text-decoration: none; font-size: 14px; transition: background 0.3s;">
+            <i class="fa-solid fa-wallet"></i> My Wallet
+        </a>
+
+        <button onclick="handleLogout()" style="display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 8px; color: #fff; text-decoration: none; font-size: 14px; background: none; border: none; cursor: pointer; width: 100%; transition: background 0.3s;">
+            <i class="fa-solid fa-sign-out-alt"></i> Log Out
+        </button>
+    </div>
+</aside>

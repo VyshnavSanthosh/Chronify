@@ -1,4 +1,4 @@
-module.exports = class AdminAuthController {
+export default class AdminAuthController {
     constructor(loginService, jwtService, joi_login, validator) {
         this.loginService = loginService
         this.jwtService = jwtService
@@ -6,45 +6,46 @@ module.exports = class AdminAuthController {
         this.validator = validator
     }
 
-    rendorLoginPage(req,res){
-        return res.render("admin/auth/login",{
+    rendorLoginPage(req, res) {
+        return res.render("admin/auth/login", {
             email: "",
             error: null,
             query: req.query
         })
     }
 
-    async handleLogin(req,res){
-        const {error, value} = this.validator.validate(this.joi_login, req)
+    async handleLogin(req, res) {
+
+        const { error, value } = this.validator.validate(this.joi_login, req.body)
 
         if (error) {
-            return res.render("vendor/auth/login", {
+            return res.render("admin/auth/login", {
                 error: error.details[0].message,
                 email: req.body.email || "",
                 query: req.query
             });
         }
 
-        const {email, password} = value
+        const { email, password } = value
 
         try {
-            const {accessToken, refreshToken} = await this.loginService.login(email, password)
+            const { adminAccessToken, adminRefreshToken } = await this.loginService.login(email, password)
 
-            res.cookie("accessToken",accessToken,{
+            res.cookie("adminAccessToken", adminAccessToken, {
                 httpOnly: true,
                 secure: false, // true in production (HTTPS)
                 sameSite: "lax",
                 maxAge: 15 * 60 * 1000 // 15 minutes
             })
 
-            res.cookie("refreshToken",refreshToken,{
+            res.cookie("adminRefreshToken", adminRefreshToken, {
                 httpOnly: true,
                 secure: false, // true in production (HTTPS)
                 sameSite: "lax",
-                maxAge: 15 * 60 * 1000 // 15 minutes
+                maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
             })
 
-            return res.redirect("/home")
+            return res.redirect("/admin/profile")
 
         } catch (error) {
             return res.render("admin/auth/login", {
@@ -55,51 +56,58 @@ module.exports = class AdminAuthController {
         }
     }
 
-    async refreshToken(req,res){
+    async refreshToken(req, res) {
         try {
-            const {refreshToken} = req.cookies;
+            const { adminRefreshToken } = req.cookies;
 
-            if (!refreshToken) {
+            if (!adminRefreshToken) {
                 return res.status(401).json({
                     success: false,
                     error: "Refresh token not found. Please login again."
                 });
             }
 
-            const newTokens = this.loginService.refreshAccessToken(refreshToken)
+            const newTokens = await this.loginService.refreshAccessToken(adminRefreshToken)
 
-            es.cookie("accessToken",newTokens.accessToken,{
+            res.cookie("adminAccessToken", newTokens.accessToken, {
                 httpOnly: true,
                 secure: false, // true in production (HTTPS)
                 sameSite: "lax",
                 maxAge: 15 * 60 * 1000 // 15 minutes
             })
 
-            res.cookie("refreshToken",newTokens.refreshToken,{
+            res.cookie("adminRefreshToken", newTokens.refreshToken, {
                 httpOnly: true,
                 secure: false, // true in production (HTTPS)
                 sameSite: "lax",
-                maxAge: 15 * 60 * 1000 // 15 minutes
+                maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
             })
+        return res.json({ success: true, message: "Token refreshed successfully" });
+
 
         } catch (error) {
-            
+            console.error("Refresh token error:", error);
+            return res.status(401).json({
+                success: false,
+                error: error.message,
+                code: "REFRESH_FAILED"
+            });
         }
     }
 
     async logout(req, res) {
         try {
             // req.user is set by jwt middleware
-            const vendorId = req.user._id;
+            const userId = req.user._id;
 
             // Clear refresh token from database
-            await this.loginService.logout(vendorId);
+            await this.loginService.logout(userId);
 
             // Clear cookies
-            res.clearCookie("accessToken");
-            res.clearCookie("refreshToken");
+            res.clearCookie("adminAccessToken");
+            res.clearCookie("adminRefreshToken");
 
-            return res.redirect("/vendor/auth/login");
+            return res.redirect("/admin/auth/login");
 
         } catch (err) {
             console.error("Logout Error:", err);

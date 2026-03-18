@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Addresses - Chronify | Luxury Watches</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <%- include('../partials/userStyles') %>
+    <%- include('../partials/logoutScript') %>
+    <style>
+        .address-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .address-card {
+            background: linear-gradient(135deg, #1a2855 0%, #0f1a35 100%);
+            border: 1px solid #2a3f66;
+            border-radius: 12px;
+            padding: 24px;
+            position: relative;
+            transition: border-color 0.3s;
+        }
+
+        .address-card:hover {
+            border-color: #3b82f6;
+        }
+
+        .address-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 16px;
+        }
+
+        .address-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .address-details {
+            font-size: 13px;
+            color: #b0b5c8;
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+
+        .address-badges {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .badge {
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge-type {
+            background: #0a0e27;
+            color: #b0b5c8;
+        }
+
+        .badge-default {
+            background: #3b82f6;
+            color: #fff;
+        }
+
+        .btn-icon {
+            background: none;
+            border: none;
+            color: #b0b5c8;
+            cursor: pointer;
+            font-size: 16px;
+            transition: color 0.3s;
+        }
+
+        .btn-icon:hover {
+            color: #3b82f6;
+        }
+
+        .btn-delete {
+            background: none;
+            border: none;
+            color: #dc2626;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-top: 16px;
+            transition: color 0.3s;
+        }
+
+        .btn-delete:hover {
+            color: #ef4444;
+        }
+
+        .btn-add {
+            background: #3b82f6;
+            color: #fff;
+            border: none;
+            padding: 12px 32px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-add:hover {
+            background: #2563eb;
+        }
+
+        @media (max-width: 768px) {
+            .address-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <%- include('../partials/userNavbar') %>
+
+    <!-- Main Content -->
+    <div class="container">
+        <%- include('../partials/userSidebar', { user, activePage: 'address', wishlistCount: 0 }) %>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <h2 style="font-size: 20px; font-weight: 600; margin-bottom: 32px;">My Addresses</h2>
+
+            <!-- Address Grid -->
+            <div class="address-grid">
+                <% addresses.forEach((addr) => { %>
+                    <div class="address-card">
+                        <div class="address-header">
+                            <div class="address-name"><%= addr.name %></div>
+                            <a href="/address/edit/<%= addr._id %>" class="btn-icon" title="Edit Address">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </a>
+                        </div>
+
+                        <div class="address-details">
+                            <div><%= addr.address %></div>
+                            <div>Phone: <%= addr.phone %></div>
+                            <div><%= addr.district %>, <%= addr.state %></div>
+                            <div>Pincode: <%= addr.pinCode %></div>
+                        </div>
+
+                        <div class="address-badges">
+                            <span class="badge badge-type"><%= addr.addressType %></span>
+                            <% if (addr.isDefault) { %>
+                                <span class="badge badge-default">Default</span>
+                            <% } %>
+                        </div>
+
+                        <div style="text-align: right;">
+                            <button onclick="confirmDelete('<%= addr._id %>')" class="btn-delete">
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                <% }); %>
+            </div>
+
+            <!-- Add New Address Button -->
+            <div style="text-align: center; margin-top: 32px;">
+                <a href="/address/add" class="btn-add">Add New Address</a>
+            </div>
+        </main>
+    </div>
+
+    <%- include('../partials/userFooter') %>
+
+    <!-- JavaScript -->
+    <script>
+        // Show SweetAlert messages from backend
+        <% if (locals.success) { %>
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: '<%= success %>',
+                background: '#1a2855',
+                color: '#fff',
+                confirmButtonColor: '#3b82f6',
+                timer: 3000,
+                timerProgressBar: true
+            });
+        <% } %>
+
+        <% if (locals.error) { %>
+            Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: '<%= error %>',
+                background: '#1a2855',
+                color: '#fff',
+                confirmButtonColor: '#ef4444'
+            });
+        <% } %>
+
+        function confirmDelete(addressId) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#4b5563',
+                confirmButtonText: 'Yes, delete it!',
+                background: '#1a2855',
+                color: '#fff'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = `/address/delete/${addressId}`;
+                    document.body.appendChild(form);
+                    form.submit();
+                }
+            });
+        }
+
+
+    </script>
+</body>
+</html>

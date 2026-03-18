@@ -1,12 +1,12 @@
-const {hashString, compareString} = require('../../../utils/bcrypt');
+import { hashString, compareString } from "../../../utils/bcrypt.js";
 
-module.exports = class VendorAuthService{
-    constructor(vendorRepository){
+export default class VendorAuthService {
+    constructor(vendorRepository) {
         this.vendorRepository = vendorRepository;
     }
 
-    async register(vendordata){
-        const {brandName, brandEmail, mobileNumber,  password} = vendordata
+    async register(vendordata) {
+        const { brandName, brandEmail, mobileNumber, password } = vendordata
 
         const exist = await this.vendorRepository.findByEmail(brandEmail)
 
@@ -29,7 +29,7 @@ module.exports = class VendorAuthService{
             const vendorobj = await this.vendorRepository.createVendor(newVendorData)
 
             // sanitize
-            let vendorObj = typeof vendorobj.toObject === "function"? vendorobj.toObject() : { ...vendorobj }; 
+            let vendorObj = typeof vendorobj.toObject === "function" ? vendorobj.toObject() : { ...vendorobj };
 
             delete vendorObj.passwordHash;
             return vendorObj;

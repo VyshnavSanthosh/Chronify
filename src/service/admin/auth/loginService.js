@@ -1,13 +1,14 @@
-const {compareString} = require("../../../utils/bcrypt")
-module.exports = class LoginService {
+import { compareString } from "../../../utils/bcrypt.js";
+
+export default class LoginService {
     constructor(jwtService, userRepository) {
         this.jwtService = jwtService
         this.userRepository = userRepository
     }
 
-    async login(email, password){
+    async login(email, password) {
         const admin = await this.userRepository.findByEmail(email)
-        
+
         if (!admin) {
             throw new Error("Invalid email or password");
         }
@@ -18,7 +19,7 @@ module.exports = class LoginService {
             throw new Error("Invalid email or password");
         }
 
-        const {accessToken, refreshToken} = this.jwtService.generateTokens(
+        const { accessToken, refreshToken } = this.jwtService.generateTokens(
             admin._id.toString(),
             admin.email,
             admin.role
@@ -34,24 +35,27 @@ module.exports = class LoginService {
 
         return {
             admin: adminObj,
-            accessToken,
-            refreshToken
+            adminAccessToken: accessToken,
+            adminRefreshToken: refreshToken
         };
     }
 
-    async refreshAccesToken(refreshToken){
+    async refreshAccessToken(refreshToken) {
 
         const decoded = await this.jwtService.verifyRefreshToken(refreshToken)
 
-        const admin = await this.userRepository.findById(decoded.userId) // decoded will have payload data
-
+        const admin = await this.userRepository.findWithRefreshTokenById(decoded.userId) // decoded will have payload data
+        console.log("admin :", admin)
+        
         if (!admin) {
             throw new Error("User not found");
         }
+        console.log(`admin refresh token ${admin.refreshToken} , refresh token ${refreshToken}`)
+        
 
         if (admin.refreshToken !== refreshToken) {
             // Clear all tokens for security
-            await this.userRepository.clearRefreshToken(admin._id);
+            // await this.userRepository.clearRefreshToken(admin._id);
             throw new Error("Invalid refresh token. Please login again.");
         }
 
@@ -60,15 +64,15 @@ module.exports = class LoginService {
             admin.email,
             admin.role
         )
-
-         // Update refresh token in database
+        
+        // Update refresh token in database
         await this.userRepository.updateRefreshToken(admin._id, newTokens.refreshToken);
 
         return newTokens
 
     }
 
-    async logout(adminId){
+    async logout(adminId) {
         // Clear refresh token from database
         await this.userRepository.clearRefreshToken(adminId);
         return true;

@@ -3,281 +3,324 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ChronoMy - Luxury Watches</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="/css/custom.css">
+    <title>Chronify - Luxury Watches</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <%- include('user/partials/userStyles') %>
+    <style>
+        /* Hero Section */
+        .hero-section {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 80px 48px;
+            min-height: 80vh;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
+            overflow: hidden;
+        }
+
+        .hero-content {
+            flex: 1;
+            max-width: 600px;
+        }
+
+        .hero-tagline {
+            font-size: 48px;
+            font-weight: 300;
+            line-height: 1.2;
+            margin-bottom: 24px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .hero-image-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .hero-image-container img {
+            max-width: 100%;
+            height: auto;
+            z-index: 2;
+            filter: drop-shadow(0 20px 50px rgba(0,0,0,0.5));
+        }
+
+        .moon-bg {
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            z-index: 1;
+        }
+
+        /* Explore More Section */
+        .explore-section {
+            padding: 80px 48px;
+            background: #000;
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: 300;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 32px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .product-card {
+            background: linear-gradient(135deg, #1a2855 0%, #0f1a35 100%);
+            border: 1px solid #2a3f66;
+            border-radius: 12px;
+            padding: 24px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .product-card:hover {
+            transform: translateY(-10px);
+            border-color: #3b82f6;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+
+        .product-image {
+            width: 100%;
+            aspect-ratio: 1;
+            background: #000;
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .product-card:hover .product-image img {
+            transform: scale(1.1);
+        }
+
+        .product-name {
+            font-size: 16px;
+            font-weight: 600;
+            margin: 0;
+            color: #fff;
+        }
+
+        .product-rating {
+            display: flex;
+            gap: 4px;
+            color: #fbbf24;
+            font-size: 12px;
+        }
+
+        .product-price {
+            font-size: 18px;
+            font-weight: 700;
+            color: #3b82f6;
+            margin: 0;
+        }
+
+        @media (max-width: 1200px) {
+            .products-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .products-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .hero-section {
+                flex-direction: column;
+                text-align: center;
+                padding: 40px 24px;
+            }
+            .hero-tagline {
+                font-size: 32px;
+            }
+        }
+    </style>
 </head>
-<body class="bg-gray-950 text-white">
-
-    <!-- Header/Navigation -->
-    <header class="bg-gray-900 border-b border-gray-800 sticky top-0 z-50">
-        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
-            <!-- Logo -->
-            <div class="text-2xl font-bold tracking-wider">
-                <span class="text-white">CHRONI</span><span class="text-amber-500">FY</span>
-            </div>
-
-            <!-- Navigation Menu -->
-            <nav class="hidden md:flex gap-8">
-                <a href="/" class="hover:text-amber-500 transition">HOME</a>
-                <a href="/shop" class="hover:text-amber-500 transition">SHOP</a>
-                <a href="/about" class="hover:text-amber-500 transition">ABOUT</a>
-                <a href="/contact" class="hover:text-amber-500 transition">CONTACT</a>
-            </nav>
-
-            <!-- User Actions -->
-            <div class="flex items-center gap-4">
-                <input type="text" placeholder="Search..." class="hidden md:block bg-gray-800 px-4 py-2 rounded text-sm text-white placeholder-gray-500">
-                <a href="/account" class="text-gray-400 hover:text-amber-500">ACCOUNT</a>
-                <a href="/cart" class="text-gray-400 hover:text-amber-500">CART</a>
-            </div>
+<body>
+    <header>
+        <div class="logo" style="cursor: pointer;" onclick="window.location.href='/'">CHRONIFY</div>
+        <div class="header-center">
+            <a href="/" style="color: #fff; text-decoration: none;">Home</a>
+            <a href="/products" style="color: #fff; text-decoration: none;">Shop</a>
+        </div>
+        <div class="header-icons">
+            <button class="icon-btn" title="Wishlist" onclick="window.location.href='/wishlist'">
+                <i class="far fa-heart"></i>
+                <% if (wishlistCount > 0) { %>
+                    <span class="badge wishlist-badge"><%= wishlistCount %></span>
+                <% } %>
+            </button>
+            <button class="icon-btn" title="Cart" onclick="window.location.href='/cart'">
+                <i class="fas fa-shopping-cart"></i>
+                <% if (cartCount > 0) { %>
+                    <span class="badge cart-badge"><%= cartCount %></span>
+                <% } %>
+            </button>
+            <button class="icon-btn" title="Account" onclick="window.location.href='/profile'">
+                <i class="far fa-user-circle"></i>
+            </button>
         </div>
     </header>
 
-    <!-- Hero Section with Carousel -->
-    <section class="bg-gradient-to-b from-gray-900 to-gray-950 py-20 overflow-hidden">
-        <div class="container mx-auto px-4">
-            <div class="grid md:grid-cols-2 gap-12 items-center">
-                <!-- Hero Text -->
-                <div class="flex flex-col justify-center">
-                    <h1 class="text-5xl md:text-6xl font-bold leading-tight mb-8 uppercase tracking-wide">
-                        Crafted for those<br>
-                        who <span class="text-amber-500">value</span> every<br>
-                        moment.
-                    </h1>
-                    <button class="bg-amber-500 text-gray-950 px-8 py-3 w-fit font-semibold hover:bg-amber-600 transition">
-                        SHOP NOW
-                    </button>
-                </div>
-
-                <!-- Hero Image (with carousel placeholder) -->
-                <div class="relative flex justify-center items-center">
-                    <img src="<%= heroImage %>" alt="Featured Watch" class="w-full max-w-md">
-                    
-                    <!-- Carousel Controls -->
-                    <button class="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-12 text-amber-500 text-3xl hover:text-amber-400">&lt;</button>
-                    <button class="absolute right-0 top-1/2 -translate-y-1/2 translate-x-12 text-amber-500 text-3xl hover:text-amber-400">&gt;</button>
-                </div>
-            </div>
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="hero-content">
+            <!-- Dynamic hero tagline data from backend -->
+            <h1 class="hero-tagline">'Crafted for those who value every moment.'</h1>
         </div>
-    </section>
-
-    <!-- New Arrivals Section -->
-    <section class="py-20 bg-gray-950">
-        <div class="container mx-auto px-4">
-            <h2 class="text-4xl font-bold text-center mb-16 uppercase tracking-widest">New Arrivals</h2>
-            
-            <!-- Products Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <% newArrivals.forEach(watch => { %>
-                    <!-- Product Card -->
-                    <div class="bg-gray-900 border-2 border-gray-800 hover:border-blue-600 transition p-4 group cursor-pointer">
-                        <!-- Product Image -->
-                        <div class="relative mb-4 overflow-hidden h-64 bg-gray-800">
-                            <img src="<%= watch.image %>" alt="<%= watch.name %>" class="w-full h-full object-cover group-hover:scale-105 transition">
-                        </div>
-                        
-                        <!-- Product Info -->
-                        <h3 class="text-lg font-semibold mb-2"><%= watch.name %></h3>
-                        <p class="text-sm text-gray-400 mb-3"><%= watch.model %></p>
-                        
-                        <!-- Rating -->
-                        <div class="flex items-center gap-1 mb-4">
-                            <% for(let i = 0; i < 5; i++) { %>
-                                <span class="<%= i < watch.rating ? 'text-amber-500' : 'text-gray-600' %>">★</span>
-                            <% } %>
-                            <span class="text-xs text-gray-500">(<%= watch.reviews %>)</span>
-                        </div>
-                        
-                        <!-- Price -->
-                        <p class="text-amber-500 font-bold text-xl">$<%= watch.price %></p>
-                    </div>
-                <% }); %>
-            </div>
+        <div class="hero-image-container">
+            <div class="moon-bg"></div>
+            <!-- Dynamic hero image from backend -->
+            <img src="/assets/heroImage.png" alt="Hero Watch">
         </div>
-    </section>
 
-    <!-- Featured Sale Section -->
-    <section class="py-20 bg-gray-900">
-        <div class="container mx-auto px-4">
-            <div class="grid md:grid-cols-2 gap-12 items-center">
-                <!-- Featured Image -->
-                <div class="relative">
-                    <img src="<%= featuredWatch.image %>" alt="Featured Watch" class="w-full">
-                </div>
-
-                <!-- Sale Info -->
-                <div class="flex flex-col justify-center">
-                    <h2 class="text-5xl md:text-6xl font-bold mb-6 uppercase">
-                        <%= featuredWatch.title %>
-                    </h2>
-                    <p class="text-gray-400 text-lg mb-8"><%= featuredWatch.description %></p>
-                    
-                    <!-- Sale Badge -->
-                    <div class="mb-8">
-                        <span class="inline-block text-4xl font-bold text-amber-500 border-2 border-amber-500 px-6 py-4 rounded-full">
-                            SALE <%= featuredWatch.discount %>%
-                        </span>
-                    </div>
-                    
-                    <button class="bg-amber-500 text-gray-950 px-8 py-3 w-fit font-semibold hover:bg-amber-600 transition">
-                        SHOP SALE
-                    </button>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Trending Section -->
-    <section class="py-20 bg-gray-950">
-        <div class="container mx-auto px-4">
-            <h2 class="text-4xl font-bold text-center mb-16 uppercase tracking-widest">Trending</h2>
-            
-            <!-- Products Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <% trendingWatches.forEach(watch => { %>
-                    <!-- Product Card -->
-                    <div class="bg-gray-900 border-2 border-gray-800 hover:border-blue-600 transition p-4 group cursor-pointer">
-                        <!-- Product Image -->
-                        <div class="relative mb-4 overflow-hidden h-64 bg-gray-800">
-                            <img src="<%= watch.image %>" alt="<%= watch.name %>" class="w-full h-full object-cover group-hover:scale-105 transition">
-                        </div>
-                        
-                        <!-- Product Info -->
-                        <h3 class="text-lg font-semibold mb-2"><%= watch.name %></h3>
-                        <p class="text-sm text-gray-400 mb-3"><%= watch.model %></p>
-                        
-                        <!-- Rating -->
-                        <div class="flex items-center gap-1 mb-4">
-                            <% for(let i = 0; i < 5; i++) { %>
-                                <span class="<%= i < watch.rating ? 'text-amber-500' : 'text-gray-600' %>">★</span>
-                            <% } %>
-                            <span class="text-xs text-gray-500">(<%= watch.reviews %>)</span>
-                        </div>
-                        
-                        <!-- Price -->
-                        <p class="text-amber-500 font-bold text-xl">$<%= watch.price %></p>
-                    </div>
-                <% }); %>
-            </div>
-        </div>
     </section>
 
     <!-- Explore More Section -->
-    <section class="py-20 bg-gray-900">
-        <div class="container mx-auto px-4">
-            <h2 class="text-4xl font-bold text-center mb-16 uppercase tracking-widest">Explore More</h2>
+    <section class="explore-section">
+        <h2 class="section-title">Explore More</h2>
+        
+        <div class="products-grid">
+
             
-            <!-- Products Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <% exploreWatches.forEach(watch => { %>
-                    <!-- Product Card -->
-                    <div class="bg-gray-900 border-2 border-gray-800 hover:border-blue-600 transition p-4 group cursor-pointer">
-                        <!-- Product Image -->
-                        <div class="relative mb-4 overflow-hidden h-64 bg-gray-800">
-                            <img src="<%= watch.image %>" alt="<%= watch.name %>" class="w-full h-full object-cover group-hover:scale-105 transition">
-                        </div>
-                        
-                        <!-- Product Info -->
-                        <h3 class="text-lg font-semibold mb-2"><%= watch.name %></h3>
-                        <p class="text-sm text-gray-400 mb-3"><%= watch.model %></p>
-                        
-                        <!-- Rating -->
-                        <div class="flex items-center gap-1 mb-4">
-                            <% for(let i = 0; i < 5; i++) { %>
-                                <span class="<%= i < watch.rating ? 'text-amber-500' : 'text-gray-600' %>">★</span>
-                            <% } %>
-                            <span class="text-xs text-gray-500">(<%= watch.reviews %>)</span>
-                        </div>
-                        
-                        <!-- Price -->
-                        <p class="text-amber-500 font-bold text-xl">$<%= watch.price %></p>
+            <% products.forEach((product, index) => { %>
+                <div class="product-card" onclick="window.location.href='/products/<%= product._id %>'">
+                    <div class="product-image">
+                        <!-- Dynamic product image from backend -->
+                        <img src="<%= product.variants[0].mainImage.url %>" alt="<%= product.name %>">
                     </div>
-                <% }); %>
-            </div>
+                    <h3 class="product-name"><%= product.name %></h3>
+                    <div class="product-rating">
+                        <% for(let i = 0; i < (product.rating || 5); i++) { %>
+                            <i class="fas fa-star"></i>
+                        <% } %>
+                    </div>
+                    <p class="product-price">
+                        <% if (product.variants && product.variants.length > 0) { %>
+                            ₹<%= product.variants[0].price.toLocaleString('en-IN') %>
+                        <% } else { %>
+                            Price on Request
+                        <% } %>
+                    </p>
+                </div>
+            <% }); %>
         </div>
     </section>
 
     <!-- Footer -->
-    <footer class="bg-gray-950 border-t border-gray-800 py-16">
-        <div class="container mx-auto px-4">
-            <div class="grid grid-cols-1 md:grid-cols-5 gap-8 mb-12">
-                <!-- Company Info -->
-                <div>
-                    <h3 class="text-white font-bold mb-4">ABOUT US</h3>
-                    <p class="text-gray-400 text-sm leading-relaxed mb-4">
-                        <%= companyInfo.description %>
-                    </p>
-                    <a href="#" class="inline-block border border-amber-500 text-amber-500 px-4 py-2 text-sm hover:bg-amber-500 hover:text-gray-950 transition">
-                        LEARN MORE
-                    </a>
-                </div>
-
-                <!-- Customer Service -->
-                <div>
-                    <h3 class="text-white font-bold mb-4">CUSTOMER SERVICE</h3>
-                    <ul class="text-gray-400 text-sm space-y-2">
-                        <li><a href="#" class="hover:text-amber-500 transition">Contact Us</a></li>
-                        <li><a href="#" class="hover:text-amber-500 transition">Shipping Info</a></li>
-                        <li><a href="#" class="hover:text-amber-500 transition">Returns</a></li>
-                        <li><a href="#" class="hover:text-amber-500 transition">FAQ</a></li>
-                    </ul>
-                </div>
-
-                <!-- Information -->
-                <div>
-                    <h3 class="text-white font-bold mb-4">INFORMATION</h3>
-                    <ul class="text-gray-400 text-sm space-y-2">
-                        <li><a href="#" class="hover:text-amber-500 transition">About Us</a></li>
-                        <li><a href="#" class="hover:text-amber-500 transition">Privacy Policy</a></li>
-                        <li><a href="#" class="hover:text-amber-500 transition">Terms & Conditions</a></li>
-                        <li><a href="#" class="hover:text-amber-500 transition">Blog</a></li>
-                    </ul>
-                </div>
-
-                <!-- Quick Links -->
-                <div>
-                    <h3 class="text-white font-bold mb-4">QUICK LINKS</h3>
-                    <ul class="text-gray-400 text-sm space-y-2">
-                        <li><a href="#" class="hover:text-amber-500 transition">New Arrivals</a></li>
-                        <li><a href="#" class="hover:text-amber-500 transition">Best Sellers</a></li>
-                        <li><a href="#" class="hover:text-amber-500 transition">Sale</a></li>
-                        <li><a href="#" class="hover:text-amber-500 transition">Gift Cards</a></li>
-                    </ul>
-                </div>
-
-                <!-- Newsletter -->
-                <div>
-                    <h3 class="text-white font-bold mb-4">FOLLOW US</h3>
-                    <p class="text-gray-400 text-sm mb-4">Subscribe to our newsletter for exclusive offers</p>
-                    <form method="POST" action="/subscribe" class="mb-4">
-                        <input type="email" name="email" placeholder="Enter your email" class="w-full bg-gray-800 border border-gray-700 px-3 py-2 text-white text-sm placeholder-gray-500 mb-2">
-                        <button type="submit" class="w-full bg-amber-500 text-gray-950 py-2 font-semibold hover:bg-amber-600 transition">
-                            SUBSCRIBE
-                        </button>
-                    </form>
-                    
-                    <!-- Social Icons -->
-                    <div class="flex gap-3">
-                        <a href="#" class="text-gray-400 hover:text-amber-500 transition">f</a>
-                        <a href="#" class="text-gray-400 hover:text-amber-500 transition">𝕏</a>
-                        <a href="#" class="text-gray-400 hover:text-amber-500 transition">📷</a>
-                        <a href="#" class="text-gray-400 hover:text-amber-500 transition">in</a>
-                    </div>
+    <footer>
+        <div class="footer-content">
+            <!-- Exclusive Section -->
+            <div class="footer-section">
+                <h3>Exclusive</h3>
+                <h4 style="font-size: 14px; margin-bottom: 10px;">Subscribe</h4>
+                <p style="color: #999; font-size: 13px; margin-bottom: 12px;">Get 10% off your first order</p>
+                <div class="subscription-box">
+                    <input type="email" placeholder="Enter your email">
+                    <button><i class="fas fa-arrow-right"></i></button>
                 </div>
             </div>
 
-            <!-- Footer Bottom -->
-            <div class="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center text-gray-400 text-sm">
-                <p>&copy; 2025 ChronoMy. All rights reserved.</p>
-                <div class="flex gap-4 mt-4 md:mt-0">
-                    <img src="https://img.shields.io/badge/visa-1434CB?style=flat" alt="Visa" class="h-6">
-                    <img src="https://img.shields.io/badge/mastercard-FF5F00?style=flat" alt="Mastercard" class="h-6">
-                    <img src="https://img.shields.io/badge/amex-006FCF?style=flat" alt="Amex" class="h-6">
+            <!-- Support Section -->
+            <div class="footer-section">
+                <h3>Support</h3>
+                <ul>
+                    <li>9th Floor, Orion Business Park, Thane West, Mumbai, Maharashtra 400607</li>
+                    <li><a href="mailto:'nexoratech@gmail.com">'nexoratech@gmail.com' </a></li>
+                    <li><a href="tel: +91 22 4973 4581 ">+91 22 4973 4581</a></li>
+                </ul>
+            </div>
+
+            <!-- Account Section -->
+            <div class="footer-section">
+                <h3>Account</h3>
+                <ul>
+                    <li><a href="/account">My Account</a></li>
+                    <li><a href="/auth">Login / Register</a></li>
+                    <li><a href="/cart">Cart</a></li>
+                    <li><a href="/wishlist">Wishlist</a></li>
+                    <li><a href="/shop">Shop</a></li>
+                </ul>
+            </div>
+
+            <!-- Quick Link Section -->
+            <div class="footer-section">
+                <h3>Quick Link</h3>
+                <ul>
+                    <li><a href="/privacy">Privacy Policy</a></li>
+                    <li><a href="/terms">Terms Of Use</a></li>
+                    <li><a href="/faq">FAQ</a></li>
+                    <li><a href="/contact">Contact</a></li>
+                </ul>
+            </div>
+
+            <!-- Download App Section -->
+            <div class="footer-section">
+                <h3>Download App</h3>
+                <p style="color: #999; font-size: 13px; margin-bottom: 12px;">Save with App New User Only</p>
+                <div class="qr-code">
+                    <!-- QR Code placeholder - replace with actual QR image -->
+                    <span style="color: #000; font-size: 12px;">QR Code</span>
+                </div>
+                <div class="app-downloads">
+                    <a href="/" class="app-btn">
+                        <i class="fab fa-google-play"></i>
+                        <span>Google Play</span>
+                    </a>
+                    <a href="" class="app-btn">
+                        <i class="fab fa-app-store"></i>
+                        <span>App Store</span>
+                    </a>
+                </div>
+                <div class="social-links">
+                    <a href="#" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" title="Twitter"><i class="fab fa-twitter"></i></a>
+                    <a href="#" title="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="#" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
                 </div>
             </div>
         </div>
+
+        <div class="footer-bottom">
+            <p>&copy; Copyright Rimel 2022. All right reserved</p>
+        </div>
     </footer>
 
+    <script>
+        function previousHero() {
+            console.log("[v0] Previous hero clicked");
+            // Backend API call to load previous hero slide
+        }
+
+        function nextHero() {
+            console.log("[v0] Next hero clicked");
+            // Backend API call to load next hero slide
+        }
+    </script>
 </body>
 </html>

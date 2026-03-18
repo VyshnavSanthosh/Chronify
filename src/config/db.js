@@ -1,5 +1,5 @@
-const mongoose = require("mongoose");
-const {mongoUri} = require('./index');
+import mongoose from "mongoose";
+import { mongoUri } from './index.js';
 
 async function connectDB() {
     try {
@@ -11,4 +11,4 @@ async function connectDB() {
     }
 }
 
-module.exports = connectDB;
+export default connectDB;

@@ -1,0 +1,1259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= product?.name || 'Product Details' %> - Chronify</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #050a14 0%, #0f172a 100%);
+            color: #fff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+        }
+
+        /* Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            background: rgba(5, 10, 20, 0.95);
+            border-bottom: 1px solid #1a2f4d;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        .header-links {
+            flex: 1;
+            margin-left: 360px;
+            gap: 20px;
+        }
+
+        .header-links a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+
+        .header-links a:hover {
+            color: #3b82f6;
+        }
+
+        .header-icons {
+            display: flex;
+            gap: 30px;
+        }
+
+        .icon-btn {
+            background: none;
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            font-size: 18px;
+            transition: color 0.3s;
+            position: relative;
+        }
+
+        .icon-btn:hover {
+            color: #3b82f6;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px;
+        }
+
+        /* Product Section */
+        .product-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            margin-bottom: 80px;
+        }
+
+        .product-images {
+            position: relative;
+        }
+
+        .main-image {
+            width: 100%;
+            height: 500px;
+            background: #0f172a;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .main-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            transition: transform 0.3s ease;
+            transform-origin: center;
+        }
+
+        .wishlist-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(59, 130, 246, 0.8);
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.3s;
+        }
+
+        .wishlist-btn:hover {
+            background: #3b82f6;
+            transform: scale(1.1);
+        }
+
+        .nav-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 40px;
+            height: 40px;
+            background: rgba(59, 130, 246, 0.7);
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 18px;
+            transition: background 0.3s;
+            z-index: 10;
+        }
+
+        .nav-arrow:hover {
+            background: rgba(59, 130, 246, 0.9);
+        }
+
+        .nav-arrow.prev {
+            left: 20px;
+        }
+
+        .nav-arrow.next {
+            right: 20px;
+        }
+
+        .gallery {
+            display: flex;
+            gap: 12px;
+        }
+
+        .gallery-thumb {
+            width: 80px;
+            height: 80px;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            background: #0f172a;
+            transition: border-color 0.3s;
+        }
+
+        .gallery-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .gallery-thumb:hover,
+        .gallery-thumb.active {
+            border-color: #3b82f6;
+        }
+
+        /* Product Info */
+        .product-info h1 {
+            font-size: 42px;
+            margin-bottom: 20px;
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+
+        .price-rating {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .price {
+            font-size: 32px;
+            font-weight: bold;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .original-price {
+            font-size: 24px;
+            font-weight: 500;
+            color: #9ca3af;
+            text-decoration: line-through;
+        }
+
+        .offer-price {
+            font-size: 32px;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .offer-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            color: #fff;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .rating {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .stars {
+            color: #fbbf24;
+            font-size: 18px;
+        }
+
+        .review-count {
+            color: #9ca3af;
+            font-size: 14px;
+        }
+
+        .stock-status {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-left: 20px;
+        }
+
+        .stock-status.out-of-stock {
+            background: rgba(248, 113, 113, 0.2);
+            color: #f87171;
+            border: 1px solid #f87171;
+        }
+
+        .stock-status.low-stock {
+            background: rgba(251, 191, 36, 0.2);
+            color: #fbbf24;
+            border: 1px solid #fbbf24;
+        }
+
+        .stock-status.in-stock {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+            border: 1px solid #22c55e;
+        }
+
+        .description {
+            margin: 30px 0;
+            line-height: 1.8;
+            color: #d1d5db;
+            font-size: 14px;
+        }
+
+        .description-section {
+            margin: 80px 0;
+        }
+
+        .description-content {
+            background: linear-gradient(135deg, #1a2855 0%, #0f1a35 100%);
+            border: 1px solid #2a3f66;
+            border-radius: 12px;
+            padding: 40px;
+        }
+
+        .description-content p {
+            line-height: 1.8;
+            color: #d1d5db;
+            font-size: 15px;
+            margin-bottom: 16px;
+        }
+
+        /* Related Products */
+        .related-products {
+            margin: 80px 0;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .product-card {
+            background: linear-gradient(135deg, #1a2855 0%, #0f1a35 100%);
+            border: 1px solid #2a3f66;
+            border-radius: 12px;
+            padding: 24px;
+            transition: all 0.3s;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .product-card:hover {
+            border-color: #3b82f6;
+            transform: translateY(-6px);
+        }
+
+        .card-image {
+            width: 100%;
+            height: 280px;
+            background: #000;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .card-brand {
+            font-size: 12px;
+            color: #9ca3af;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #fff;
+        }
+
+        .card-price {
+            font-size: 20px;
+            font-weight: 700;
+            color: #3b82f6;
+            margin-bottom: 12px;
+        }
+
+        .card-stock {
+            font-size: 13px;
+            padding: 6px 12px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        .card-stock.in-stock {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+        }
+
+        .card-stock.low-stock {
+            background: rgba(251, 191, 36, 0.2);
+            color: #fbbf24;
+        }
+
+        .card-stock.out-of-stock {
+            background: rgba(248, 113, 113, 0.2);
+            color: #f87171;
+        }
+
+        .product-options {
+            margin: 40px 0;
+        }
+
+        .option-group {
+            margin-bottom: 30px;
+        }
+
+        .option-label {
+            font-weight: 600;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 1px;
+        }
+
+        .option-values {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .color-option {
+            width: 40px;
+            height: 40px;
+            border-radius: 6px;
+            border: 2px solid #444;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .color-option:hover,
+        .color-option.active {
+            border-color: #3b82f6;
+        }
+
+        .color-option.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .strap-option {
+            padding: 10px 16px;
+            border: 1px solid #444;
+            border-radius: 6px;
+            background: transparent;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 12px;
+        }
+
+        .strap-option:hover,
+        .strap-option.active {
+            border-color: #3b82f6;
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .strap-option.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .add-to-cart {
+            width: 200px;
+            padding: 14px 0;
+            background: #3b82f6;
+            border: none;
+            color: #fff;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: background 0.3s;
+            margin-top: 30px;
+        }
+
+        .add-to-cart:hover {
+            background: #2563eb;
+        }
+
+        .add-to-cart:disabled {
+            background: #6b7280;
+            cursor: not-allowed;
+        }
+
+        /* Specifications Section */
+        .specifications {
+            margin: 80px 0;
+        }
+
+        .section-title {
+            font-size: 32px;
+            margin-bottom: 40px;
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+
+        .specs-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+        }
+
+        .spec-category {
+            margin-bottom: 40px;
+        }
+
+        .spec-category h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .spec-category ul {
+            list-style: none;
+        }
+
+        .spec-category li {
+            margin-bottom: 10px;
+            color: #d1d5db;
+            font-size: 14px;
+        }
+
+        /* Footer */
+        footer {
+            background: #000;
+            padding: 60px 40px 30px;
+            margin-top: 80px;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 40px;
+            margin-bottom: 60px;
+            max-width: 1400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .footer-col h3 {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .footer-col ul {
+            list-style: none;
+        }
+
+        .footer-col ul li {
+            margin-bottom: 12px;
+            font-size: 13px;
+            color: #d1d5db;
+        }
+
+        .footer-col ul li a {
+            color: #d1d5db;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-col ul li a:hover {
+            color: #3b82f6;
+        }
+
+        .subscribe-input {
+            display: flex;
+            margin-top: 16px;
+        }
+
+        .subscribe-input input {
+            flex: 1;
+            padding: 10px 12px;
+            background: transparent;
+            border: 1px solid #444;
+            color: #fff;
+            border-radius: 0;
+            font-size: 12px;
+        }
+
+        .subscribe-input button {
+            padding: 10px 16px;
+            background: transparent;
+            border: 1px solid #444;
+            color: #fff;
+            cursor: pointer;
+            border-radius: 0;
+            transition: all 0.3s;
+        }
+
+        .subscribe-input button:hover {
+            background: #3b82f6;
+            border-color: #3b82f6;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid #1a2f4d;
+            padding-top: 30px;
+            text-align: center;
+            color: #6b7280;
+            font-size: 12px;
+        }
+
+        @media (max-width: 1024px) {
+            .product-section {
+                grid-template-columns: 1fr;
+            }
+
+            .specs-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .products-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .footer-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="logo">CHRONIFY</div>
+        <div class="header-links">
+            <a href="/">Home</a>
+            <a href="/products">Shop</a>
+        </div>
+        
+        <div class="header-icons">
+            <button class="icon-btn" title="Wishlist" onclick="window.location.href='/wishlist'">
+                <i class="far fa-heart"></i>
+                <% if (wishlistCount > 0) { %>
+                    <span class="badge" style="position: absolute; top: -8px; right: -8px; background-color: #ef4444; color: white; border-radius: 50%; padding: 2px 6px; font-size: 10px; font-weight: bold; min-width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.3); border: 2px solid #000; pointer-events: none;"><%= wishlistCount %></span>
+                <% } %>
+            </button>
+            <button class="icon-btn" title="Cart" onclick="window.location.href='/cart'">
+                <i class="fas fa-shopping-cart"></i>
+                <% if ( cartCount > 0) { %>
+                    <span class="badge" style="position: absolute; top: -8px; right: -8px; background-color: #ef4444; color: white; border-radius: 50%; padding: 2px 6px; font-size: 10px; font-weight: bold; min-width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.3); border: 2px solid #000; pointer-events: none;"><%= cartCount %></span>
+                <% } %>
+            </button>
+            <button class="icon-btn" title="Account" onclick="window.location.href='/profile'">
+                <i class="far fa-user-circle"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Product Section -->
+        <section class="product-section">
+            <div class="product-images">
+                <div class="main-image">
+                    <button class="nav-arrow prev" onclick="previousImage()"><i class="fas fa-chevron-left"></i></button>
+                    <img id="mainImage" src="<%= product?.variants[0]?.mainImage?.url || '/images/default-watch.jpg' %>" alt="<%= product?.name || 'Product' %>">
+                    <button class="nav-arrow next" onclick="nextImage()"><i class="fas fa-chevron-right"></i></button>
+                    <button class="wishlist-btn" onclick="toggleWishlist()" style="<%= typeof isWishlisted !== 'undefined' && isWishlisted ? 'background-color: #ef4444;' : '' %>">
+                        <i class="<%= typeof isWishlisted !== 'undefined' && isWishlisted ? 'fas' : 'far' %> fa-heart"></i>
+                    </button>
+                </div>
+
+                <div class="gallery" id="gallery">
+                    <!-- Gallery will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <div class="product-info">
+                <h1><%= product?.name || 'Product Name' %></h1>
+
+                <div class="price-rating">
+                    <% 
+                        const firstVariant = product?.variants[0];
+                        const originalPrice = firstVariant?.price || 0;
+                        const offer = firstVariant?.offer || 0;
+                        const offerPrice = originalPrice - (originalPrice * offer / 100);
+                    %>
+                    <div class="price" id="variantPrice">
+                        <% if (offer > 0) { %>
+                            <span class="original-price">₹<%= originalPrice.toLocaleString('en-IN') %></span>
+                            <span class="offer-price">₹<%= Math.round(offerPrice).toLocaleString('en-IN') %></span>
+                            <span class="offer-badge"><%= offer %>% OFF</span>
+                        <% } else { %>
+                            <span class="offer-price">₹<%= originalPrice.toLocaleString('en-IN') %></span>
+                        <% } %>
+                    </div>
+                    <% 
+                        const currentVariant = product?.variants[0];
+                        const quantity = currentVariant?.quantity || 0;
+                        let stockClass = 'in-stock';
+                        let stockText = 'In Stock';
+                        
+                        if (quantity === 0) {
+                            stockClass = 'out-of-stock';
+                            stockText = 'Out of stock';
+                        } else if (quantity < 10) {
+                            stockClass = 'low-stock';
+                            stockText = `Only ${quantity} left`;
+                        }
+                    %>
+                    <span class="stock-status <%= stockClass %>" id="stockStatus"><%= stockText %></span>
+                </div>
+
+                <div class="description">
+                    <p><%= product?.description || 'No description available.' %></p>
+                </div>
+
+                <div class="product-options">
+                    <div class="option-group">
+                        <div class="option-label">Color: <span id="selectedColor"><%= product?.variants[0]?.color || '' %></span></div>
+                        <div class="option-values" id="colorOptions">
+                            <!-- Color options will be populated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <div class="option-group">
+                        <div class="option-label">Strap Material: <span id="selectedStrap"><%= product?.variants[0]?.strapMaterial || '' %></span></div>
+                        <div class="option-values" id="strapOptions">
+                            <!-- Strap options will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+
+                <button class="add-to-cart" id="addToCartBtn" onclick="addToCart()" <%= product.variants[0].quantity === 0 ? 'disabled' : '' %>>
+                    <%= product.variants[0].quantity === 0 ? 'Out of Stock' : 'Add To Cart' %>
+                </button>
+            </div>
+        </section>
+
+        <!-- Specifications -->
+        <section class="specifications">
+            <h2 class="section-title">Specifications</h2>
+
+            <div class="specs-grid">
+                <div>
+                    <div class="spec-category">
+                        <h3>Product Details</h3>
+                        <ul>
+                            <li>• Brand: <%= product?.brand || 'N/A' %></li>
+                            <li>• Model: <%= product?.name || 'N/A' %></li>
+                            <% if (product?.specifications?.weight) { %>
+                                <li>• Weight: <%= product.specifications.weight %></li>
+                            <% } %>
+                            <% if (product?.specifications?.waterResistance) { %>
+                                <li>• Water Resistance: <%= product.specifications.waterResistance %></li>
+                            <% } %>
+                            <% if (product?.specifications?.warranty) { %>
+                                <li>• Warranty: <%= product.specifications.warranty %></li>
+                            <% } %>
+                        </ul>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="spec-category">
+                        <h3>Available Variants</h3>
+                        <ul>
+                            <% if (product?.variants) { %>
+                                <% product.variants.forEach((variant, index) => { %>
+                                    <li>• <%= variant.color %> - <%= variant.strapMaterial %> (₹<%= variant.price %>)</li>
+                                <% }); %>
+                            <% } else { %>
+                                <li>No variants available</li>
+                            <% } %>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Description Section -->
+        <section class="description-section">
+            <h2 class="section-title">Description</h2>
+            <div class="description-content">
+                <p><%= product?.description || 'No detailed description available for this product.' %></p>
+                
+                <% if (product?.specifications) { %>
+                    <p style="margin-top: 24px;">
+                        <strong>Additional Features:</strong><br>
+                        This timepiece combines exceptional craftsmanship with modern functionality. 
+                        <% if (product.specifications.waterResistance) { %>
+                            With <%= product.specifications.waterResistance %> water resistance, it's built to withstand daily wear and various conditions.
+                        <% } %>
+                        <% if (product.specifications.warranty) { %>
+                            Backed by a <%= product.specifications.warranty %> warranty, ensuring peace of mind with your purchase.
+                        <% } %>
+                    </p>
+                <% } %>
+            </div>
+        </section>
+
+        <!-- Related Products -->
+        <% if (relatedProducts && relatedProducts.length > 0) { %>
+            <section class="related-products">
+                <h2 class="section-title">Related Products</h2>
+                
+                <div class="products-grid">
+                    <% relatedProducts.slice(0, 3).forEach(relatedProduct => { 
+                        const firstVariant = relatedProduct.variants[0];
+                        const quantity = firstVariant?.quantity || 0;
+                        let stockClass = 'in-stock';
+                        let stockText = 'In Stock';
+                        
+                        if (quantity === 0) {
+                            stockClass = 'out-of-stock';
+                            stockText = 'Out of stock';
+                        } else if (quantity < 10) {
+                            stockClass = 'low-stock';
+                            stockText = `Only ${quantity} left`;
+                        }
+                    %>
+                        <a href="/products/<%= relatedProduct._id %>" class="product-card">
+                            <div class="card-image">
+                                <img src="<%= firstVariant?.mainImage?.url || '/images/default-watch.jpg' %>" alt="<%= relatedProduct.name %>">
+                            </div>
+                            <div class="card-brand"><%= relatedProduct.brand %></div>
+                            <div class="card-title"><%= relatedProduct.name %></div>
+                            <% 
+                                const relatedOriginalPrice = firstVariant?.price || 0;
+                                const relatedOffer = firstVariant?.offer || 0;
+                                const relatedOfferPrice = relatedOriginalPrice - (relatedOriginalPrice * relatedOffer / 100);
+                            %>
+                            <div class="card-price" style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                                <% if (relatedOffer > 0) { %>
+                                    <span style="font-size: 16px; font-weight: 500; color: #9ca3af; text-decoration: line-through;">₹<%= relatedOriginalPrice.toLocaleString('en-IN') %></span>
+                                    <span style="font-size: 20px; font-weight: 700; color: #3b82f6;">₹<%= Math.round(relatedOfferPrice).toLocaleString('en-IN') %></span>
+                                    <span style="display: inline-block; background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); color: #fff; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700;"><%= relatedOffer %>% OFF</span>
+                                <% } else { %>
+                                    ₹<%= relatedOriginalPrice.toLocaleString('en-IN') %>
+                                <% } %>
+                            </div>
+
+                        </a>
+                    <% }); %>
+                </div>
+            </section>
+        <% } %>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-grid">
+            <div class="footer-col">
+                <h3>Exclusive</h3>
+                <div style="margin-top: 16px;">
+                    <div style="margin-bottom: 12px;">Subscribe</div>
+                    <div style="font-size: 13px; color: #d1d5db; margin-bottom: 16px;">Get 10% off your first order</div>
+                    <div class="subscribe-input">
+                        <input type="email" placeholder="Enter your email">
+                        <button><i class="fas fa-arrow-right"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-col">
+                <h3>Support</h3>
+                <ul>
+                    <li>9th Floor, Orion Business Park, Thane West, Mumbai, Maharashtra 400607</li>
+                    <li><a href="mailto:nexoratech@gmail.com">nexoratech@gmail.com</a></li>
+                    <li><a href="tel:+912224973401">+91 22 4973 4501</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h3>Account</h3>
+                <ul>
+                    <li><a href="/account">My Account</a></li>
+                    <li><a href="/auth">Login / Register</a></li>
+                    <li><a href="/cart">Cart</a></li>
+                    <li><a href="/wishlist">Wishlist</a></li>
+                    <li><a href="/shop">Shop</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h3>Quick Link</h3>
+                <ul>
+                    <li><a href="/privacy">Privacy Policy</a></li>
+                    <li><a href="/terms">Terms Of Use</a></li>
+                    <li><a href="/faq">FAQ</a></li>
+                    <li><a href="/contact">Contact</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h3>Download App</h3>
+                <div style="margin-top: 16px;">
+                    <div style="font-size: 12px; color: #d1d5db; margin-bottom: 12px;">Save $3 with App New User Only</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; Copyright Chronify 2025 All rights reserved</p>
+        </div>
+    </footer>
+
+    <script>
+        // Product data from backend
+        const productData = <%- JSON.stringify(product) %>;
+        let currentVariantIndex = 0;
+        let currentImageIndex = 0;
+        let allImages = [];
+
+        // Color mapping for display
+        const colorMap = {
+            'Blue': '#3b82f6',
+            'Green': '#22c55e',
+            'Gold': '#fbbf24',
+            'Rose Gold': '#c77d56',
+            'Red': '#ef4444',
+            'Black': '#000000',
+            'Silver': '#c0c0c0',
+            'White': '#ffffff'
+        };
+
+        // Initialize the page
+        function init() {
+            updateGallery();
+            populateColorOptions();
+            populateStrapOptions();
+        }
+
+        function updateGallery() {
+            const variant = productData.variants[currentVariantIndex];
+            allImages = [variant.mainImage, ...variant.additionalImages];
+            
+            const gallery = document.getElementById('gallery');
+            gallery.innerHTML = '';
+            
+            allImages.forEach((image, index) => {
+                const thumb = document.createElement('div');
+                thumb.className = `gallery-thumb ${index === currentImageIndex ? 'active' : ''}`;
+                thumb.onclick = () => changeImage(index);
+                thumb.innerHTML = `<img src="${image.url}" alt="Image ${index + 1}">`;
+                gallery.appendChild(thumb);
+            });
+        }
+
+        function populateColorOptions() {
+            const colors = [...new Set(productData.variants.map(v => v.color))];
+            const colorOptions = document.getElementById('colorOptions');
+            colorOptions.innerHTML = '';
+            
+            colors.forEach(color => {
+                const colorDiv = document.createElement('div');
+                const bgColor = colorMap[color] || '#666';
+                const isActive = productData.variants[currentVariantIndex].color === color;
+                colorDiv.className = `color-option ${isActive ? 'active' : ''}`;
+                colorDiv.style.background = bgColor;
+                colorDiv.title = color;
+                colorDiv.onclick = () => selectColor(color);
+                colorOptions.appendChild(colorDiv);
+            });
+        }
+
+        function populateStrapOptions() {
+            const currentColor = productData.variants[currentVariantIndex].color;
+            const straps = productData.variants
+                .filter(v => v.color === currentColor)
+                .map(v => v.strapMaterial);
+            
+            const strapOptions = document.getElementById('strapOptions');
+            strapOptions.innerHTML = '';
+            
+            straps.forEach(strap => {
+                const btn = document.createElement('button');
+                const isActive = productData.variants[currentVariantIndex].strapMaterial === strap;
+                btn.className = `strap-option ${isActive ? 'active' : ''}`;
+                btn.textContent = strap;
+                btn.onclick = () => selectStrap(strap);
+                strapOptions.appendChild(btn);
+            });
+        }
+
+        function selectColor(color) {
+            const currentStrap = productData.variants[currentVariantIndex].strapMaterial;
+            const newVariant = productData.variants.find(v => 
+                v.color === color && v.strapMaterial === currentStrap
+            ) || productData.variants.find(v => v.color === color);
+            
+            if (newVariant) {
+                currentVariantIndex = productData.variants.indexOf(newVariant);
+                currentImageIndex = 0;
+                updateVariantDisplay();
+            }
+        }
+
+        function selectStrap(strap) {
+            const currentColor = productData.variants[currentVariantIndex].color;
+            const newVariant = productData.variants.find(v => 
+                v.color === currentColor && v.strapMaterial === strap
+            );
+            
+            if (newVariant) {
+                currentVariantIndex = productData.variants.indexOf(newVariant);
+                currentImageIndex = 0;
+                updateVariantDisplay();
+            }
+        }
+
+        function updateVariantDisplay() {
+            const variant = productData.variants[currentVariantIndex];
+            
+            // Update price with offer calculation
+            const originalPrice = variant.price;
+            const offer = variant.offer || 0;
+            const offerPrice = originalPrice - (originalPrice * offer / 100);
+            
+            const priceElement = document.getElementById('variantPrice');
+            if (offer > 0) {
+                priceElement.innerHTML = `
+                    <span class="original-price">₹${originalPrice.toLocaleString('en-IN')}</span>
+                    <span class="offer-price">₹${Math.round(offerPrice).toLocaleString('en-IN')}</span>
+                    <span class="offer-badge">${offer}% OFF</span>
+                `;
+            } else {
+                priceElement.innerHTML = `<span class="offer-price">₹${originalPrice.toLocaleString('en-IN')}</span>`;
+            }
+            
+            // Update stock status
+            const stockStatus = document.getElementById('stockStatus');
+            const addToCartBtn = document.getElementById('addToCartBtn');
+            
+            if (variant.quantity === 0) {
+                stockStatus.className = 'stock-status out-of-stock';
+                stockStatus.textContent = 'Out of stock';
+                addToCartBtn.disabled = true;
+                addToCartBtn.textContent = 'Out of Stock';
+            } else if (variant.quantity < 10) {
+                stockStatus.className = 'stock-status low-stock';
+                stockStatus.textContent = `Only ${variant.quantity} left`;
+                addToCartBtn.disabled = false;
+                addToCartBtn.textContent = 'Add To Cart';
+            } else {
+                stockStatus.className = 'stock-status in-stock';
+                stockStatus.textContent = 'In Stock';
+                addToCartBtn.disabled = false;
+                addToCartBtn.textContent = 'Add To Cart';
+            }
+            
+            // Update selected labels
+            document.getElementById('selectedColor').textContent = variant.color;
+            document.getElementById('selectedStrap').textContent = variant.strapMaterial;
+            
+            // Update main image
+            document.getElementById('mainImage').src = variant.mainImage.url;
+            
+            // Update gallery
+            updateGallery();
+            populateColorOptions();
+            populateStrapOptions();
+        }
+
+        function changeImage(index) {
+            currentImageIndex = index;
+            document.getElementById('mainImage').src = allImages[index].url;
+            
+            document.querySelectorAll('.gallery-thumb').forEach((thumb, i) => {
+                thumb.classList.toggle('active', i === index);
+            });
+        }
+
+        function nextImage() {
+            currentImageIndex = (currentImageIndex + 1) % allImages.length;
+            changeImage(currentImageIndex);
+        }
+
+        function previousImage() {
+            currentImageIndex = (currentImageIndex - 1 + allImages.length) % allImages.length;
+            changeImage(currentImageIndex);
+        }
+
+async function toggleWishlist() {
+    console.log("clicked")
+    
+    const btn = document.querySelector('.wishlist-btn');
+    const icon = btn.querySelector('i');
+    const productId = productData._id;
+    const variant = productData.variants[currentVariantIndex];
+    const sku = variant.sku;
+    const isHeartFilled = icon.classList.contains('fas');
+
+    try {
+        let response;
+        if (isHeartFilled) {
+            response = await fetch(`/wishlist/remove/${productId}`, {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' }
+            });
+        } else {
+            response = await fetch(`/wishlist/add/${productId}?sku=${sku}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            });
+        }
+        
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+            if (isHeartFilled) {
+                btn.style.backgroundColor = '';
+                icon.classList.replace('fas', 'far');
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Removed from Wishlist',
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    background: '#1a2855',
+                    color: '#fff'
+                });
+            } else {
+                btn.style.backgroundColor = '#ef4444';
+                icon.classList.replace('far', 'fas');
+                 Swal.fire({
+                    icon: 'success',
+                    title: 'Added to Wishlist',
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    background: '#1a2855',
+                    color: '#fff'
+                });
+            }
+        } else {
+              Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: data.message || 'Failed to update wishlist',
+                background: '#1a2855',
+                color: '#fff'
+            });
+        }
+    } catch (error) {
+         console.error('Error:', error);
+         Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'An error occurred',
+            background: '#1a2855',
+            color: '#fff'
+        });
+    }
+}
+
+
+async function addToCart() {
+    const variant = productData.variants[currentVariantIndex];
+
+    if (variant.quantity === 0) return;
+
+    const productId = productData._id;
+    const sku = variant.sku || variant._id; // fallback if SKU doesn't exist
+
+    try {
+        const response = await fetch(`/cart/add/${productId}/${sku}`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                quantity: 1
+            })
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: result.message || "Failed to add to cart",
+                background: '#1a2855',
+                color: '#fff',
+                confirmButtonColor: '#3b82f6'
+            });
+            return;
+        }
+
+        Swal.fire({
+            icon: 'success',
+            title: 'Added!',
+            text: 'Item added to cart successfully',
+            background: '#1a2855',
+            color: '#fff',
+            confirmButtonColor: '#3b82f6'
+        });
+
+        console.log("Cart response:", result);
+
+    } catch (error) {
+        console.error("Add to cart error:", error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: "Something went wrong. Please try again.",
+            background: '#1a2855',
+            color: '#fff',
+            confirmButtonColor: '#3b82f6'
+        });
+    }
+}
+
+
+        // Initialize hover zoom
+        function initZoom() {
+            const mainImageContainer = document.querySelector('.main-image');
+            const mainImage = document.getElementById('mainImage');
+
+            if (!mainImageContainer || !mainImage) return;
+
+            mainImageContainer.addEventListener('mousemove', (e) => {
+                // Get the bounding rectangle of the container
+                const rect = mainImageContainer.getBoundingClientRect();
+                
+                // Calculate mouse position relative to the container
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                // Set the transform origin to the mouse position
+                mainImage.style.transformOrigin = `${x}px ${y}px`;
+                mainImage.style.transform = "scale(2.5)";
+            });
+
+            mainImageContainer.addEventListener('mouseleave', () => {
+                mainImage.style.transformOrigin = "center";
+                mainImage.style.transform = "scale(1)";
+            });
+        }
+
+        // Initialize on page load
+        init();
+        initZoom();
+    </script>
+    </script>
+</body>
+</html>

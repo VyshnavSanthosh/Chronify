@@ -1,18 +1,18 @@
-module.exports = class OtpController {
+export default class OtpController {
     constructor(otpService) {
         this.otpService = otpService
     }
 
-    renderOtpPage(req,res){
-        return res.render("vendor/auth/verifyOtp",{
+    renderOtpPage(req, res) {
+        return res.render("vendor/auth/verifyOtp", {
             email: req.session.tempVendorEmail,
             error: null,
-            timeRemaining: 20
+            timeRemaining: 120
         })
     }
 
-    async verifyOtp(req,res){
-        const {otp} = req.body;
+    async verifyOtp(req, res) {
+        const { otp } = req.body;
         const vendorId = req.session.tempVendorId
 
         try {
@@ -25,7 +25,7 @@ module.exports = class OtpController {
             return res.render("vendor/auth/verifyOtp", {
                 email: req.session.tempVendorEmail,
                 error: error.message,
-                timeRemaining: 20 
+                timeRemaining: 120
             });
         }
     }
@@ -36,24 +36,24 @@ module.exports = class OtpController {
 
         // Check if session data exists
         if (!vendorId || !email) {
-            return res.status(400).json({ 
+            return res.status(400).json({
                 success: false,
-                error: "Session expired. Please signup again." 
+                error: "Session expired. Please signup again."
             });
         }
 
         try {
             await this.otpService.resendOtp({ _id: vendorId, brandEmail: email });
 
-            return res.json({ 
+            return res.json({
                 success: true,
-                message: "OTP resent successfully" 
+                message: "OTP resent successfully"
             });
 
         } catch (err) {
-            return res.status(400).json({ 
+            return res.status(400).json({
                 success: false,
-                error: err.message 
+                error: err.message
             });
         }
     }

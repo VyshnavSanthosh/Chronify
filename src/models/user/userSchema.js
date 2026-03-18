@@ -1,4 +1,19 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
+
+const imageSchema = new mongoose.Schema({
+    url: {
+        type: String,
+        default: null
+    },
+    publicId: {
+        type: String,
+        default: null
+    },
+    fileName: {
+        type: String,
+        default: null
+    }
+}, { _id: false });
 
 const UserSchema = new mongoose.Schema(
     {
@@ -71,15 +86,19 @@ const UserSchema = new mongoose.Schema(
             default: "local",
         },
 
+        profileImage: {
+            type: imageSchema,
+        },
+
         refreshToken: {
             type: String,
             default: null,
         }
 
     },
-    { timestamps: true } 
+    { timestamps: true }
 )
 
 
 
-module.exports = mongoose.model("User", UserSchema);
+export default mongoose.model("User", UserSchema);

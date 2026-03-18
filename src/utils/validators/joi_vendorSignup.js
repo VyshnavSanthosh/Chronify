@@ -1,6 +1,6 @@
-const Joi = require("joi");
+import Joi from "joi";
 
-module.exports = Joi.object({
+export default Joi.object({
     // ---------- Brand Name ----------
     brandName: Joi.string()
         .trim()

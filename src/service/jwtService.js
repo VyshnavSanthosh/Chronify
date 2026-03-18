@@ -1,27 +1,26 @@
-const jwt = require('jsonwebtoken');
-const { jwt_access_secret, jwt_refresh_secret, jwt_access_expiry, jwt_refresh_expiry } = require("../config/index")
+import jwt from "jsonwebtoken";
+import { jwt_access_secret, jwt_refresh_secret, jwt_access_expiry, jwt_refresh_expiry } from "../config/index.js";
 
-module.exports = class JwtService {
-    
+export default class JwtService {
 
     // generate access 
-    generateTokens(userId,email, role){
+    generateTokens(userId, email, role) {
         const payload = {
             userId: userId,
             email: email,
             role: role
         }
 
-        const accessToken = jwt.sign(payload,jwt_access_secret,{expiresIn: jwt_access_expiry})
-        const refreshToken = jwt.sign({ userId: userId },jwt_refresh_secret,{expiresIn: jwt_refresh_expiry})
-
+        const accessToken = jwt.sign(payload, jwt_access_secret, { expiresIn: jwt_access_expiry })
+        const refreshToken = jwt.sign({ userId: userId }, jwt_refresh_secret, { expiresIn: jwt_refresh_expiry })
+        
         return {
             accessToken,
             refreshToken
         }
     }
 
-    verifyAccessToken(token){
+    verifyAccessToken(token) {
         try {
             const decoded = jwt.verify(token, jwt_access_secret);
             return decoded;

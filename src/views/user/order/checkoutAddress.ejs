@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add Address - Chronify</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #050a14;
+    }
+    .custom-dark-card {
+      background-color: #0a192f;
+    }
+    .error-text {
+      color: #ef4444;
+      font-size: 12px;
+      margin-top: 4px;
+    }
+  </style>
+</head>
+
+<body class="text-white min-h-screen flex">
+
+  <!-- Sidebar -->
+    <aside class="w-64 bg-[#0a1425] flex flex-col border-r border-gray-800 hidden md:flex">
+        <div class="p-6">
+            <h1 class="text-2xl font-bold tracking-widest text-white uppercase italic">
+                Chronify
+            </h1>
+        </div>
+
+        <nav class="flex-1 px-4 space-y-2">
+            <div class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                Checkout Progress
+            </div>
+            <div class="flex items-center space-x-3 px-4 py-3 text-gray-400">
+                <i class="fa-solid fa-cart-shopping w-5"></i>
+                <span class="text-sm">1. Cart</span>
+            </div>
+            <div class="flex items-center space-x-3 px-4 py-3 text-white bg-blue-600/20 rounded-lg border border-blue-500/30">
+                <i class="fa-solid fa-location-dot w-5 text-blue-500"></i>
+                <span class="text-sm font-medium">2. Shipping Address</span>
+            </div>
+            <div class="flex items-center space-x-3 px-4 py-3 text-gray-400 opacity-50">
+                <i class="fa-solid fa-credit-card w-5"></i>
+                <span class="text-sm">3. Payment</span>
+            </div>
+        </nav>
+
+        <div class="p-6 mt-auto border-t border-gray-800">
+            <a href="/cart" class="flex items-center space-x-3 text-gray-400 hover:text-white transition-colors">
+                <i class="fa-solid fa-arrow-left text-sm"></i>
+                <span class="text-sm">Back to Cart</span>
+            </a>
+        </div>
+    </aside>
+
+  <!-- Main Content -->
+  <main class="flex-1 flex flex-col">
+
+    <!-- Header -->
+    <header class="h-16 flex items-center justify-end px-8 border-b border-gray-800">
+      <div class="text-right">
+        <p class="text-sm font-semibold"><%= user.firstName %></p>
+        <p class="text-xs text-gray-400 uppercase">Customer</p>
+      </div>
+    </header>
+
+    <!-- Form Container -->
+    <div class="flex-1 p-12 flex justify-center items-start overflow-y-auto">
+      <div class="w-full max-w-4xl custom-dark-card rounded-2xl p-10 shadow-xl mb-12">
+
+        <h2 class="text-2xl font-semibold mb-8 border-b border-gray-700 pb-4">
+          Add New Shipping Address
+        </h2>
+
+        <!-- FORM -->
+        <form id="addressForm" action="/checkout/<%= cartId %>/add-address" method="POST" class="space-y-6" novalidate>
+
+          <!-- Address -->
+          <div>
+            <label class="block text-sm font-medium text-gray-300 mb-2">Address</label>
+            <input
+              type="text"
+              id="address"
+              name="address"
+              value="<%= locals.addressData?.address || '' %>"
+              placeholder="House Name, House Number, Locality"
+              class="w-full bg-white text-black px-4 py-3 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+            <div id="addressError" class="error-text">
+                <% if (locals.errors?.address) { %> <%= locals.errors.address %> <% } %>
+            </div>
+          </div>
+
+          <!-- Name & Phone -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label class="block text-sm font-medium text-gray-300 mb-2">Full Name</label>
+              <input
+                type="text"
+                id="name"
+                name="name"
+                value="<%= locals.addressData?.name || user?.firstName || '' %>"
+                class="w-full bg-white text-black px-4 py-3 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+              <div id="nameError" class="error-text">
+                  <% if (locals.errors?.name) { %> <%= locals.errors.name %> <% } %>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-300 mb-2">Phone Number</label>
+              <input
+                type="tel"
+                id="phone"
+                name="phone"
+                value="<%= locals.addressData?.phone || user?.phone || '' %>"
+                class="w-full bg-white text-black px-4 py-3 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+              <div id="phoneError" class="error-text">
+                  <% if (locals.errors?.phone) { %> <%= locals.errors.phone %> <% } %>
+              </div>
+            </div>
+          </div>
+
+          <!-- District & State -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label class="block text-sm font-medium text-gray-300 mb-2">Pin Code</label>
+              <input
+                type="text"
+                id="pinCode"
+                name="pinCode"
+                value="<%= locals.addressData?.pinCode || '' %>"
+                placeholder="eg: 689230"
+                class="w-full bg-white text-black px-4 py-3 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+              <div id="pinCodeError" class="error-text">
+                  <% if (locals.errors?.pinCode) { %> <%= locals.errors.pinCode %> <% } %>
+              </div>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-300 mb-2">District / Town</label>
+              <input
+                type="text"
+                id="district"
+                name="district"
+                value="<%= locals.addressData?.district || '' %>"
+                placeholder="eg: Ernakulam"
+                class="w-full bg-white text-black px-4 py-3 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+              <div id="districtError" class="error-text">
+                  <% if (locals.errors?.district) { %> <%= locals.errors.district %> <% } %>
+              </div>
+            </div>
+          </div>
+
+          <!-- Landmark & State -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label class="block text-sm font-medium text-gray-300 mb-2">State</label>
+              <input
+                type="text"
+                id="state"
+                name="state"
+                value="<%= locals.addressData?.state || '' %>"
+                placeholder="eg: Kerala"
+                class="w-full bg-white text-black px-4 py-3 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+              <div id="stateError" class="error-text">
+                  <% if (locals.errors?.state) { %> <%= locals.errors.state %> <% } %>
+              </div>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-300 mb-2">Landmark (optional)</label>
+              <input
+                type="text"
+                id="landmark"
+                name="landmark"
+                value="<%= locals.addressData?.landmark || '' %>"
+                placeholder="eg: Hospital"
+                class="w-full bg-white text-black px-4 py-3 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+              <div id="landmarkError" class="error-text">
+                  <% if (locals.errors?.landmark) { %> <%= locals.errors.landmark %> <% } %>
+              </div>
+            </div>
+          </div>
+
+          <!-- Address Type -->
+          <div>
+            <label class="block text-sm font-medium text-gray-300 mb-2">Address Type</label>
+            <div class="flex items-center space-x-6">
+              <label class="flex items-center space-x-2">
+                <input type="radio" name="addressType" value="home" <%= (locals.addressData?.addressType === 'home' || !locals.addressData?.addressType) ? 'checked' : '' %>>
+                <span class="text-sm">Home</span>
+              </label>
+
+              <label class="flex items-center space-x-2">
+                <input type="radio" name="addressType" value="work" <%= locals.addressData?.addressType === 'work' ? 'checked' : '' %>>
+                <span class="text-sm">Work</span>
+              </label>
+            </div>
+            <div id="addressTypeError" class="error-text">
+                <% if (locals.errors?.addressType) { %> <%= locals.errors.addressType %> <% } %>
+            </div>
+          </div>
+
+          <!-- Default -->
+          <div class="flex items-center space-x-2">
+            <input type="checkbox" id="makeDefault" name="makeDefault" <%= locals.addressData?.makeDefault ? 'checked' : '' %>>
+            <label for="makeDefault" class="text-sm text-gray-300">
+              Make this default
+            </label>
+          </div>
+
+          <!-- Buttons -->
+          <div class="flex justify-end gap-4 pt-6">
+            <a
+              href="/checkout/<%= cartId %>"
+              class="bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-md font-medium transition-colors"
+            >
+              Cancel
+            </a>
+
+            <button
+              type="submit"
+              class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-md font-medium transition-colors"
+            >
+              Add Address
+            </button>
+          </div>
+
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <!-- PINCODE AUTOFILL & VALIDATION SCRIPT -->
+  <script>
+    const addressForm = document.getElementById("addressForm");
+    const pinInput = document.getElementById("pinCode");
+    const districtInput = document.getElementById("district");
+    const stateInput = document.getElementById("state");
+    const nameInput = document.getElementById("name");
+    const phoneInput = document.getElementById("phone");
+    const addressInput = document.getElementById("address");
+    const landmarkInput = document.getElementById("landmark");
+
+    const errors = {
+        name: document.getElementById("nameError"),
+        phone: document.getElementById("phoneError"),
+        address: document.getElementById("addressError"),
+        pinCode: document.getElementById("pinCodeError"),
+        district: document.getElementById("districtError"),
+        state: document.getElementById("stateError"),
+        landmark: document.getElementById("landmarkError")
+    };
+
+    const validateField = (id) => {
+        const input = document.getElementById(id);
+        const errorDiv = errors[id];
+        const value = input.value.trim();
+        let message = "";
+
+        switch(id) {
+            case "name":
+                if (!value) message = "Name is required";
+                else if (value.length < 2) message = "Name must be at least 2 characters";
+                else if (value.length > 50) message = "Name must be at most 50 characters";
+                else if (!/^[A-Za-z\s]+$/.test(value)) message = "Name must contain only letters and spaces";
+                break;
+            case "phone":
+                if (!value) message = "Phone number is required";
+                else if (!/^[6-9][0-9]{9}$/.test(value)) message = "Phone number must be a valid 10-digit Indian mobile number";
+                break;
+            case "address":
+                if (!value) message = "Address is required";
+                else if (value.length < 5) message = "Address must be at least 5 characters";
+                else if (value.length > 200) message = "Address must be at most 200 characters";
+                break;
+            case "pinCode":
+                if (!value) message = "Pin code is required";
+                else if (!/^[1-9][0-9]{5}$/.test(value)) message = "Pin code must be a valid 6-digit Indian postal code";
+                break;
+            case "district":
+                if (!value) message = "District is required";
+                else if (value.length < 2) message = "District must be at least 2 characters";
+                else if (value.length > 50) message = "District must be at most 50 characters";
+                else if (!/^[A-Za-z\s]+$/.test(value)) message = "District must contain only letters and spaces";
+                break;
+            case "state":
+                if (!value) message = "State is required";
+                else if (value.length < 2) message = "State must be at least 2 characters";
+                else if (value.length > 50) message = "State must be at most 50 characters";
+                else if (!/^[A-Za-z\s]+$/.test(value)) message = "State must contain only letters and spaces";
+                break;
+            case "landmark":
+                if (value && value.length < 2) message = "Landmark must be at least 2 characters";
+                else if (value && value.length > 100) message = "Landmark must be at most 100 characters";
+                break;
+        }
+
+        errorDiv.textContent = message;
+        return !message;
+    };
+
+    // Attach listeners for real-time validation
+    ["name", "phone", "address", "pinCode", "district", "state", "landmark"].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.addEventListener("input", () => validateField(id));
+            el.addEventListener("blur", () => validateField(id));
+        }
+    });
+
+    // Form submission validation
+    addressForm.addEventListener("submit", (e) => {
+        let isValid = true;
+        ["name", "phone", "address", "pinCode", "district", "state", "landmark"].forEach(id => {
+            if (!validateField(id)) isValid = false;
+        });
+
+        if (!isValid) {
+            e.preventDefault();
+            Swal.fire({
+                icon: 'error',
+                title: 'Validation Error',
+                text: 'Please fix the errors in the form before submitting.',
+                confirmButtonColor: '#3b82f6'
+            });
+        }
+    });
+
+    // PINCODE AUTOFILL LOGIC
+    let debounceTimer = null;
+    pinInput.addEventListener("input", () => {
+      const pincode = pinInput.value.trim();
+      if (!/^\d{6}$/.test(pincode)) {
+        return;
+      }
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+        fetchPincodeDetails(pincode);
+      }, 400);
+    });
+
+    async function fetchPincodeDetails(pincode) {
+      try {
+        districtInput.value = "Loading...";
+        stateInput.value = "Loading...";
+        const res = await fetch(`https://api.postalpincode.in/pincode/${pincode}`);
+        const data = await res.json();
+        if (data && data[0].Status === "Success") {
+          const postOffice = data[0].PostOffice[0];
+          districtInput.value = postOffice.District;
+          stateInput.value = postOffice.State;
+          validateField("district");
+          validateField("state");
+        } else {
+          districtInput.value = "";
+          stateInput.value = "";
+        }
+      } catch (err) {
+        console.error("Pincode lookup failed:", err);
+        districtInput.value = "";
+        stateInput.value = "";
+      }
+    }
+  </script>
+
+</body>
+</html>

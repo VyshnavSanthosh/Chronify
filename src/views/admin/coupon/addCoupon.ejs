@@ -1,0 +1,650 @@
+<% layout('admin/layout/adminLayout') %>
+
+<% block('styles', `
+    <!-- SweetAlert2 CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        /* SweetAlert Dark Theme Overrides */
+        div:where(.swal2-container) {
+            z-index: 9999 !important;
+        }
+        
+        div:where(.swal2-popup) {
+            background: #0f1a35 !important;
+            border: 1px solid #2a3f66 !important;
+            color: #fff !important;
+        }
+        
+        div:where(.swal2-title) {
+            color: #fff !important;
+        }
+        
+        div:where(.swal2-html-container) {
+            color: #b0b5c8 !important;
+        }
+        
+        div:where(.swal2-icon) {
+            border-color: #3b82f6 !important; 
+            color: #3b82f6 !important;
+        }
+
+        div:where(.swal2-icon.swal2-success) {
+            border-color: #22c55e !important;
+            color: #22c55e !important;
+        }
+
+        div:where(.swal2-icon.swal2-error) {
+            border-color: #dc2626 !important;
+            color: #dc2626 !important;
+        }
+
+        div:where(.swal2-icon.swal2-warning) {
+            border-color: #f59e0b !important;
+            color: #f59e0b !important;
+        }
+
+        div:where(.swal2-confirm) {
+            background-color: #3b82f6 !important;
+            box-shadow: none !important;
+        }
+
+        div:where(.swal2-cancel) {
+            background-color: #dc2626 !important; 
+            box-shadow: none !important;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a2555 100%);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 255px;
+            background: linear-gradient(180deg, #1a2855 0%, #0f1a35 100%);
+            position: fixed;
+            left: 0;
+            top: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 24px 16px;
+            border-right: 1px solid #2a3f66;
+            z-index: 1000;
+        }
+
+        .sidebar-logo {
+            font-size: 24px;
+            font-weight: 300;
+            letter-spacing: 2px;
+            margin-bottom: 32px;
+            text-transform: uppercase;
+        }
+
+        .sidebar-menu {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            text-decoration: none;
+            color: #b0b8c1;
+            font-size: 14px;
+            transition: all 0.3s;
+            cursor: pointer;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+        }
+
+        .sidebar-item:hover {
+            background: rgba(59, 130, 246, 0.2);
+            color: #fff;
+        }
+
+        .sidebar-item.active {
+            background: rgba(59, 130, 246, 0.3);
+            color: #3b82f6;
+        }
+
+        .sidebar-item i {
+            font-size: 18px;
+            width: 24px;
+            text-align: center;
+        }
+
+        .sidebar-item .arrow {
+            margin-left: auto;
+            font-size: 14px;
+        }
+
+        .sidebar-bottom {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: auto;
+        }
+
+        .btn-account, .btn-logout {
+            padding: 10px 16px;
+            border-radius: 6px;
+            border: 1px solid #2a3f66;
+            background: transparent;
+            color: #fff;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-account:hover {
+            background: rgba(59, 130, 246, 0.2);
+            border-color: #3b82f6;
+        }
+
+        .btn-logout {
+            background: #fff;
+            color: #000;
+            border: none;
+        }
+
+        .btn-logout:hover {
+            background: #e0e0e0;
+        }
+
+        /* Main Content */
+        .main-container {
+            margin-left: 55px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #1a2855 0%, #0f1a35 100%);
+            border-bottom: 1px solid #2a3f66;
+            padding: 16px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 24px;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ff6b6b, #ffa07a);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .user-name {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .user-role {
+            font-size: 12px;
+            color: #b0b8c1;
+        }
+
+        /* Content */
+        .content {
+            flex: 1;
+            padding: 32px 40px;
+        }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: 300;
+            margin-bottom: 8px;
+        }
+
+        .breadcrumb {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            font-size: 14px;
+            color: #fff;
+            margin-bottom: 32px;
+        }
+
+        .breadcrumb a {
+            color: #fff;
+            text-decoration: none;
+        }
+
+        .breadcrumb span {
+            color: #fff;
+        }
+
+        /* Form Container */
+        .form-container {
+            background: linear-gradient(135deg, #1a2855 0%, #0f1a35 100%);
+            border: 1px solid #2a3f66;
+            border-radius: 16px;
+            padding: 32px;
+            max-width: 1000px;
+        }
+
+        .form-title {
+            font-size: 24px;
+            font-weight: 400;
+            text-align: center;
+            margin-bottom: 32px;
+            text-decoration: underline;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group.full {
+            grid-column: 1 / -1;
+        }
+
+        .form-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: #fff;
+        }
+
+        .form-input {
+            padding: 12px 16px;
+            border: 1px solid #2a3f66;
+            border-radius: 6px;
+            color: #000;
+            font-size: 14px;
+            transition: border 0.3s;
+        }
+
+        .form-input::placeholder {
+            color: #6b7280;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        .btn-primary {
+            background: #3b82f6;
+            color: #fff;
+            border: none;
+            padding: 12px 32px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .btn-primary:hover {
+            background: #2563eb;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #fff;
+            border: 1px solid #2a3f66;
+            padding: 12px 32px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-secondary:hover {
+            border-color: #3b82f6;
+            color: #3b82f6;
+        }
+
+        .error-text {
+            color: #ef4444;
+            font-size: 12px;
+            margin-top: 4px;
+            display: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 200px;
+                padding: 16px 12px;
+            }
+
+            .main-container {
+                margin-left: 200px;
+            }
+
+            .content {
+                padding: 24px 20px;
+            }
+
+            .form-container {
+                padding: 20px;
+            }
+
+            .header {
+                padding: 12px 20px;
+                gap: 16px;
+            }
+        }
+    </style>
+`) %>
+
+
+    <!-- Main Container -->
+    <div class="main-container">
+
+
+        <!-- Content -->
+        <div class="content">
+            <!-- Page Header -->
+            <h1 class="page-title">Add Coupon</h1>
+            <div class="breadcrumb">
+                <a href="/admin/coupons">Coupons</a>
+                <span>></span>
+                <span>Add Coupon</span>
+            </div>
+
+            <!-- Form Container -->
+            <div class="form-container">
+                <h2 class="form-title">Add coupon</h2>
+
+                <!-- Coupon Form -->
+                <form onsubmit="handleAddCoupon(event)" id="couponForm">
+                    <div class="form-grid">
+                        <!-- Left Column -->
+                        <div class="form-group">
+                            <label class="form-label">Coupon Code :</label>
+                            <input type="text" class="form-input" name="couponCode" placeholder="Enter coupon code" >
+                            <div class="error-text" id="error-couponCode"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Discount % :</label>
+                            <input type="number" class="form-input" name="discount" placeholder="Enter discount percentage" min="0" max="100" >
+                            <div class="error-text" id="error-discount"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Description :</label>
+                            <input type="text" class="form-input" name="description" placeholder="Enter coupon description" >
+                            <div class="error-text" id="error-description"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Usage Limit :</label>
+                            <input type="number" class="form-input" name="usageLimit" placeholder="Enter usage limit" min="1" >
+                            <div class="error-text" id="error-usageLimit"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Starting Date :</label>
+                            <input type="date" class="form-input" name="startingDate" id="startingDate" >
+                            <div class="error-text" id="error-startDate"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Expiry Date :</label>
+                            <input type="date" class="form-input" name="expiryDate" id="expiryDate" >
+                            <div class="error-text" id="error-expiryDate"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Minimum purchase :</label>
+                            <input type="number" class="form-input" name="minimumPurchase" placeholder="Enter minimum purchase amount" min="0" >
+                            <div class="error-text" id="error-minimumPurchase"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Max Discount Amount :</label>
+                            <input type="number" class="form-input" name="maxDiscountAmount" placeholder="Enter max discount amount" min="1" >
+                            <div class="error-text" id="error-maxDiscountAmount"></div>
+                        </div>
+                        
+                        <input type="hidden" name="applyType" value="all">
+                    </div>
+
+                    <!-- Form Actions -->
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary" onclick="resetForm()">
+                            Cancel
+                        </button>
+                        <button type="submit" class="btn-primary">
+                            Add Coupon
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // Set minimum dates on page load
+        function setMinDates() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('startingDate').setAttribute('min', today);
+            document.getElementById('expiryDate').setAttribute('min', today);
+        }
+
+        // Update expiry date minimum when starting date changes
+        document.addEventListener('DOMContentLoaded', function() {
+            setMinDates();
+            
+            const startingDateInput = document.getElementById('startingDate');
+            const expiryDateInput = document.getElementById('expiryDate');
+            
+            startingDateInput.addEventListener('change', function() {
+                const startDate = this.value;
+                if (startDate) {
+                    // Set expiry date minimum to be at least one day after starting date
+                    const minExpiryDate = new Date(startDate);
+                    minExpiryDate.setDate(minExpiryDate.getDate() + 1);
+                    expiryDateInput.setAttribute('min', minExpiryDate.toISOString().split('T')[0]);
+                }
+            });
+        });
+
+        // Handle form submission
+        async function handleAddCoupon(event) {
+            event.preventDefault();
+            console.log('[v0] Adding new coupon');
+
+            // Clear previous errors
+            document.querySelectorAll('.error-text').forEach(div => {
+                div.textContent = '';
+                div.style.display = 'none';
+            });
+
+            // Validate dates first
+            const startDateVal = document.querySelector('input[name="startingDate"]').value;
+            const endDateVal = document.querySelector('input[name="expiryDate"]').value;
+            
+            if(startDateVal && endDateVal) {
+                const startDate = new Date(startDateVal);
+                const endDate = new Date(endDateVal);
+                if(startDate >= endDate) {
+                    const expiryError = document.getElementById('error-expiryDate');
+                    expiryError.textContent = 'Expiry date must be after starting date';
+                    expiryError.style.display = 'block';
+                    return;
+                }
+            }
+
+            const formData = new FormData(document.getElementById('couponForm'));
+            const couponData = {
+                couponCode: formData.get('couponCode'),
+                discount: parseInt(formData.get('discount')),
+                description: formData.get('description'),
+                usageLimit: parseInt(formData.get('usageLimit')),
+                startDate: formData.get('startingDate'),
+                expiryDate: formData.get('expiryDate'),
+                applyType: 'all',
+                minimumPurchase: parseFloat(formData.get('minimumPurchase')),
+                maxDiscountAmount: parseFloat(formData.get('maxDiscountAmount'))
+            };
+
+            console.log('[v0] Coupon data:', couponData);
+            
+            try {
+                const response = await fetch('/admin/coupons/add', { 
+                    method: 'POST', 
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(couponData) 
+                });
+                
+                const result = await response.json();
+                console.log('[v0] Server response:', result);
+                
+                if (result.success) {
+                    await Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        text: 'Coupon added successfully!',
+                        confirmButtonText: 'OK',
+                        timer: 2000
+                    });
+                    resetForm();
+                    window.location.href = '/admin/coupons';
+                } else if (result.errors) {
+                    // Display inline errors
+                    Object.keys(result.errors).forEach(key => {
+                        const errorDiv = document.getElementById(`error-${key}`);
+                        if (errorDiv) {
+                            errorDiv.textContent = result.errors[key];
+                            errorDiv.style.display = 'block';
+                        }
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: result.message || 'Failed to add coupon',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            } catch (error) {
+                console.error('[v0] Error adding coupon:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Failed to add coupon. Please try again.',
+                    confirmButtonText: 'OK'
+                });
+            }
+        }
+
+        // Reset form
+        async function resetForm() {
+            const result = await Swal.fire({
+                title: 'Reset Form?',
+                text: "Are you sure you want to reset the form? All entered data will be lost.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, reset it!',
+                cancelButtonText: 'No, keep it',
+                reverseButtons: true
+            });
+
+            if (result.isConfirmed) {
+                document.getElementById('couponForm').reset();
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Form Reset',
+                    text: 'The form has been reset successfully.',
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+            }
+        }
+
+        // Navigate to another page
+        function navigateTo(path) {
+            console.log('[v0] Navigating to:', path);
+            // window.location.href = path;
+        }
+
+        // Handle logout
+        function handleLogout() {
+            console.log('[v0] Admin logout initiated');
+            if(confirm('Are you sure you want to logout?')) {
+                // TODO: Send logout API call
+                window.location.href = '/admin/logout';
+            }
+        }
+
+        // Validate dates on form submission
+        function validateDates() {
+            const startDate = new Date(document.querySelector('input[name="startingDate"]').value);
+            const endDate = new Date(document.querySelector('input[name="expiryDate"]').value);
+            
+            if(startDate >= endDate) {
+                alert('Expiry date must be after starting date');
+                return false;
+            }
+            return true;
+        }
+    </script>
+</body>
+</html>

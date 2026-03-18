@@ -1,30 +1,27 @@
-const express = require("express");
+import express from "express";
 const router = express.Router();
+import noCache from "../../../middleware/nocache.js";
+router.use(noCache);
 
-const {verifyToken} = require("../../../middleware/vendorJwt") 
-// Controllers
-const profileControllerFile = require("../../../controllers/vendor/profile/profileController")
-
-// Service
-const profileServiceFile = require("../../../service/vendor/profile/profileService")
-
-// Repository
-const VendorRepository = require("../../../repository/vendor")
+import { initialVerifyToken } from "../../../middleware/vendorInitialJwt.js";
+import ProfileController from "../../../controllers/vendor/profile/profileController.js";
+import ProfileService from "../../../service/vendor/profile/profileService.js";
+import VendorRepository from "../../../repository/vendor.js";
 
 
 // ========== Dependency Injection ==========
 
 const vendorRepository = new VendorRepository()
 
-const profileService = new profileServiceFile(vendorRepository)
+const profileService = new ProfileService(vendorRepository)
 
-const profileController = new profileControllerFile(profileService)
+const profileController = new ProfileController(profileService)
 
 
 // ========== Routes ==========
 
 // profile
 router.route("/profile")
-    .get(verifyToken, profileController.renderProfilePage.bind(profileController))
+    .get(initialVerifyToken, profileController.renderProfilePage.bind(profileController))
 
-module.exports = router;
+export default router;

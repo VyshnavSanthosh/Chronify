@@ -1,0 +1,332 @@
+<% layout('vendor/layout/vendorLayout') %>
+
+<% block('styles', `
+    <style>
+        .stat-card {
+            background: linear-gradient(135deg, #1a2855 0%, #0f1a35 100%);
+            border: 1px solid #2a3f66;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+        .stat-card-label {
+            color: #b0b8c1;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .stat-card-value {
+            font-size: 32px;
+            font-weight: 700;
+        }
+        .table-container {
+            background: linear-gradient(135deg, #1a2855 0%, #0f1a35 100%);
+            border: 1px solid #2a3f66;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .status-pending { background: #f59e0b; color: #fff; }
+        .status-approved { background: #22c55e; color: #fff; }
+        .status-rejected { background: #ef4444; color: #fff; }
+        
+        .action-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        .pagination-btn {
+            width: 36px;
+            height: 36px;
+            border: 1px solid #2a3f66;
+            background: transparent;
+            color: #fff;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .pagination-btn:hover:not(:disabled) {
+            border-color: #3b82f6;
+            color: #3b82f6;
+        }
+        .pagination-btn.active {
+            background: #3b82f6;
+            border-color: #3b82f6;
+            color: #fff;
+        }
+    </style>
+`) %>
+
+<div class="p-8">
+    <!-- Page Header -->
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold mb-2">Returns</h1>
+        <div class="flex items-center space-x-2 text-sm text-gray-400">
+            <a href="/vendor/dashboard" class="hover:text-white transition-colors">Dashboard</a>
+            <span>&gt;</span>
+            <span class="text-blue-400">Return List</span>
+        </div>
+    </div>
+
+    <% 
+        const safeReturns = (typeof returns !== 'undefined' && returns) ? returns : [];
+        const totalReturnsCount = (typeof totalReturns !== 'undefined') ? totalReturns : safeReturns.length;
+        const requestedReturns = safeReturns.filter(r => r.status === 'pending').length;
+        const approvedReturns = safeReturns.filter(r => r.status === 'approved').length;
+        const totalRefund = safeReturns.filter(r => r.status === 'approved').reduce((sum, r) => sum + (r.refundAmount || 0), 0);
+    %>
+
+    <!-- Stat Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+        <div class="stat-card">
+            <div class="stat-card-label">Total Returns</div>
+            <div class="stat-card-value"><%= totalReturnsCount %></div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card-label">Requested</div>
+            <div class="stat-card-value text-amber-400"><%= requestedReturns %></div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card-label">Approved</div>
+            <div class="stat-card-value text-green-400"><%= approvedReturns %></div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card-label">Total Refund</div>
+            <div class="stat-card-value">₹<%= totalRefund %></div>
+        </div>
+    </div>
+
+    <!-- Search & Filter -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+        <div class="relative w-full max-w-md">
+            <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
+            <input type="text" id="searchInput" placeholder="Search by Order ID or Customer..." 
+                   class="w-full bg-[#1a2855] border border-[#2a3f66] rounded-xl py-3 pl-12 pr-4 text-white focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all">
+        </div>
+        <select id="statusFilter" class="bg-[#1a2855] border border-[#2a3f66] text-white rounded-xl px-4 py-3 focus:outline-none focus:ring-1 focus:ring-blue-500 w-full md:w-48">
+            <option value="">All Status</option>
+            <option value="pending">Requested</option>
+            <option value="approved">Approved</option>
+            <option value="rejected">Rejected</option>
+        </select>
+    </div>
+
+    <!-- Data Table -->
+    <div class="table-container shadow-2xl">
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead>
+                    <tr class="bg-blue-600 text-white">
+                        <th class="px-6 py-4 text-left font-semibold text-sm">Return ID</th>
+                        <th class="px-6 py-4 text-left font-semibold text-sm">Order ID</th>
+                        <th class="px-6 py-4 text-left font-semibold text-sm">Customer</th>
+                        <th class="px-6 py-4 text-left font-semibold text-sm">Date</th>
+                        <th class="px-6 py-4 text-left font-semibold text-sm">Refund Amount</th>
+                        <th class="px-6 py-4 text-left font-semibold text-sm">Items</th>
+                        <th class="px-6 py-4 text-left font-semibold text-sm">Status</th>
+                        <th class="px-6 py-4 text-center font-semibold text-sm">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="returnsTableBody">
+                    <% if (safeReturns.length > 0) { %>
+                        <% safeReturns.forEach(item => { %>
+                            <tr class="hover:bg-white/5 transition-colors border-b border-[#2a3f66] last:border-0">
+                                <td class="px-6 py-4 text-xs font-mono text-gray-400">#<%= item._id.toString().slice(-8).toUpperCase() %></td>
+                                <td class="px-6 py-4 text-xs font-mono text-blue-400">#<%= (item.orderId?._id || item.orderId).toString().slice(-8).toUpperCase() %></td>
+                                <td class="px-6 py-4 font-medium"><%= item.userId?.firstName %> <%= item.userId?.lastName || '' %></td>
+                                <td class="px-6 py-4 text-gray-400"><%= new Date(item.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) %></td>
+                                <td class="px-6 py-4 font-bold text-green-400">₹<%= item.refundAmount %></td>
+                                <td class="px-6 py-4 text-gray-300">
+                                    <div class="flex items-center gap-2">
+                                        <span class="truncate max-w-[120px]"><%= item.items[0]?.name %></span>
+                                        <% if(item.items.length > 1) { %>
+                                            <span class="bg-gray-700 px-1.5 py-0.5 rounded text-[10px]">+<%= item.items.length - 1 %></span>
+                                        <% } %>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="status-badge status-<%= item.status %>">
+                                        <%= item.status %>
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex justify-center gap-2">
+                                        <% if(item.status === 'pending') { %>
+                                            <button onclick="approveReturn('<%= item._id %>')" class="action-btn bg-green-500/20 text-green-500 hover:bg-green-500 hover:text-white" title="Approve">
+                                                <i class="fa-solid fa-check"></i>
+                                            </button>
+                                            <button onclick="rejectReturn('<%= item._id %>')" class="action-btn bg-red-500/20 text-red-500 hover:bg-red-500 hover:text-white" title="Reject">
+                                                <i class="fa-solid fa-xmark"></i>
+                                            </button>
+                                        <% } else { %>
+                                            <button onclick="viewDetails('<%= item._id %>')" class="action-btn bg-blue-500/20 text-blue-500 hover:bg-blue-500 hover:text-white" title="View Details">
+                                                <i class="fa-solid fa-eye"></i>
+                                            </button>
+                                        <% } %>
+                                    </div>
+                                </td>
+                            </tr>
+                        <% }); %>
+                    <% } else { %>
+                        <tr>
+                            <td colspan="8" class="px-6 py-20 text-center">
+                                <i class="fa-solid fa-box-open text-5xl text-gray-600 mb-4 block"></i>
+                                <p class="text-gray-400 text-lg">No return requests found.</p>
+                            </td>
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    <% if (safeReturns.length > 0) { %>
+        <div class="mt-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <p class="text-sm text-gray-400">
+                Showing <span class="text-white font-medium"><%= (typeof returns !== 'undefined' ? returns.length : 0) %></span> of <span class="text-white font-bold"><%= totalReturnsCount %></span> returns
+            </p>
+            <div class="flex gap-2">
+                <button onclick="goToPage(<%= currentPage - 1 %>)" 
+                        <%= currentPage === 1 ? 'disabled' : '' %>
+                        class="pagination-btn <%= currentPage === 1 ? 'opacity-50 cursor-not-allowed' : '' %>">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </button>
+                
+                <% for(let i = 1; i <= totalPages; i++) { %>
+                    <button onclick="goToPage(<%= i %>)"
+                            class="pagination-btn <%= currentPage === i ? 'active' : '' %>">
+                        <%= i %>
+                    </button>
+                <% } %>
+
+                <button onclick="goToPage(<%= currentPage + 1 %>)"
+                        <%= currentPage === totalPages ? 'disabled' : '' %>
+                        class="pagination-btn <%= currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : '' %>">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+    <% } %>
+</div>
+
+<% block('scripts', `
+    <script>
+        function goToPage(page) {
+            const url = new URL(window.location.href);
+            url.searchParams.set('page', page);
+            window.location.href = url.toString();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const searchInput = document.getElementById('searchInput');
+            const statusFilter = document.getElementById('statusFilter');
+            const tableRows = document.querySelectorAll('#returnsTableBody tr');
+
+            function filterTable() {
+                const searchTerm = searchInput.value.toLowerCase();
+                const statusTerm = statusFilter.value.toLowerCase();
+
+                tableRows.forEach(row => {
+                    const text = row.textContent.toLowerCase();
+                    const statusBadge = row.querySelector('.status-badge');
+                    const status = statusBadge ? statusBadge.textContent.trim().toLowerCase() : '';
+                    
+                    const matchesSearch = text.includes(searchTerm);
+                    const matchesStatus = !statusTerm || status === statusTerm;
+                    
+                    row.style.display = (matchesSearch && matchesStatus) ? '' : 'none';
+                });
+            }
+
+            searchInput.addEventListener('keyup', filterTable);
+            statusFilter.addEventListener('change', filterTable);
+        });
+
+        async function approveReturn(id) {
+            const res = await Swal.fire({
+                title: 'Approve Return?',
+                text: "Stock will be added back to inventory and refund will be initiated.",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#10b981',
+                cancelButtonColor: '#374151',
+                confirmButtonText: 'Yes, Approve',
+                background: '#0a1425',
+                color: '#fff'
+            });
+
+            if (res.isConfirmed) {
+                try {
+                    const response = await fetch(\`/vendor/returns/\${id}/approve\`, { method: 'POST' });
+                    const data = await response.json();
+                    if (data.success) {
+                        await Swal.fire({ icon: 'success', title: 'Approved', text: data.message, background: '#0a1425', color: '#fff' });
+                        location.reload();
+                    } else throw new Error(data.message);
+                } catch (e) {
+                    Swal.fire({ icon: 'error', title: 'Error', text: e.message, background: '#0a1425', color: '#fff' });
+                }
+            }
+        }
+
+        async function rejectReturn(id) {
+            const res = await Swal.fire({
+                title: 'Reject Return?',
+                text: "Please provide a reason for rejection:",
+                input: 'textarea',
+                inputPlaceholder: 'Reason...',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#374151',
+                confirmButtonText: 'Yes, Reject',
+                background: '#0a1425',
+                color: '#fff'
+            });
+
+            if (res.isConfirmed) {
+                try {
+                    const response = await fetch(\`/vendor/returns/\${id}/reject\`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ comment: res.value || "Rejected by vendor" })
+                    });
+                    const data = await response.json();
+                    if (data.success) {
+                        await Swal.fire({ icon: 'success', title: 'Rejected', text: data.message, background: '#0a1425', color: '#fff' });
+                        location.reload();
+                    } else throw new Error(data.message);
+                } catch (e) {
+                    Swal.fire({ icon: 'error', title: 'Error', text: e.message, background: '#0a1425', color: '#fff' });
+                }
+            }
+        }
+
+        function viewDetails(id) {
+            // Placeholder for detail view
+            Swal.fire({
+                title: 'Return Details',
+                text: "ID: " + id,
+                icon: 'info',
+                background: '#0a1425',
+                color: '#fff'
+            });
+        }
+    </script>
+`) %>

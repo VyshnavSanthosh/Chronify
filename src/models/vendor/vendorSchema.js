@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const VendorSchema = new mongoose.Schema(
     {
@@ -40,7 +40,6 @@ const VendorSchema = new mongoose.Schema(
             default: false
         },
 
-
         isVerified: {
             type: Boolean,
             default: false,
@@ -52,9 +51,9 @@ const VendorSchema = new mongoose.Schema(
         },
 
     },
-    { timestamps: true } 
+    { timestamps: true }
 )
 
 
 
-module.exports = mongoose.model("Vendor", VendorSchema);
+export default mongoose.model("Vendor", VendorSchema);

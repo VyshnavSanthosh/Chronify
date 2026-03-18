@@ -1,33 +1,26 @@
-const express = require("express");
+import express from "express";
 const router = express.Router();
+import noCache from "../../../middleware/nocache.js";
+router.use(noCache);
 
-// Controller file
-const loginControllerFile = require("../../../controllers/vendor/auth/loginController");
-
-// Service file
-const loginServiceFile = require("../../../service/vendor/auth/loginService")
-const jwtServiceFile = require("../../../service/jwtService")
-
-// Repository
-const vendorRepositoryFile = require("../../../repository/vendor")
-
-// Validators
-const joi_login = require("../../../utils/validators/joi_login");
-const validator = require("../../../utils/validators/validator");
-
-// Middleware
-const { verifyToken } = require("../../../middleware/jwt");
+import VendorLoginController from "../../../controllers/vendor/auth/loginController.js";
+import LoginService from "../../../service/vendor/auth/loginService.js";
+import JwtService from "../../../service/jwtService.js";
+import VendorRepository from "../../../repository/vendor.js";
+import joi_login from "../../../utils/validators/joi_login.js";
+import validator from "../../../utils/validators/validator.js";
+import { initialVerifyToken } from "../../../middleware/vendorInitialJwt.js";
 
 
 // DEPENDENCY INJECTION 
 
-const vendorRepository = new vendorRepositoryFile()
+const vendorRepository = new VendorRepository()
 
-const jwtService = new jwtServiceFile()
+const jwtService = new JwtService()
 
-const loginService = new loginServiceFile(vendorRepository, jwtService)
+const loginService = new LoginService(vendorRepository, jwtService)
 
-const loginController = new loginControllerFile(loginService, jwtService, vendorRepository, joi_login, validator)
+const loginController = new VendorLoginController(loginService, jwtService, vendorRepository, joi_login, validator)
 
 
 router.route("/login")
@@ -41,8 +34,8 @@ router.post("/refresh-token",
 
 // Logout (protected route)
 router.post("/logout",
-    verifyToken,  // Middleware: verify user is logged in
+    initialVerifyToken,  // Middleware: verify user is logged in
     loginController.logout.bind(loginController)
 );
 
-module.exports = router;
+export default router;

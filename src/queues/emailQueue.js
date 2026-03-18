@@ -1,9 +1,9 @@
-const { Queue } = require("bullmq");
-const redis = require("../utils/redis"); // use existing ioredis instance
+import { Queue } from "bullmq";
+import redis from "../utils/redis.js";
 
 // Create queue with ioredis client instance
 const emailQueue = new Queue("emailQueue", {
     connection: redis
 });
 
-module.exports = emailQueue;
+export default emailQueue;

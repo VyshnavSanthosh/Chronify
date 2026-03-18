@@ -1,19 +1,19 @@
-module.exports = class forgotPasswordOtpController {
+export default class forgotPasswordOtpController {
     constructor(forgotPasswordOtpService) {
         this.forgotPasswordOtpService = forgotPasswordOtpService
     }
 
-    renderVerifyOtpPage(req,res){
-        return res.render("vendor/auth/verifyOtpForgotPassword",{
+    renderVerifyOtpPage(req, res) {
+        return res.render("vendor/auth/verifyOtpForgotPassword", {
             email: req.session.resetVendorEmail,
             error: null,
-            timeRemaining: 15
+            timeRemaining: 300
         })
     }
 
-    async verifyOtp(req,res){
+    async verifyOtp(req, res) {
 
-        const {otp} = req.body
+        const { otp } = req.body
         const vendorId = req.session.resetVendorId
 
         if (!vendorId) {
@@ -28,32 +28,32 @@ module.exports = class forgotPasswordOtpController {
             return res.render("vendor/auth/verifyOtpForgotPassword", {
                 email: req.session.resetVendorEmail,
                 error: error.message,
-                timeRemaining: 15 
+                timeRemaining: 300
             });
         }
     }
 
-    async resendOtp(req,res){
+    async resendOtp(req, res) {
         const vendorEmail = req.session.resetVendorEmail
         const vendorId = req.session.resetVendorId
 
         if (!vendorId || !vendorEmail) {
-            return res.status(400).json({ 
+            return res.status(400).json({
                 success: false,
-                error: "Session expired. Please start again." 
+                error: "Session expired. Please start again."
             });
         }
 
         try {
-            await this.forgotPasswordOtpService.resendOtp(vendorEmail,vendorId)
-            return res.json({ 
+            await this.forgotPasswordOtpService.resendOtp(vendorEmail, vendorId)
+            return res.json({
                 success: true,
-                message: "OTP resent successfully" 
+                message: "OTP resent successfully"
             });
         } catch (error) {
-            return res.status(400).json({ 
+            return res.status(400).json({
                 success: false,
-                error: error.message 
+                error: error.message
             });
         }
     }

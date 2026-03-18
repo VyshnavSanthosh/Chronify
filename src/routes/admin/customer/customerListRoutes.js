@@ -1,32 +1,30 @@
-const express = require('express');
-const router = new express.Router()
+import express from "express";
+const router = express.Router();
+import noCache from "../../../middleware/nocache.js";
+router.use(noCache);
 
 
 // Contorllers
-const customerListContorllerFile = require("../../../controllers/admin/customer/customerListController")
-
-
-// Services
-const customerListServiceFile = require("../../../service/admin/customer/customerListService")
-
-// repositories
-const userRepositoryFile = require("../../../repository/user");
-const { route } = require('../category/categoryRoutes');
+import CustomerListController from "../../../controllers/admin/customer/customerListController.js";
+import CustomerListService from "../../../service/admin/customer/customerListService.js";
+import UserRepository from "../../../repository/user.js";
+import adminJwtMiddlewareFile from "../../../middleware/adminJwt.js";
 
 
 // Dependency Injection
-const userRepository = new userRepositoryFile()
+const userRepository = new UserRepository()
+const adminJwtMiddleware = new adminJwtMiddlewareFile();
 
-const customerListService = new customerListServiceFile(userRepository)
+const customerListService = new CustomerListService(userRepository)
 
-const customerListController = new customerListContorllerFile(customerListService)
+const customerListController = new CustomerListController(customerListService)
 
 
 // Routes
 router.route("/customers")
-    .get(customerListController.renderCustomerListPage.bind(customerListController))
+    .get(adminJwtMiddleware.verifyToken.bind(adminJwtMiddleware), customerListController.renderCustomerListPage.bind(customerListController))
 
-router.patch("/customers/:customerId/toggle-block", customerListController.toggleCustomerBlock.bind(customerListController))
+router.patch("/customers/:customerId/toggle-block", adminJwtMiddleware.verifyToken.bind(adminJwtMiddleware), customerListController.toggleCustomerBlock.bind(customerListController))
 
 
-module.exports = router
+export default router;

@@ -1,31 +1,25 @@
-const express = require("express");
+import express from "express";
 const router = express.Router();
+import noCache from "../../../middleware/nocache.js";
+router.use(noCache);
 
 // Controllers
-const loginControllerFile = require("../../../controllers/admin/auth/loginController");
-
-// Services
-const loginServiceFile = require("../../../service/admin/auth/loginService");
-const jwtServiceFile = require("../../../service/jwtService");
-
-// Repository
-const userRepositoryFile = require("../../../repository/user");
-
-// Validators
-const joi_login = require("../../../utils/validators/joi_login");
-const validator = require("../../../utils/validators/validator");
-
-// Middleware
-const { verifyToken } = require("../../../middleware/jwt");
+import LoginController from "../../../controllers/admin/auth/loginController.js";
+import LoginService from "../../../service/admin/auth/loginService.js";
+import JwtService from "../../../service/jwtService.js";
+import UserRepository from "../../../repository/user.js";
+import joi_login from "../../../utils/validators/joi_login.js";
+import validator from "../../../utils/validators/validator.js";
+import adminJwtMiddlewareFile from "../../../middleware/adminJwt.js";
 
 
 // DEPENDENCY INJECTION 
 
-const userRepository = new userRepositoryFile();
-const jwtService = new jwtServiceFile();
-const loginService = new loginServiceFile(userRepository, jwtService)
-
-const loginController = new loginControllerFile(
+const userRepository = new UserRepository();
+const jwtService = new JwtService();
+const loginService = new LoginService(jwtService, userRepository)
+const adminJwtMiddleware = new adminJwtMiddlewareFile();
+const loginController = new LoginController(
     loginService,
     jwtService,
     joi_login,
@@ -45,8 +39,8 @@ router.post("/refresh-token",
 
 // Logout (protected route)
 router.post("/logout",
-    verifyToken,  // Middleware: verify user is logged in
+    adminJwtMiddleware.verifyToken.bind(adminJwtMiddleware),   // Middleware: verify user is logged in
     loginController.logout.bind(loginController)
 );
 
-module.exports = router;
+export default router;

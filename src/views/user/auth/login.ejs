@@ -6,6 +6,7 @@
     <title>Log In - ChronoMy</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/css/login.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
         /* Fade out animation */
@@ -123,6 +124,40 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
+    // Show SweetAlert messages if passed from backend
+    <% if (locals.success) { %>
+        Swal.fire({
+            icon: 'success',
+            title: 'Account Verified!',
+            text: '<%= locals.success %>',
+            confirmButtonColor: '#28a745',
+            timer: 3000,
+            timerProgressBar: true
+        });
+    <% } %>
+
+    <% if (locals.info) { %>
+        Swal.fire({
+            icon: 'info',
+            title: 'Information',
+            text: '<%= locals.info %>',
+            confirmButtonColor: '#17a2b8'
+        });
+    <% } %>
+
+    // Check for Google auth error in query params
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('error') === 'google_auth_failed') {
+        Swal.fire({
+            icon: 'error',
+            title: 'Authentication Failed',
+            text: 'Google authentication failed. Please try again.',
+            confirmButtonColor: '#dc3545'
+        });
+        // Clean up URL
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
+
     // Clear email input
     function clearEmail() {
         document.getElementById('email').value = '';
@@ -140,12 +175,12 @@
         const el = document.getElementById(id);
         if (!el) return;
 
-        // Start fade at 2.5s
+        // Start fade at 1.5s
         setTimeout(() => {
             el.classList.add('alert-dismissing');
         }, 1500);
 
-        // Remove at 3s
+        // Remove at 2s
         setTimeout(() => {
             el.remove();
         }, 2000);

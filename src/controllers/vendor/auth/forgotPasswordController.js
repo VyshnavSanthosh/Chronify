@@ -1,29 +1,29 @@
-module.exports = class ForgotPasswordController {
-    constructor(forgotPasswordService,joi_forgotPassword, validator) {
+export default class ForgotPasswordController {
+    constructor(forgotPasswordService, joi_forgotPassword, validator) {
         this.forgotPasswordService = forgotPasswordService
         this.joi_forgotPassword = joi_forgotPassword;
         this.validator = validator;
     }
 
-    renderForgotPasswordPage(req,res){
-        res.render("vendor/auth/forgotPassword",{
+    renderForgotPasswordPage(req, res) {
+        res.render("vendor/auth/forgotPassword", {
             email: "",
             error: null
         })
     }
 
-    async handleForgotPassword(req,res){
-        const {error, value} = this.validator.validate(this.joi_forgotPassword, req.body)
+    async handleForgotPassword(req, res) {
+        const { error, value } = this.validator.validate(this.joi_forgotPassword, req.body)
 
         if (error) {
             const errorMessage = error.details[0].message;
-            return res.render("vendor/auth/forgotPassword",{
+            return res.render("vendor/auth/forgotPassword", {
                 error: errorMessage,
                 email: req.body.email || ""
             })
         }
 
-        const {email} = value
+        const { email } = value
 
         try {
             const result = await this.forgotPasswordService.requestPasswordReset(email)
@@ -39,7 +39,7 @@ module.exports = class ForgotPasswordController {
                 email: email
             });
         }
-        
+
     }
 
 }

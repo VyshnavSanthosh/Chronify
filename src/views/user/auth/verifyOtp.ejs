@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Verify OTP</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
         body {
@@ -96,10 +97,13 @@
                 </div>
             <% } %>
 
-            <!-- Timer -->
-            <div class="text-center">
-                <p id="timerText" class="text-gray-300 text-sm">
-                    Resend code in <span id="timer" class="font-mono">02:00</span>
+            <!-- Timers -->
+            <div class="text-center space-y-2">
+                <p id="resendTimerText" class="text-gray-300 text-sm">
+                    Resend code in <span id="resendTimer" class="font-mono">00:10</span>
+                </p>
+                <p id="expiryTimerText" class="text-gray-300 text-sm">
+                    OTP expires in <span id="expiryTimer" class="font-mono text-red-400">02:00</span>
                 </p>
             </div>
 
@@ -132,6 +136,31 @@
 </div>
 
 <script>
+    // Show SweetAlert messages if passed from backend
+    <% if (locals.success) { %>
+        Swal.fire({
+            icon: 'success',
+            title: 'Success!',
+            text: '<%= locals.success %>',
+            confirmButtonColor: '#2563eb',
+            background: '#001a33',
+            color: '#fff',
+            timer: 2000,
+            timerProgressBar: true
+        });
+    <% } %>
+
+    <% if (locals.info) { %>
+        Swal.fire({
+            icon: 'info',
+            title: 'Information',
+            text: '<%= locals.info %>',
+            confirmButtonColor: '#3b82f6',
+            background: '#001a33',
+            color: '#fff'
+        });
+    <% } %>
+
     // OTP handling
     const inputs = document.querySelectorAll(".otp-input");
     const hiddenOtpField = document.getElementById("otp");
@@ -165,34 +194,79 @@
         const otp = Array.from(inputs).map(i => i.value).join("");
         if (otp.length !== 4) {
             e.preventDefault();
-            alert("Please enter a valid 4-digit OTP");
+            Swal.fire({
+                icon: 'warning',
+                title: 'Incomplete OTP',
+                text: 'Please enter all 4 digits',
+                confirmButtonColor: '#fbbf24',
+                background: '#001a33',
+                color: '#fff'
+            });
             return;
         }
         hiddenOtpField.value = otp;
     });
 
-    // Timer
-    let timeRemaining =  timeRemaining || 120 ;
-    const timerEl = document.getElementById("timer");
-    const resendBtn = document.getElementById("resendBtn");
+    // Timers
+    let resendCooldown = 10;
+    let otpExpiry = <%= timeRemaining || 120 %>;
+    const submitBtn = document.querySelector('button[type="submit"]');
+    let timerInterval = null;
 
-    function updateTimer() {
-        const m = Math.floor(timeRemaining / 60);
-        const s = timeRemaining % 60;
-        timerEl.textContent = `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+    function updateTimers() {
+        if (timerInterval) return;
 
-        if (timeRemaining > 0) {
-            timeRemaining--;
-            setTimeout(updateTimer, 1000);
-        } else {
-            resendBtn.disabled = false;
-            resendBtn.classList.remove("disabled");
-            document.getElementById("timerText").textContent = "Code expired. Resend now";
-        }
+        timerInterval = setInterval(() => {
+            const resendTimerEl = document.getElementById("resendTimer");
+            const expiryTimerEl = document.getElementById("expiryTimer");
+            const resendBtn = document.getElementById("resendBtn");
+            const resendTimerText = document.getElementById("resendTimerText");
+            const expiryTimerText = document.getElementById("expiryTimerText");
+
+            // Update Resend Timer
+            if (resendCooldown > 0) {
+                if (resendTimerEl) {
+                    const m = Math.floor(resendCooldown / 60);
+                    const s = resendCooldown % 60;
+                    resendTimerEl.textContent = `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+                }
+                resendCooldown--;
+            } else if (resendCooldown === 0) {
+                if (resendBtn) {
+                    resendBtn.disabled = false;
+                    resendBtn.classList.remove("disabled");
+                }
+                if (resendTimerText) resendTimerText.innerHTML = '<span class="text-green-400 font-semibold">You can resend the code now</span>';
+                resendCooldown = -1;
+            }
+
+            // Update Expiry Timer
+            if (otpExpiry > 0) {
+                if (expiryTimerEl) {
+                    const m = Math.floor(otpExpiry / 60);
+                    const s = otpExpiry % 60;
+                    expiryTimerEl.textContent = `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+                }
+                otpExpiry--;
+            } else if (otpExpiry === 0) {
+                if (expiryTimerText) expiryTimerText.innerHTML = '<span class="text-red-500 font-bold">OTP Expired!</span>';
+                inputs.forEach(i => i.disabled = true);
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                }
+                otpExpiry = -1;
+            }
+
+            if (resendCooldown < 0 && otpExpiry < 0) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+        }, 1000);
     }
-    updateTimer();
+    updateTimers();
 
-    function resendCode() {
+    async function resendCode() {
         if (resendBtn.disabled) return;
 
         resendBtn.disabled = true;
@@ -200,28 +274,58 @@
         const originalText = resendBtn.textContent;
         resendBtn.textContent = "Sending...";
 
-        fetch("/auth/resend-otp", { method: "POST" })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    alert("OTP sent successfully! Check your email.");
-                    timeRemaining = 120;
-                    document.getElementById("timerText").innerHTML =
-                        'Resend code in <span id="timer" class="font-mono">02:00</span>';
-                    updateTimer();
-                    inputs.forEach(i => i.value = "");
-                    inputs[0].focus();
-                } else {
-                    throw new Error(data.error || "Failed to resend OTP");
-                }
-                resendBtn.textContent = originalText;
-            })
-            .catch(err => {
-                alert(err.message || "Error sending OTP");
-                resendBtn.disabled = false;
-                resendBtn.classList.remove("disabled");
-                resendBtn.textContent = originalText;
+        try {
+            const response = await fetch("/auth/resend-otp", { method: "POST" });
+            const data = await response.json();
+
+            if (data.success) {
+                await Swal.fire({
+                    icon: 'success',
+                    title: 'OTP Resent!',
+                    text: 'A new OTP has been sent to your email',
+                    confirmButtonColor: '#22c55e',
+                    background: '#001a33',
+                    color: '#fff',
+                    timer: 2000,
+                    timerProgressBar: true
+                });
+
+                // Reset timers
+                resendCooldown = 10;
+                otpExpiry = <%= timeRemaining || 120 %>;
+                
+                // Re-enable inputs if they were disabled
+                inputs.forEach(i => {
+                    i.disabled = false;
+                    i.value = "";
+                });
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                
+                // Reset UI text
+                document.getElementById("resendTimerText").innerHTML = 'Resend code in <span id="resendTimer" class="font-mono">00:10</span>';
+                document.getElementById("expiryTimerText").innerHTML = 'OTP expires in <span id="expiryTimer" class="font-mono text-red-400">02:00</span>';
+                
+                updateTimers(); // Restart loop
+                
+                inputs[0].focus();
+            } else {
+                throw new Error(data.error || "Failed to resend OTP");
+            }
+        } catch (err) {
+            await Swal.fire({
+                icon: 'error',
+                title: 'Resend Failed',
+                text: err.message || 'Something went wrong. Please try again.',
+                confirmButtonColor: '#ef4444',
+                background: '#001a33',
+                color: '#fff'
             });
+            resendBtn.disabled = false;
+            resendBtn.classList.remove("disabled");
+        } finally {
+            resendBtn.textContent = originalText;
+        }
     }
 
     // ✅ Auto-hide error EXACTLY in 3 seconds

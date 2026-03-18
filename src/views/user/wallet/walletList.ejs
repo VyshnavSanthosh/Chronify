@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Wallet - Chronify | Luxury Watches</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <%- include('../partials/userStyles') %>
+    <%- include('../partials/logoutScript') %>
+    <style>
+        .wallet-card {
+            background: linear-gradient(135deg, #1a2855 0%, #0f1a35 100%);
+            border: 1px solid #2a3f66;
+            border-radius: 12px;
+            padding: 32px;
+            margin-bottom: 24px;
+        }
+
+        .wallet-balance-box {
+            background: #0a0e27;
+            border: 1px solid #2a3f66;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 32px;
+        }
+
+        .wallet-balance-text {
+            font-size: 14px;
+            color: #b0b5c8;
+            margin-bottom: 8px;
+        }
+
+        .wallet-amount {
+            font-size: 32px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .transactions-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 24px;
+        }
+
+        .transactions-table thead {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        }
+
+        .transactions-table th {
+            padding: 14px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 13px;
+            border: 1px solid #1e40af;
+        }
+
+        .transactions-table td {
+            padding: 14px;
+            border: 1px solid #2a3f66;
+            font-size: 13px;
+            background: transparent;
+        }
+
+        .transactions-table tbody tr {
+            background: transparent;
+            border-bottom: 1px solid #2a3f66;
+        }
+
+        .transactions-table tbody tr:hover {
+            background: rgba(59, 130, 246, 0.05);
+        }
+
+        .status-credited {
+            color: #22c55e;
+            font-weight: 600;
+        }
+
+        .status-debited {
+            color: #dc2626;
+            font-weight: 600;
+        }
+
+        .btn-add-money {
+            background: #3b82f6;
+            color: #fff;
+            border: none;
+            padding: 12px 32px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .btn-add-money:hover {
+            background: #2563eb;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            margin-top: 24px;
+        }
+
+        .pagination button {
+            background: transparent;
+            border: 1px solid #2a3f66;
+            color: #fff;
+            width: 36px;
+            height: 36px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        .pagination button:hover {
+            border-color: #3b82f6;
+            color: #3b82f6;
+        }
+
+        .pagination button.active {
+            background: #fff;
+            color: #000;
+            border-color: #fff;
+        }
+    </style>
+</head>
+<body>
+
+    <%- include('../partials/userNavbar') %>
+
+    <!-- Main Content -->
+    <div class="container">
+        <%- include('../partials/userSidebar', { user, activePage: 'wallet', wishlistCount: 0 }) %>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <div class="wallet-card">
+                <h2 style="font-size: 20px; font-weight: 600; margin-bottom: 24px;">My Wallet</h2>
+
+                <!-- Wallet Balance -->
+                <div class="wallet-balance-box">
+                    <div class="wallet-balance-text">Available wallet balance:</div>
+                    <div class="wallet-amount">₹<%= walletBalance || '0.00' %></div>
+                </div>
+
+                <!-- Transactions Table -->
+                <table class="transactions-table">
+                    <thead>
+                        <tr>
+                            <th>Transaction ID</th>
+                            <th>Date</th>
+                            <th>Amount</th>
+                            <th>Source</th>
+                            <th>Debit / Credit</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% const transactions = walletTransactions %>
+
+                        <% transactions.forEach(transaction => { %>
+                            <% const date = new Date(transaction.createdAt);
+
+const formatted = date.toLocaleDateString("en-GB", {
+    timeZone: "Asia/Kolkata"
+}); %>
+                            <tr>
+                                <td><%= transaction.id %></td>
+                                <td><%= formatted %></td>
+                                <td><%= transaction.amount %></td>
+                                <td><%= transaction.source %></td>
+                                <td class="<%= transaction.type === 'credit' ? 'status-credited' : 'status-debited' %>">
+                                    Amount <%= transaction.type === 'credit' ? 'Credited' : 'Debited' %>
+                                </td>
+                            </tr>
+                        <% }); %>
+                    </tbody>
+                </table>
+
+                <!-- Add Money Button -->
+                <div style="text-align: center; margin-bottom: 24px;">
+                    <button onclick="addMoney()" class="btn-add-money">
+                        ADD Money
+                    </button>
+                </div>
+
+                <!-- Pagination -->
+                <div class="pagination">
+                    <% if (currentPage > 1) { %>
+                        <button onclick="goToPage(<%= currentPage - 1 %>)">
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </button>
+                    <% } %>
+
+                    <% 
+                    let startPage = Math.max(1, currentPage - 2);
+                    let endPage = Math.min(totalPages, startPage + 4);
+                    
+                    if (endPage - startPage < 4) {
+                        startPage = Math.max(1, endPage - 4);
+                    }
+                    %>
+
+                    <% for(let i = startPage; i <= endPage; i++) { %>
+                        <button onclick="goToPage(<%= i %>)" class="<%= i === currentPage ? 'active' : '' %>">
+                            <%= i %>
+                        </button>
+                    <% } %>
+
+                    <% if (currentPage < totalPages) { %>
+                        <button onclick="goToPage(<%= currentPage + 1 %>)">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+                    <% } %>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <%- include('../partials/userFooter') %>
+
+    <!-- JavaScript -->
+    <script>
+        // Add money to wallet
+        function addMoney() {
+            console.log('[v0] Add money to wallet clicked');
+            window.location.href = '/wallet/handle-add-money';
+        }
+
+        // Go to specific page
+        function goToPage(pageNum) {
+            window.location.href = `/wallet?page=${pageNum}`;
+        }
+
+        // Previous page
+        function previousPage() {
+            console.log('[v0] Previous page clicked');
+        }
+
+        // Next page
+        function nextPage() {
+            console.log('[v0] Next page clicked');
+        }
+
+
+    </script>
+</body>
+</html>

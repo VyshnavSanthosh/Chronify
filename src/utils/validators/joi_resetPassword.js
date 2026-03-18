@@ -1,6 +1,6 @@
-const Joi = require("joi");
+import Joi from "joi";
 
-module.exports = Joi.object({
+export default Joi.object({
     newPassword: Joi.string().min(8).required().messages({
         "string.min": "Password must be at least 8 characters",
         "string.empty": "New password is required",

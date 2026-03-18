@@ -1,12 +1,10 @@
-const { exists } = require("../../../models/admin/categorySchema")
-
-module.exports = class CategoryService {
+export default class CategoryService {
     constructor(categoryRepository) {
         this.categoryRepository = categoryRepository
     }
 
     async saveCategoryToDb(categoryObj) {
-        
+
         const exists = await this.categoryRepository.findByName(categoryObj.categoryName)
 
         if (exists) {
@@ -22,7 +20,7 @@ module.exports = class CategoryService {
         }
     }
 
-    async getCategoriesList(search, page, status, sort){
+    async getCategoriesList(search, page, status, sort) {
         const limit = 10;
         const skip = (page - 1) * limit
 
@@ -35,25 +33,33 @@ module.exports = class CategoryService {
             sortOrder = 1
         }
 
-        const {categories, totalCategories} = await this.categoryRepository.getAllCategories(limit, skip, sortOrder, search, status,sortField)
+        const { categories, totalCategories } = await this.categoryRepository.getAllCategories(limit, skip, sortOrder, search, status, sortField)
 
-        return {categories,totalCategories}
+        return { categories, totalCategories }
     }
 
-    async toggleCategoryListingStatus(categoryId, isListed){
+    async toggleCategoryListingStatus(categoryId, isListed) {
         const updatedCategory = await this.categoryRepository.updatedCategoryListingStatus(categoryId, isListed)
-        
+
         return updatedCategory
     }
 
-    async findCategory(categoryId){
+    async findCategory(categoryId) {
         const category = await this.categoryRepository.findById(categoryId)
         return category
     }
-    
-    async editCategory(categoryObj){
-        const categoryExits = await this.categoryRepository.findByName(categoryObj.categoryName)
-        
-        await this.categoryRepository.editCategoryinDb(categoryExits._id,categoryObj)
+
+    async editCategory(categoryId, categoryObj) {
+        const exists = await this.categoryRepository.findByName(categoryObj.categoryName);
+
+        if (exists && exists._id.toString() !== categoryId) {
+            throw new Error("Category name already exists");
+        }
+
+        try {
+            await this.categoryRepository.editCategoryinDb(categoryId, categoryObj);
+        } catch (error) {
+            throw error;
+        }
     }
 }

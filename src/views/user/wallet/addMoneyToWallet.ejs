@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Money to Wallet - Chronify | Luxury Watches</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <%- include('../partials/userStyles') %>
+    <%- include('../partials/logoutScript') %>
+    <style>
+        .add-money-card {
+            background: linear-gradient(135deg, #1a2855 0%, #0f1a35 100%);
+            border: 1px solid #2a3f66;
+            border-radius: 12px;
+            padding: 48px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 16px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 12px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 14px 18px;
+            background: #0a0e27;
+            border: 1px solid #2a3f66;
+            border-radius: 6px;
+            color: #fff;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+
+        .form-input::placeholder {
+            color: #6b7280;
+        }
+
+        .btn-submit {
+            background: #3b82f6;
+            color: #fff;
+            border: none;
+            padding: 14px 48px;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+            width: 100%;
+        }
+
+        .btn-submit:hover {
+            background: #2563eb;
+        }
+
+        .btn-submit:active {
+            transform: scale(0.98);
+        }
+    </style>
+</head>
+<body>
+
+    <%- include('../partials/userNavbar') %>
+
+    <!-- Main Content -->
+    <div class="container">
+        <%- include('../partials/userSidebar', { user, activePage: 'wallet', wishlistCount: 0 }) %>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <h2 style="font-size: 20px; font-weight: 600; margin-bottom: 32px;">Add Money to Wallet</h2>
+
+            <div class="add-money-card">
+                <div class="form-group">
+                    <label class="form-label">Enter Amount</label>
+                    <input 
+                        type="number" 
+                        id="addMoneyInput" 
+                        class="form-input"
+                        placeholder="Enter amount to add" 
+                        min="1" 
+                        step="1"
+                    >
+                </div>
+
+                <button onclick="submitAddMoney()" class="btn-submit">
+                    Add Money
+                </button>
+            </div>
+        </main>
+    </div>
+
+    <%- include('../partials/userFooter') %>
+
+    <!-- JavaScript -->
+    <script>
+        // Submit add money form
+        async function submitAddMoney() {
+            const amountInput = document.getElementById('addMoneyInput');
+            const amount = amountInput.value.trim();
+
+            if (!amount || isNaN(amount) || Number(amount) <= 0) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Invalid Amount',
+                    text: 'Please enter a valid amount',
+                    background: '#1a2855',
+                    color: '#fff',
+                    confirmButtonColor: '#3b82f6'
+                });
+                return;
+            }
+
+            try {
+                // Step 1: Create Razorpay order from backend
+                const response = await fetch('/wallet/handle-add-money', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        amount: Number(amount),
+                        paymentMethod: "razorpay"
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!data.success) {
+                    throw new Error(data.message || "Failed to initiate payment");
+                }
+
+                const { orderId, amount: orderAmount, currency, key } = data.paymentData;
+
+                // Step 2: Configure Razorpay Checkout
+                const options = {
+                    key: key,
+                    amount: orderAmount,
+                    currency: currency,
+                    order_id: orderId,
+                    name: "Chronify",
+                    description: "Wallet Topup",
+                    
+                    handler: async function (response) {
+                        // Step 3: Verify payment with backend
+                        const verifyRes = await fetch('/wallet/verify-payment', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                paymentData: response,
+                                paymentMethod: "razorpay",
+                                amount: amount
+                            })
+                        });
+
+                        const verifyData = await verifyRes.json();
+
+                        if (verifyData.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Success!',
+                                text: 'Money added successfully!',
+                                background: '#1a2855',
+                                color: '#fff',
+                                confirmButtonColor: '#3b82f6'
+                            }).then(() => {
+                                window.location.href = '/wallet';
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Verification Failed',
+                                text: verifyData.message || 'Payment verification failed',
+                                background: '#1a2855',
+                                color: '#fff',
+                                confirmButtonColor: '#ef4444'
+                            });
+                        }
+                    },
+
+                    theme: {
+                        color: "#3b82f6"
+                    }
+                };
+
+                // Step 4: Open Razorpay
+                const rzp = new Razorpay(options);
+                rzp.open();
+
+            } catch (error) {
+                console.error(error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Payment Failed',
+                    text: error.message || 'Failed to process payment',
+                    background: '#1a2855',
+                    color: '#fff',
+                    confirmButtonColor: '#ef4444'
+                });
+            }
+        }
+
+        // Logout function
+
+    </script>
+</body>
+</html>

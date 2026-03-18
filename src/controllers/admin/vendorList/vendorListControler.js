@@ -1,16 +1,16 @@
-module.exports = class VendorListController {
+export default class VendorListController {
     constructor(vendorListService) {
         this.vendorListService = vendorListService
     }
 
-    async renderVendorListPage(req,res){
-            const search = req.query.search || "";
-            const page = parseInt(req.query.page) || 1;
-            const status = req.query.status || "";
-            const sort = req.query.sort || "";
-        try{
-            const {vendors, totalVendors} = await this.vendorListService.getVendorList(search, page, status, sort)
-            return res.status(200).render("admin/vendorList/vendorList",{
+    async renderVendorListPage(req, res) {
+        const search = req.query.search || "";
+        const page = parseInt(req.query.page) || 1;
+        const status = req.query.status || "";
+        const sort = req.query.sort || "";
+        try {
+            const { vendors, totalVendors } = await this.vendorListService.getVendorList(search, page, status, sort)
+            return res.status(200).render("admin/vendorList/vendorList", {
                 vendors,
                 totalVendors,
                 currentPage: page
@@ -24,12 +24,12 @@ module.exports = class VendorListController {
         }
     }
 
-    async toggleVendorBlock(req,res){
+    async toggleVendorBlock(req, res) {
         try {
-            const {vendorId} = req.params
-            const {isBlocked} = req.body
-            
-            if (!vendorId) {                
+            const { vendorId } = req.params
+            const { isBlocked } = req.body
+
+            if (!vendorId) {
                 return res.status(400).json({
                     success: false,
                     message: "Vendor ID is required"

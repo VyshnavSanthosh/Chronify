@@ -1,0 +1,315 @@
+<% layout('admin/layout/adminLayout') %>
+
+<% block('styles', `
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .stats-card {
+            background: linear-gradient(145deg, #0f1829 0%, #1a2840 100%);
+            border: 1px solid #1e3a5f;
+            border-radius: 1rem;
+            transition: transform 0.3s ease;
+        }
+        .stats-card:hover {
+            transform: translateY(-5px);
+        }
+        .icon-circle {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .chart-container {
+            background: rgba(15, 24, 41, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid #1e3a5f;
+            border-radius: 1rem;
+        }
+        .table-container {
+            background: rgba(15, 24, 41, 0.4);
+            border: 1px solid #1e3a5f;
+            border-radius: 1rem;
+            overflow: hidden;
+        }
+        .table-header {
+            background: #3b82f6;
+            color: white;
+            font-weight: 600;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #1e3a5f;
+            border-radius: 10px;
+        }
+    </style>
+`) %>
+
+<div class="p-8 space-y-8 max-w-[1600px] mx-auto w-full">
+    <!-- Header with Breadcrumbs -->
+    <div class="flex justify-between items-center">
+        <div>
+            <h1 class="text-3xl font-bold">Dashboard</h1>
+            <p class="text-gray-400 text-sm mt-1">Welcome back, <%= user.firstName %></p>
+        </div>
+    </div>
+
+    <!-- Summary Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <!-- Total Customers -->
+        <div class="stats-card p-6 flex items-center space-x-4 shadow-xl">
+            <div class="icon-circle bg-green-900/30 text-green-400">
+                <i class="fa-solid fa-users text-xl"></i>
+            </div>
+            <div class="flex-1">
+                <p class="text-gray-400 text-xs font-semibold uppercase tracking-wider">Total Customers</p>
+                <div class="flex items-baseline space-x-2">
+                    <h3 class="text-2xl font-bold"><%= summary.totalCustomers.toLocaleString() %></h3>
+                    <!-- <span class="text-green-500 text-xs font-bold font-mono">16% this month</span> -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Orders -->
+        <div class="stats-card p-6 flex items-center space-x-4 shadow-xl">
+            <div class="icon-circle bg-blue-900/30 text-blue-400">
+                <i class="fa-solid fa-cart-shopping text-xl"></i>
+            </div>
+            <div>
+                <p class="text-gray-400 text-xs font-semibold uppercase tracking-wider">Total Orders</p>
+                <h3 class="text-2xl font-bold"><%= summary.totalOrders.toLocaleString() %></h3>
+            </div>
+        </div>
+
+        <!-- Total Sales -->
+        <div class="stats-card p-6 flex items-center space-x-4 shadow-xl">
+            <div class="icon-circle bg-emerald-900/30 text-emerald-400">
+                <i class="fa-solid fa-indian-rupee-sign text-xl"></i>
+            </div>
+            <div>
+                <p class="text-gray-400 text-xs font-semibold uppercase tracking-wider">Total Sales</p>
+                <h3 class="text-2xl font-bold">₹<%= summary.totalSales.toLocaleString('en-IN') %></h3>
+            </div>
+        </div>
+
+        <!-- Total Pending -->
+        <div class="stats-card p-6 flex items-center space-x-4 shadow-xl">
+            <div class="icon-circle bg-amber-900/30 text-amber-400">
+                <i class="fa-solid fa-clock text-xl"></i>
+            </div>
+            <div>
+                <p class="text-gray-400 text-xs font-semibold uppercase tracking-wider">Total Pending</p>
+                <h3 class="text-2xl font-bold"><%= summary.totalPending.toLocaleString() %></h3>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sales Details Chart -->
+    <div class="space-y-4">
+        <h2 class="text-xl font-bold mt-4">Sales Details</h2>
+        <div class="chart-container p-6">
+            <div class="flex justify-between items-center mb-6">
+                <span class="text-gray-400 text-sm font-medium">Activity</span>
+                <select id="chartPeriod" class="bg-[#0a1425] border border-[#1e3a5f] text-xs rounded-md px-3 py-1 text-white focus:outline-none focus:ring-1 focus:ring-blue-500">
+                    <option value="weekly" <%= currentPeriod === 'weekly' ? 'selected' : '' %>>Weekly</option>
+                    <option value="monthly" <%= currentPeriod === 'monthly' ? 'selected' : '' %>>Monthly</option>
+                    <option value="yearly" <%= currentPeriod === 'yearly' ? 'selected' : '' %>>Yearly</option>
+                </select>
+            </div>
+            <script>
+                document.getElementById('chartPeriod').addEventListener('change', function() {
+                    window.location.href = '/admin/dashboard?period=' + this.value;
+                });
+            </script>
+            <div class="h-[300px] w-full">
+                <canvas id="salesChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Selling Sections -->
+    <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
+        <!-- Top Selling Products -->
+        <div class="space-y-4">
+            <h2 class="text-xl font-bold">Top Selling Products</h2>
+            <div class="table-container shadow-2xl">
+                <table class="w-full text-left text-sm">
+                    <thead class="table-header">
+                        <tr>
+                            <th class="px-6 py-4">Rank</th>
+                            <th class="px-6 py-4">Product Name</th>
+                            <th class="px-6 py-4">Category</th>
+                            <th class="px-6 py-4">Units Sold</th>
+                            <th class="px-6 py-4">Revenue</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-[#1e3a5f]">
+                        <% topProducts.forEach((product, index) => { %>
+                            <tr class="hover:bg-blue-900/10 transition-colors">
+                                <td class="px-6 py-4 font-medium"><%= index + 1 %></td>
+                                <td class="px-6 py-4 text-gray-200"><%= product.name %></td>
+                                <td class="px-6 py-4 text-gray-400"><%= product.category %></td>
+                                <td class="px-6 py-4 "><%= product.unitsSold %></td>
+                                <td class="px-6 py-4 font-bold text-blue-400">₹<%= product.revenue.toLocaleString('en-IN') %></td>
+                            </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Top Selling Categories -->
+        <div class="space-y-4">
+            <h2 class="text-xl font-bold">Top Categories</h2>
+            <div class="table-container shadow-2xl">
+                <table class="w-full text-left text-sm">
+                    <thead class="table-header">
+                        <tr>
+                            <th class="px-6 py-4">Rank</th>
+                            <th class="px-6 py-4">Category</th>
+                            <th class="px-6 py-4">Units Sold</th>
+                            <th class="px-6 py-4">Revenue</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-[#1e3a5f]">
+                        <% topCategories.forEach((cat, index) => { %>
+                            <tr class="hover:bg-blue-900/10 transition-colors">
+                                <td class="px-6 py-4 font-medium"><%= index + 1 %></td>
+                                <td class="px-6 py-4 text-gray-200"><%= cat.name %></td>
+                                <td class="px-6 py-4 "><%= cat.unitsSold %></td>
+                                <td class="px-6 py-4 font-bold text-blue-400">₹<%= cat.revenue.toLocaleString('en-IN') %></td>
+                            </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Top Selling Brands -->
+        <div class="space-y-4">
+            <h2 class="text-xl font-bold">Top Brands</h2>
+            <div class="table-container shadow-2xl">
+                <table class="w-full text-left text-sm">
+                    <thead class="table-header">
+                        <tr>
+                            <th class="px-6 py-4">Rank</th>
+                            <th class="px-6 py-4">Brand</th>
+                            <th class="px-6 py-4">Units Sold</th>
+                            <th class="px-6 py-4">Revenue</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-[#1e3a5f]">
+                        <% topBrands.forEach((brand, index) => { %>
+                            <tr class="hover:bg-blue-900/10 transition-colors">
+                                <td class="px-6 py-4 font-medium"><%= index + 1 %></td>
+                                <td class="px-6 py-4 text-gray-200"><%= brand.name %></td>
+                                <td class="px-6 py-4 "><%= brand.unitsSold %></td>
+                                <td class="px-6 py-4 font-bold text-blue-400">₹<%= brand.revenue.toLocaleString('en-IN') %></td>
+                            </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Top Selling Vendors -->
+        <div class="space-y-4">
+            <h2 class="text-xl font-bold">Top Vendors</h2>
+            <div class="table-container shadow-2xl">
+                <table class="w-full text-left text-sm">
+                    <thead class="table-header">
+                        <tr>
+                            <th class="px-6 py-4">Rank</th>
+                            <th class="px-6 py-4">Vendor Name</th>
+                            <th class="px-6 py-4">Units Sold</th>
+                            <th class="px-6 py-4">Revenue</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-[#1e3a5f]">
+                        <% topVendors.forEach((vendor, index) => { %>
+                            <tr class="hover:bg-blue-900/10 transition-colors">
+                                <td class="px-6 py-4 font-medium"><%= index + 1 %></td>
+                                <td class="px-6 py-4 text-gray-200"><%= vendor.name %></td>
+                                <td class="px-6 py-4 "><%= vendor.unitsSold %></td>
+                                <td class="px-6 py-4 font-bold text-blue-400">₹<%= vendor.revenue.toLocaleString('en-IN') %></td>
+                            </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<% block('scripts', `
+    <script>
+        const ctx = document.getElementById('salesChart').getContext('2d');
+        const salesChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ${JSON.stringify(chartData.labels)},
+                datasets: [{
+                    label: 'Monthly Sales',
+                    data: ${JSON.stringify(chartData.data)},
+                    backgroundColor: function(context) {
+                        const chart = context.chart;
+                        const {ctx, chartArea} = chart;
+                        if (!chartArea) return null;
+                        const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
+                        gradient.addColorStop(0, 'rgba(59, 130, 246, 0.1)');
+                        gradient.addColorStop(1, 'rgba(59, 130, 246, 0.8)');
+                        return gradient;
+                    },
+                    borderRadius: 8,
+                    borderWidth: 0,
+                    hoverBackgroundColor: '#60a5fa',
+                    barThickness: 20
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: '#1e3a5f',
+                        titleColor: '#fff',
+                        bodyColor: '#e5e7eb',
+                        borderColor: '#3b82f6',
+                        borderWidth: 1,
+                        padding: 10,
+                        displayColors: false,
+                        callbacks: {
+                            label: function(context) {
+                                return '₹' + context.parsed.y.toLocaleString('en-IN');
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: '#9ca3af', font: { size: 11, weight: '500' } }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: '#1e3a5f', drawBorder: false },
+                        ticks: { 
+                            color: '#9ca3af', 
+                            font: { size: 10 },
+                            callback: function(value) {
+                                if (value >= 1000) return '₹' + (value/1000).toFixed(1) + 'k';
+                                return '₹' + value;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+`) %>

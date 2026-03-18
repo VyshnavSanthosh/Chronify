@@ -1,11 +1,11 @@
-const {hashString} = require("../../../utils/bcrypt")
-module.exports = class resetPasswordService {
+import { hashString } from "../../../utils/bcrypt.js";
+export default class resetPasswordService {
     constructor(vendorRepository, redis) {
         this.vendorRepository = vendorRepository
         this.redis = redis
     }
 
-    async resetPassword(vendorEmail, password, vendorId){
+    async resetPassword(vendorEmail, password, vendorId) {
         const vendor = await this.vendorRepository.findByEmail(vendorEmail)
 
         if (!vendor) {

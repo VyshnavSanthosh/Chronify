@@ -1,4 +1,4 @@
-module.exports = class VendorLoginController {
+export default class VendorLoginController {
     constructor(loginService, jwtService, vendorRepository, joi_login, validator) {
         this.loginService = loginService;
         this.jwtService = jwtService;
@@ -7,16 +7,16 @@ module.exports = class VendorLoginController {
         this.validator = validator;
     }
 
-    renderLoginPage(req,res){
-        return res.render("vendor/auth/login",{
+    renderLoginPage(req, res) {
+        return res.render("vendor/auth/login", {
             error: null,
             email: "",
             query: req.query
         })
     }
 
-    async handleLogin(req,res){
-        const {error, value} = this.validator.validate(this.joi_login, req.body)
+    async handleLogin(req, res) {
+        const { error, value } = this.validator.validate(this.joi_login, req.body)
 
         if (error) {
             const errorMessage = error.details[0].message;
@@ -27,15 +27,15 @@ module.exports = class VendorLoginController {
             });
         }
 
-        const {email, password} = value;
-        
-        try {
-            const {accessToken, refreshToken} = await this.loginService.login(email, password)
-            
-            // Set HTTP-only cookies
-            this.setAuthCookies(res,accessToken, refreshToken)
+        const { email, password } = value;
 
-            return res.redirect("/home");
+        try {
+            const { vendorAccessToken, vendorRefreshToken } = await this.loginService.login(email, password)
+
+            // Set HTTP-only cookies
+            this.setAuthCookies(res, vendorAccessToken, vendorRefreshToken)
+
+            return res.redirect("/vendor/profile");
 
         } catch (error) {
             return res.render("vendor/auth/login", {
@@ -46,9 +46,9 @@ module.exports = class VendorLoginController {
         }
     }
 
-    setAuthCookies(res, accessToken, refreshToken) {
+    setAuthCookies(res, vendorAccessToken, vendorRefreshToken) {
         // Access token cookie (15 minutes)
-        res.cookie("accessToken", accessToken, {
+        res.cookie("vendorAccessToken", vendorAccessToken, {
             httpOnly: true,
             secure: false, // true in production (HTTPS)
             sameSite: "lax",
@@ -56,7 +56,7 @@ module.exports = class VendorLoginController {
         });
 
         // Refresh token cookie (7 days)
-        res.cookie("refreshToken", refreshToken, {
+        res.cookie("vendorRefreshToken", vendorRefreshToken, {
             httpOnly: true,
             secure: false,
             sameSite: "lax",
@@ -66,9 +66,9 @@ module.exports = class VendorLoginController {
 
     async refreshToken(req, res) {
         try {
-            const { refreshToken } = req.cookies;
+            const { vendorRefreshToken } = req.cookies;
 
-            if (!refreshToken) {
+            if (!vendorRefreshToken) {
                 return res.status(401).json({
                     success: false,
                     error: "Refresh token not found. Please login again."
@@ -76,10 +76,10 @@ module.exports = class VendorLoginController {
             }
 
             // Get new tokens
-            const newTokens = await this.loginService.refreshAccessToken(refreshToken);
+            const newTokens = await this.loginService.refreshAccessToken(vendorRefreshToken);
 
             // Set new cookies
-            this.setAuthCookies(res, newTokens.accessToken, newTokens.refreshToken);
+            this.setAuthCookies(res, newTokens.vendorAccessToken, newTokens.vendorRefreshToken);
 
             return res.json({
                 success: true,
@@ -88,8 +88,8 @@ module.exports = class VendorLoginController {
 
         } catch (err) {
             // Clear invalid cookies
-            res.clearCookie("accessToken");
-            res.clearCookie("refreshToken");
+            res.clearCookie("vendorAccessToken");
+            res.clearCookie("vendorRefreshToken");
 
             return res.status(401).json({
                 success: false,
@@ -101,15 +101,15 @@ module.exports = class VendorLoginController {
 
     async logout(req, res) {
         try {
-            // req.user is set by authMiddleware
-            const vendorId = req.user._id;
+            // req.vendor is set by authMiddleware
+            const vendorId = req.vendor._id;
 
             // Clear refresh token from database
             await this.loginService.logout(vendorId);
 
             // Clear cookies
-            res.clearCookie("accessToken");
-            res.clearCookie("refreshToken");
+            res.clearCookie("vendorAccessToken");
+            res.clearCookie("vendorRefreshToken");
 
             return res.redirect("/vendor/auth/login");
 

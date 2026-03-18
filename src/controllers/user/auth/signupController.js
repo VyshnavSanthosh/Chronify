@@ -1,24 +1,26 @@
-module.exports = class UserAuthController {
-    constructor(signupService, otpService, joi_signup, validator){
+export default class UserAuthController {
+    constructor(signupService, otpService, joi_signup, validator) {
         this.signupService = signupService
         this.otpService = otpService
         this.joi_signup = joi_signup;
         this.validator = validator;
     }
-    renderSignup(req,res){
-        return res.render("user/auth/signup",{
+    renderSignup(req, res) {
+        return res.render("user/auth/signup", {
             errors: {},
             firstName: "",
             lastName: "",
             email: "",
             phone: "",
-            referralCode: ""
+            referralCode: "",
+            success: null,
+
         })
     }
-    async handleSignup(req,res) {
-        
+    async handleSignup(req, res) {
+
         // Joi validator
-        const {error, value} = this.validator.validate(this.joi_signup, req.body)
+        const { error, value } = this.validator.validate(this.joi_signup, req.body)
 
         let errors = {}
 
@@ -33,7 +35,9 @@ module.exports = class UserAuthController {
                 lastName: value.lastName || "",
                 email: value.email || "",
                 phone: value.phone || "",
-                referralCode: value.referralCode || ""
+                referralCode: value.referralCode || "",
+                success: null,
+                info: null
             });
         }
 
@@ -63,7 +67,9 @@ module.exports = class UserAuthController {
                 lastName,
                 email,
                 phone,
-                referralCode
+                referralCode,
+                success: null,
+                info: null
             });
         }
     }

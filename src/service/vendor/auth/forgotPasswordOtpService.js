@@ -1,4 +1,4 @@
-module.exports = class forgotPasswordOtpService {
+export default class forgotPasswordOtpService {
     constructor(vendorRepository, redis, otpGenerator, emailQueue) {
         this.vendorRepository = vendorRepository
         this.redis = redis
@@ -6,7 +6,7 @@ module.exports = class forgotPasswordOtpService {
         this.emailQueue = emailQueue
     }
 
-    async verifyResetOtp(vendorId, otp){
+    async verifyResetOtp(vendorId, otp) {
         const storedOtp = await this.redis.get(`forgot:${vendorId}`)
 
         if (!storedOtp) {
@@ -19,14 +19,14 @@ module.exports = class forgotPasswordOtpService {
         return true
     }
 
-    async resendOtp(vendorEmail, vendorId){
+    async resendOtp(vendorEmail, vendorId) {
         const newOtp = await this.otpGenerator()
 
-        await this.redis.set(`forgot:${vendorId}`,newOtp, "EX",300)
+        await this.redis.set(`forgot:${vendorId}`, newOtp, "EX", 300)
 
         console.log(`DEBUG: Resent password reset OTP for vendor ${vendorId}: ${newOtp}`);
 
-        await this.emailQueue.add("vendor-forgot-password-otp",{
+        await this.emailQueue.add("vendor-forgot-password-otp", {
             email: vendorEmail,
             otp: newOtp
         })

@@ -1,200 +1,245 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Vendor Dashboard | Chronify</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<% layout('vendor/layout/vendorLayout') %>
 
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
+<% block('styles', `
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .stats-card {
+            background: linear-gradient(145deg, #0f1829 0%, #1a2840 100%);
+            border: 1px solid #1e3a5f;
+            border-radius: 1rem;
+            transition: transform 0.3s ease;
+        }
+        .stats-card:hover {
+            transform: translateY(-5px);
+        }
+        .icon-circle {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .chart-container {
+            background: rgba(15, 24, 41, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid #1e3a5f;
+            border-radius: 1rem;
+        }
+        .table-container {
+            background: rgba(15, 24, 41, 0.4);
+            border: 1px solid #1e3a5f;
+            border-radius: 1rem;
+            overflow: hidden;
+        }
+        .table-header {
+            background: #3b82f6;
+            color: white;
+            font-weight: 600;
+        }
+    </style>
+`) %>
 
-    <!-- Google Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<div class="p-8 space-y-8 max-w-[1600px] mx-auto w-full">
+    <!-- Header -->
+    <div class="flex justify-between items-center">
+        <div>
+            <h1 class="text-3xl font-bold">Vendor Dashboard</h1>
+            <p class="text-gray-400 text-sm mt-1">Welcome back, <%= user.brandName || user.firstName %></p>
+        </div>
+    </div>
 
+    <!-- Summary Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <!-- Total Customers -->
+        <div class="stats-card p-6 flex items-center space-x-4 shadow-xl">
+            <div class="icon-circle bg-green-900/30 text-green-400">
+                <i class="fa-solid fa-users text-xl"></i>
+            </div>
+            <div class="flex-1">
+                <p class="text-gray-400 text-xs font-semibold uppercase tracking-wider">Your Customers</p>
+                <h3 class="text-2xl font-bold"><%= summary.totalCustomers.toLocaleString() %></h3>
+            </div>
+        </div>
+
+        <!-- Total Orders -->
+        <div class="stats-card p-6 flex items-center space-x-4 shadow-xl">
+            <div class="icon-circle bg-blue-900/30 text-blue-400">
+                <i class="fa-solid fa-cart-shopping text-xl"></i>
+            </div>
+            <div>
+                <p class="text-gray-400 text-xs font-semibold uppercase tracking-wider">Orders Received</p>
+                <h3 class="text-2xl font-bold"><%= summary.totalOrders.toLocaleString() %></h3>
+            </div>
+        </div>
+
+        <!-- Total Sales -->
+        <div class="stats-card p-6 flex items-center space-x-4 shadow-xl">
+            <div class="icon-circle bg-emerald-900/30 text-emerald-400">
+                <i class="fa-solid fa-indian-rupee-sign text-xl"></i>
+            </div>
+            <div>
+                <p class="text-gray-400 text-xs font-semibold uppercase tracking-wider">Your Sales</p>
+                <h3 class="text-2xl font-bold">₹<%= summary.totalSales.toLocaleString('en-IN') %></h3>
+            </div>
+        </div>
+
+        <!-- Total Pending -->
+        <div class="stats-card p-6 flex items-center space-x-4 shadow-xl">
+            <div class="icon-circle bg-amber-900/30 text-amber-400">
+                <i class="fa-solid fa-clock text-xl"></i>
+            </div>
+            <div>
+                <p class="text-gray-400 text-xs font-semibold uppercase tracking-wider">Pending Items</p>
+                <h3 class="text-2xl font-bold"><%= summary.totalPending.toLocaleString() %></h3>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sales Details Chart -->
+    <div class="space-y-4">
+        <h2 class="text-xl font-bold mt-4">Sales Activity</h2>
+        <div class="chart-container p-6">
+            <div class="flex justify-between items-center mb-6">
+                <span class="text-gray-400 text-sm font-medium">Earnings Over Time</span>
+                <select id="chartPeriod" class="bg-[#0a1425] border border-[#1e3a5f] text-xs rounded-md px-3 py-1 text-white focus:outline-none">
+                    <option value="weekly" <%= currentPeriod === 'weekly' ? 'selected' : '' %>>Weekly</option>
+                    <option value="monthly" <%= currentPeriod === 'monthly' ? 'selected' : '' %>>Monthly</option>
+                    <option value="yearly" <%= currentPeriod === 'yearly' ? 'selected' : '' %>>Yearly</option>
+                </select>
+            </div>
+            <div class="h-[300px] w-full">
+                <canvas id="salesChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Selling Sections -->
+    <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
+        <!-- Top Selling Products -->
+        <div class="space-y-4">
+            <h2 class="text-xl font-bold">Your Top Products</h2>
+            <div class="table-container shadow-2xl">
+                <table class="w-full text-left text-sm">
+                    <thead class="table-header">
+                        <tr>
+                            <th class="px-6 py-4">Rank</th>
+                            <th class="px-6 py-4">Product Name</th>
+                            <th class="px-6 py-4">Units Sold</th>
+                            <th class="px-6 py-4">Revenue</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-[#1e3a5f]">
+                        <% if (topProducts && topProducts.length > 0) { %>
+                            <% topProducts.forEach((product, index) => { %>
+                                <tr class="hover:bg-blue-900/10 transition-colors">
+                                    <td class="px-6 py-4 font-medium"><%= index + 1 %></td>
+                                    <td class="px-6 py-4 text-gray-200"><%= product.name %></td>
+                                    <td class="px-6 py-4 "><%= product.unitsSold %></td>
+                                    <td class="px-6 py-4 font-bold text-blue-400">₹<%= product.revenue.toLocaleString('en-IN') %></td>
+                                </tr>
+                            <% }) %>
+                        <% } else { %>
+                            <tr>
+                                <td colspan="4" class="px-6 py-10 text-center text-gray-500 italic">No sales data recorded yet.</td>
+                            </tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Top Selling Brands -->
+        <div class="space-y-4">
+            <h2 class="text-xl font-bold">Your Top Brands</h2>
+            <div class="table-container shadow-2xl">
+                <table class="w-full text-left text-sm">
+                    <thead class="table-header">
+                        <tr>
+                            <th class="px-6 py-4">Rank</th>
+                            <th class="px-6 py-4">Brand</th>
+                            <th class="px-6 py-4">Units Sold</th>
+                            <th class="px-6 py-4">Revenue</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-[#1e3a5f]">
+                        <% if (topBrands && topBrands.length > 0) { %>
+                            <% topBrands.forEach((brand, index) => { %>
+                                <tr class="hover:bg-blue-900/10 transition-colors">
+                                    <td class="px-6 py-4 font-medium"><%= index + 1 %></td>
+                                    <td class="px-6 py-4 text-gray-200"><%= brand.name %></td>
+                                    <td class="px-6 py-4 "><%= brand.unitsSold %></td>
+                                    <td class="px-6 py-4 font-bold text-blue-400">₹<%= brand.revenue.toLocaleString('en-IN') %></td>
+                                </tr>
+                            <% }) %>
+                        <% } else { %>
+                            <tr>
+                                <td colspan="4" class="px-6 py-10 text-center text-gray-500 italic">No brand data available.</td>
+                            </tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<% block('scripts', `
     <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: "#0a1425",
-                        secondary: "#050a14"
+        // Period filter handler
+        document.getElementById('chartPeriod').addEventListener('change', function() {
+            window.location.href = '/vendor/dashboard?period=' + this.value;
+        });
+
+        // Chart implementation
+        const ctx = document.getElementById('salesChart').getContext('2d');
+        const salesChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ${JSON.stringify(chartData.labels)},
+                datasets: [{
+                    label: 'Earnings',
+                    data: ${JSON.stringify(chartData.data)},
+                    backgroundColor: function(context) {
+                        const chart = context.chart;
+                        const {ctx, chartArea} = chart;
+                        if (!chartArea) return null;
+                        const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
+                        gradient.addColorStop(0, 'rgba(59, 130, 246, 0.1)');
+                        gradient.addColorStop(1, 'rgba(59, 130, 246, 0.8)');
+                        return gradient;
+                    },
+                    borderRadius: 8,
+                    barThickness: 'flex',
+                    maxBarThickness: 40
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: '#1e3a5f',
+                        callbacks: {
+                            label: function(context) {
+                                return '₹' + context.parsed.y.toLocaleString('en-IN');
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: { grid: { display: false }, ticks: { color: '#9ca3af' } },
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: '#1e3a5f' },
+                        ticks: {
+                            color: '#9ca3af',
+                            callback: value => '₹' + (value >= 1000 ? (value/1000).toFixed(1) + 'k' : value)
+                        }
                     }
                 }
             }
-        }
+        });
     </script>
-
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-    </style>
-</head>
-
-<body class="bg-secondary text-white min-h-screen flex">
-
-<!-- ================= SIDEBAR ================= -->
-<aside class="w-64 bg-primary border-r border-gray-800 hidden md:flex flex-col">
-
-    <div class="p-6 text-2xl font-bold border-b border-gray-800">
-        Chronify
-    </div>
-
-    <nav class="flex-1 px-4 py-6 space-y-2 text-sm">
-
-        <%
-        const menuItems = [
-            { name: "Dashboard", icon: "🏠", route: "/vendor/dashboard", active: true },
-            { name: "Products", icon: "📦", route: "/vendor/products" },
-            { name: "Order List", icon: "📑", route: "/vendor/orders" },
-            { name: "Category", icon: "📂", route: "/vendor/categories" },
-            { name: "Profile", icon: "👤", route: "/vendor/profile" },
-            { name: "Wallet", icon: "💳", route: "/vendor/wallet" },
-            { name: "Return / Refund", icon: "↩️", route: "/vendor/returns" },
-            { name: "Inventory Management", icon: "📊", route: "/vendor/inventory" }
-        ];
-        %>
-
-        <% menuItems.forEach(item => { %>
-            <a href="<%= item.route %>"
-               class="block px-4 py-3 rounded-lg
-               <%= item.active ? 'bg-gray-700' : 'hover:bg-gray-800' %>">
-                <%= item.name %>
-            </a>
-        <% }) %>
-
-    </nav>
-
-    <div class="p-4">
-        <a href="/logout"
-           class="block text-center bg-white text-black rounded-md py-2 font-medium">
-            Logout
-        </a>
-    </div>
-</aside>
-
-<!-- ================= MAIN ================= -->
-<main class="flex-1 p-6">
-
-    <!-- Header -->
-    <div class="flex justify-end mb-6">
-        <div class="text-right">
-
-            <p class="text-xs text-gray-400">Vendor</p>
-        </div>
-    </div>
-
-    <!-- ================= STATS ================= -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-
-        <%
-        const stats = [
-            {
-                label: "Total Customers",
-                value: totalCustomers,
-                sub: "16% this month",
-                icon: `
-                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                    d="M17 20h5v-2a4 4 0 00-4-4h-1M9 20H4v-2a4 4 0 014-4h1m4-4a4 4 0 100-8 4 4 0 000 8z"/>
-                </svg>`
-            },
-            {
-                label: "Total Orders",
-                value: totalOrders,
-                icon: `
-                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                    d="M3 3h13l4 6v11a1 1 0 01-1 1h-2a2 2 0 11-4 0H9a2 2 0 11-4 0H3z"/>
-                </svg>`
-            },
-            {
-                label: "Total Sales",
-                value: `₹${totalSales}`,
-                icon: `
-                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                    d="M3 3v18h18M9 17V9m4 8V5m4 12v-6"/>
-                </svg>`
-            },
-            {
-                label: "Total Pending",
-                value: totalPending,
-                icon: `
-                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>`
-            }
-        ];
-        %>
-
-        <% stats.forEach(stat => { %>
-            <div class="bg-primary border border-gray-700 rounded-xl p-5 flex gap-4">
-                <div class="h-12 w-12 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center">
-                    <%- stat.icon %>
-                </div>
-                <div>
-                    <p class="text-sm text-gray-400"><%= stat.label %></p>
-                    <p class="text-xl font-semibold"><%= stat.value %></p>
-                    <% if (stat.sub) { %>
-                        <p class="text-xs text-green-400"><%= stat.sub %></p>
-                    <% } %>
-                </div>
-            </div>
-        <% }) %>
-
-    </div>
-
-    <!-- ================= ACTIVITY ================= -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-        <!-- Total Earnings (Compact) -->
-        <div class="bg-primary border border-gray-700 rounded-xl px-6 py-4 h-fit">
-            <div class="h-12 w-12 bg-green-100 text-green-700 rounded-full flex items-center justify-center mb-3">
-                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                    d="M12 8c-1.5 0-3 .8-3 2s1.5 2 3 2 3 .8 3 2-1.5 2-3 2m0-10v10"/>
-                </svg>
-            </div>
-            <p class="text-sm text-gray-400">Total Earnings</p>
-            <p class="text-2xl font-bold">₹<%= totalEarnings %></p>
-        </div>
-
-        <!-- Activity Chart -->
-        <div class="lg:col-span-2 bg-primary border border-gray-700 rounded-xl p-6 min-h-[420px]">
-
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-lg font-semibold">Activity</h2>
-
-                <!-- Dropdown -->
-                <form method="GET" action="/vendor/dashboard">
-                    <select name="range"
-                            class="bg-secondary border border-gray-600 rounded-md px-3 py-1 text-sm">
-                        <option value="week" <%= range === 'week' ? 'selected' : '' %>>Week</option>
-                        <option value="month" <%= range === 'month' ? 'selected' : '' %>>Month</option>
-                        <option value="year" <%= range === 'year' ? 'selected' : '' %>>Year</option>
-                    </select>
-                </form>
-            </div>
-
-            <!-- Chart -->
-            <div class="flex items-end justify-between h-80">
-
-                <% activityData.forEach(item => { %>
-                    <div class="flex flex-col items-center gap-2">
-                        <div class="w-8 bg-blue-600 rounded-md"
-                             style="height:<%= item.value * 5 %>px">
-                        </div>
-                        <span class="text-xs text-gray-400"><%= item.day %></span>
-                    </div>
-                <% }) %>
-
-            </div>
-        </div>
-    </div>
-
-</main>
-
-</body>
-</html>
+`) %>

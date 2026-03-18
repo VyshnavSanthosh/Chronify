@@ -1,42 +1,53 @@
-const express = require("express");
+import express from "express";
 const router = express.Router();
+import noCache from "../../middleware/nocache.js";
+router.use(noCache);
 
-const createUploader = require("../../utils/multer");
-const {verifyToken} = require("../../middleware/vendorJwt")
-// Controller
-const addProductControllerFile = require("../../controllers/vendor/products/addProductController")
-
-// Services
-const addProductServiceFile = require("../../service/vendor/product/addProductService")
-
-// Repositories
-const categoryRepositoryFile = require("../../repository/admin/category")
-
+import validator from "../../utils/validators/validator.js";
+import joi_product from "../../utils/validators/joi_product.js";
+import createUploader from "../../utils/multer.js";
+import vendorJwtMiddlewareFile from "../../middleware/vendorJwt.js";
+import AddProductController from "../../controllers/vendor/products/addProductController.js";
+import ProductListController from "../../controllers/vendor/products/productListController.js";
+import AddProductService from "../../service/vendor/product/productService.js";
+import CategoryRepository from "../../repository/admin/category.js";
+import ProductRepository from "../../repository/vendor/productRepository.js";
 
 
 
 // Dependency injection
 
-const categoryRepository = new categoryRepositoryFile()
+const categoryRepository = new CategoryRepository()
+const addProductRepository = new ProductRepository()
+const vendorJwtMiddleware = new vendorJwtMiddlewareFile();
 
-const addProductService = new addProductServiceFile(categoryRepository)
-const addProductController = new addProductControllerFile(addProductService)
-
+const addProductService = new AddProductService(categoryRepository, addProductRepository)
+const addProductController = new AddProductController(addProductService, joi_product, validator)
+const productListController = new ProductListController(addProductService, joi_product, validator)
 
 // multer config
 // only allow images 
 const imgUpload = createUploader("IMAGES", "src/public/uploads", 10 * 1024 * 1024)
-console.log("imgUpload type:", typeof imgUpload);
 
 // Routes
 
 //   add product route 
 router.route("/products/add")
-    .get(addProductController.renderAddProductPage.bind(addProductController))
-    // .post(verifyToken, imgUpload.fields([
-    //     { name: 'gstDocument', maxCount: 1 },
-    //     { name: 'panCard', maxCount: 1 },
-    //     { name: 'tradeLicense', maxCount: 1 }
-    // ]), addProductController.handleAddProducts.bind(addProductController))
+    .get(vendorJwtMiddleware.verifyToken.bind(vendorJwtMiddleware), addProductController.renderAddProductPage.bind(addProductController))
+    .post(vendorJwtMiddleware.verifyToken.bind(vendorJwtMiddleware), imgUpload.any(), addProductController.handleAddProducts.bind(addProductController))
 
-module.exports = router;
+router.route("/products")
+    .get(vendorJwtMiddleware.verifyToken.bind(vendorJwtMiddleware), productListController.renderProductListingPage.bind(productListController))
+
+
+router.route("/products/:productId/toggle-list")
+    .patch(vendorJwtMiddleware.verifyToken.bind(vendorJwtMiddleware), productListController.toggleProductListing.bind(productListController));
+
+router.route("/products/:productId")
+    .delete(vendorJwtMiddleware.verifyToken.bind(vendorJwtMiddleware), productListController.deleteProduct.bind(productListController));
+
+router.route("/products/:productId/edit")
+    .get(vendorJwtMiddleware.verifyToken.bind(vendorJwtMiddleware), productListController.renderEditProductPage.bind(productListController))
+    .post(vendorJwtMiddleware.verifyToken.bind(vendorJwtMiddleware), imgUpload.any(), productListController.handleEditProduct.bind(productListController))
+
+export default router;

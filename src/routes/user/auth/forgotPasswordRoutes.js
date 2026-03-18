@@ -1,26 +1,15 @@
-const express = require("express");
+import express from "express";
 const router = express.Router();
 
-// Controller
-const ForgotPasswordController = require("../../../controllers/user/auth/forgotPasswordController");
-
-// Service
-const ForgotPasswordService = require("../../../service/user/auth/forgotPasswordService");
-
-// Repository
-const UserRepository = require("../../../repository/user");
-
-// Utils
-const redis = require("../../../utils/redis");
-const generateOtp = require("../../../utils/generateOTP");
-
-// Queue
-const emailQueue = require("../../../queues/emailQueue");
-
-// Validators
-const joi_forgotPassword = require("../../../utils/validators/joi_forgotPassword");
-const joi_resetPassword = require("../../../utils/validators/joi_resetPassword");
-const validator = require("../../../utils/validators/validator");
+import ForgotPasswordController from "../../../controllers/user/auth/forgotPasswordController.js";
+import ForgotPasswordService from "../../../service/user/auth/forgotPasswordService.js";
+import UserRepository from "../../../repository/user.js";
+import redis from "../../../utils/redis.js";
+import generateOtp from "../../../utils/generateOTP.js";
+import emailQueue from "../../../queues/emailQueue.js";
+import joi_forgotPassword from "../../../utils/validators/joi_forgotPassword.js";
+import joi_resetPassword from "../../../utils/validators/joi_resetPassword.js";
+import validator from "../../../utils/validators/validator.js";
 
 
 // Dependency injection
@@ -63,4 +52,4 @@ router.route("/reset-password")
     .get(forgotPasswordController.renderResetPassword.bind(forgotPasswordController))
     .post(forgotPasswordController.handleResetPassword.bind(forgotPasswordController));
 
-module.exports = router;
+export default router;

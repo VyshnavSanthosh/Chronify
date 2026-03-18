@@ -1,12 +1,12 @@
-const { compareString } = require("../../../utils/bcrypt");
+import { compareString } from "../../../utils/bcrypt.js";
 
-module.exports = class loginService {
+export default class loginService {
     constructor(vendorRepository, jwtService) {
         this.vendorRepository = vendorRepository;
         this.jwtService = jwtService
     }
 
-    async login(email, password){
+    async login(email, password) {
         const vendor = await this.vendorRepository.findByEmail(email)
         if (!vendor) {
             throw new Error("Invalid email or password");
@@ -18,7 +18,7 @@ module.exports = class loginService {
             throw new Error("Invalid email or password")
         }
 
-        const {accessToken, refreshToken} = this.jwtService.generateTokens(vendor._id.toString(), vendor.brandEmail);
+        const { accessToken, refreshToken } = this.jwtService.generateTokens(vendor._id.toString(), vendor.brandEmail);
 
         await this.vendorRepository.updateRefreshToken(vendor._id, refreshToken);
 
@@ -29,8 +29,8 @@ module.exports = class loginService {
 
         return {
             vendor: vendorObj,
-            accessToken,
-            refreshToken
+            vendorAccessToken: accessToken,
+            vendorRefreshToken: refreshToken
         };
     }
 
@@ -39,7 +39,7 @@ module.exports = class loginService {
         const decoded = this.jwtService.verifyRefreshToken(refreshToken);
 
         // Find vendor
-        const vendor = await this.vendorRepository.findById(decoded.vendorId);
+        const vendor = await this.vendorRepository.findWithRefreshTokenById(decoded.userId);
 
         if (!vendor) {
             throw new Error("vendor not found");

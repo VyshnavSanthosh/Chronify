@@ -1,34 +1,29 @@
-const express = require("express");
+import express from "express";
 const router = express.Router();
+import noCache from "../../../middleware/nocache.js";
+router.use(noCache);
 
-const createUploader = require("../../../utils/multer");
-const {verifyToken} = require("../../../middleware/vendorJwt") 
-
-
-// Controllers
-const documentUploadControllerFile = require("../../../controllers/vendor/profile/documentUploadController")
-
-// Service
-const documentUploadServiceFile = require("../../../service/vendor/profile/documentUploadService")
-
-// Repository
-const documentUploadRepositoryFile = require("../../../repository/vendor/vendorDocumentUpload");
+import createUploader from "../../../utils/multer.js";
+import { initialVerifyToken } from "../../../middleware/vendorInitialJwt.js";
+import DocumentUploadController from "../../../controllers/vendor/profile/documentUploadController.js";
+import DocumentUploadService from "../../../service/vendor/profile/documentUploadService.js";
+import DocumentUploadRepository from "../../../repository/vendor/vendorDocumentUpload.js";
 
 
 
 // ========== Dependency Injection ==========
 
 
-const documentUploadRepository = new documentUploadRepositoryFile()
+const documentUploadRepository = new DocumentUploadRepository()
 
-const documentUploadService = new documentUploadServiceFile(documentUploadRepository)
+const documentUploadService = new DocumentUploadService(documentUploadRepository)
 
-const documentUploadController = new documentUploadControllerFile(documentUploadService)
+const documentUploadController = new DocumentUploadController(documentUploadService)
 
 // Multer Configuration
 // Only allow PDF files for document uploads
 const pdfUpload = createUploader('PDF', 'src/public/uploads/', 5 * 1024 * 1024);
-console.log("pdfUpload",typeof pdfUpload); // should be "function"
+console.log("pdfUpload", typeof pdfUpload); // should be "function"
 
 
 // ========== Routes ==========
@@ -36,11 +31,11 @@ console.log("pdfUpload",typeof pdfUpload); // should be "function"
 
 // upload
 router.route("/profile/uploads")
-    .get(verifyToken, documentUploadController.renderDocumentUploadPage.bind(documentUploadController))
-    .post(verifyToken, pdfUpload.fields([
+    .get(initialVerifyToken, documentUploadController.renderDocumentUploadPage.bind(documentUploadController))
+    .post(initialVerifyToken, pdfUpload.fields([
         { name: 'gstDocument', maxCount: 1 },
         { name: 'panCard', maxCount: 1 },
         { name: 'tradeLicense', maxCount: 1 }
-    ]),documentUploadController.uploadDocuments.bind(documentUploadController))
+    ]), documentUploadController.uploadDocuments.bind(documentUploadController))
 
-module.exports = router;
+export default router;

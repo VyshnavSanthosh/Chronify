@@ -1,4 +1,4 @@
-const bcrypt = require("bcrypt");
+import bcrypt from "bcrypt";
 
 // Generate hash for any string
 async function hashString(text) {
@@ -11,7 +11,4 @@ async function compareString(plainText, hashedText) {
     return await bcrypt.compare(plainText, hashedText);
 }
 
-module.exports = {
-    hashString,
-    compareString
-};
+export { hashString, compareString };

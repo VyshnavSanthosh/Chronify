@@ -1,7 +1,7 @@
-const { Worker } = require("bullmq");
-const redis = require("../../utils/redis");
-const mailer = require("../../utils/mailer");
-const {mail_user} = require("../../config/index.js")
+import { Worker } from "bullmq";
+import redis from "../../utils/redis.js";
+import mailer from "../../utils/mailer.js";
+import { mail_user } from "../../config/index.js";
 console.log("Worker started and listening...");
 
 new Worker(
@@ -22,6 +22,10 @@ new Worker(
             } else if (job.name === "otp") {
                 subject = "Email Verification OTP";
                 text = `Your email verification OTP is: ${otp}\n\nThis OTP will expire in 2 minutes.`;
+            } else if (job.name === "order-confirmation") {
+                const { orderId, total } = job.data;
+                subject = "Order Confirmation - Chronify";
+                text = `Thank you for your order!\n\nYour Order ID is: ${orderId}\nTotal Amount: ₹${total}\n\nWe will notify you once your order is shipped.`;
             }
 
             await mailer.sendMail({

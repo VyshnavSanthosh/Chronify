@@ -1,9 +1,9 @@
-module.exports = class VendorListService {
+export default class VendorListService {
     constructor(vendorRepository) {
         this.vendorRepository = vendorRepository
     }
 
-    async getVendorList(search, page, status, sort){
+    async getVendorList(search, page, status, sort) {
         const limit = 10;
         const skip = (page - 1) * limit
 
@@ -17,8 +17,8 @@ module.exports = class VendorListService {
             sortOrder = 1
             sortField = "brandName"
         }
-        const {vendors, totalVendors} = await this.vendorRepository.getAllVendors(limit, skip, sortOrder, search, status,sortField)
-        return {vendors, totalVendors}
+        const { vendors, totalVendors } = await this.vendorRepository.getAllVendors(limit, skip, sortOrder, search, status, sortField)
+        return { vendors, totalVendors }
     }
 
     async toggleVendorBlockStatus(vendorId, isBlocked) {

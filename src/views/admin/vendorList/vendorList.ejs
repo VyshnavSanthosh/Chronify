@@ -1,31 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Vendor List - Chronify Admin</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<% layout('admin/layout/adminLayout') %>
+
+<% block('styles', `
   <style>
-    body {
-      font-family: 'Inter', sans-serif;
-      background-color: #050a14;
-    }
-    h1, h2, h3 {
-      font-family: 'Playfair Display', serif;
-    }
-    .sidebar-item-active {
-      background-color: #4b5563;
-    }
-    /* Table scrollbar */
-    .table-container::-webkit-scrollbar {
-      height: 6px;
-    }
-    .table-container::-webkit-scrollbar-thumb {
-      background: #1f2937;
-      border-radius: 10px;
-    }
     .status-badge {
       padding: 4px 12px;
       border-radius: 20px;
@@ -55,229 +31,135 @@
       font-size: 14px;
     }
   </style>
-</head>
-<body class="text-white min-h-screen flex">
+`) %>
 
-  <!-- Sidebar -->
-  <aside class="w-64 bg-[#0a1425] flex flex-col border-r border-gray-800 hidden md:flex shrink-0">
-    <div class="p-6">
-      <h1 class="text-2xl font-bold tracking-widest text-white uppercase italic">
-        Chronify
-      </h1>
-    </div>
-
-    <nav class="flex-1 px-4 space-y-2 overflow-y-auto">
-      <a href="/admin/dashboard" class="flex items-center justify-between px-4 py-3 rounded-lg transition-colors text-gray-400 hover:bg-gray-800 hover:text-white">
-        <div class="flex items-center space-x-3">
-          <i class="fa-solid fa-house w-5 text-center"></i>
-          <span class="text-sm font-medium">Dashboard</span>
-        </div>
-      </a>
-
-      <a href="/admin/products" class="flex items-center justify-between px-4 py-3 rounded-lg transition-colors text-gray-400 hover:bg-gray-800 hover:text-white">
-        <div class="flex items-center space-x-3">
-          <i class="fa-solid fa-briefcase w-5 text-center"></i>
-          <span class="text-sm font-medium">Products</span>
-        </div>
-        <i class="fa-solid fa-chevron-right text-[10px]"></i>
-      </a>
-
-      <a href="/admin/orders" class="flex items-center justify-between px-4 py-3 rounded-lg transition-colors text-gray-400 hover:bg-gray-800 hover:text-white">
-        <div class="flex items-center space-x-3">
-          <i class="fa-solid fa-list-ul w-5 text-center"></i>
-          <span class="text-sm font-medium">Order List</span>
-        </div>
-        <i class="fa-solid fa-chevron-right text-[10px]"></i>
-      </a>
-
-      <a href="/admin/customers" class="flex items-center justify-between px-4 py-3 rounded-lg transition-colors text-gray-400 hover:bg-gray-800 hover:text-white">
-        <div class="flex items-center space-x-3">
-          <i class="fa-solid fa-circle-user w-5 text-center"></i>
-          <span class="text-sm font-medium">Customer</span>
-        </div>
-        <i class="fa-solid fa-chevron-right text-[10px]"></i>
-      </a>
-
-      <a href="/admin/sales" class="flex items-center justify-between px-4 py-3 rounded-lg transition-colors text-gray-400 hover:bg-gray-800 hover:text-white">
-        <div class="flex items-center space-x-3">
-          <i class="fa-solid fa-hand-holding-dollar w-5 text-center"></i>
-          <span class="text-sm font-medium">Sales</span>
-        </div>
-        <i class="fa-solid fa-chevron-right text-[10px]"></i>
-      </a>
-
-      <a href="/admin/category" class="flex items-center justify-between px-4 py-3 rounded-lg transition-colors text-gray-400 hover:bg-gray-800 hover:text-white">
-        <div class="flex items-center space-x-3">
-          <i class="fa-solid fa-table-cells-large w-5 text-center"></i>
-          <span class="text-sm font-medium">Category</span>
-        </div>
-        <i class="fa-solid fa-chevron-right text-[10px]"></i>
-      </a>
-
-      <a href="/admin/coupons" class="flex items-center justify-between px-4 py-3 rounded-lg transition-colors text-gray-400 hover:bg-gray-800 hover:text-white">
-        <div class="flex items-center space-x-3">
-          <i class="fa-solid fa-ticket w-5 text-center"></i>
-          <span class="text-sm font-medium">Coupons</span>
-        </div>
-        <i class="fa-solid fa-chevron-right text-[10px]"></i>
-      </a>
-
-      <a href="/admin/vendors" class="flex items-center justify-between px-4 py-3 rounded-lg transition-colors sidebar-item-active text-white">
-        <div class="flex items-center space-x-3">
-          <i class="fa-solid fa-users-gear w-5 text-center"></i>
-          <span class="text-sm font-medium">Vendors</span>
-        </div>
-        <i class="fa-solid fa-chevron-right text-[10px]"></i>
-      </a>
+<!-- Content Area -->
+<div class="p-8 lg:p-12 space-y-8">
+  
+  <!-- Page Title and Breadcrumbs -->
+  <div class="space-y-4">
+    <h2 class="text-4xl font-bold tracking-tight uppercase" style="font-family: 'Playfair Display', serif;">VENDOR LIST</h2>
+    <nav class="flex text-sm text-gray-400 space-x-2">
+      <a href="/admin/dashboard" class="hover:text-white capitalize">Dashboard</a>
+      <span><i class="fa-solid fa-chevron-right text-[8px] mx-1"></i></span>
+      <span class="text-white capitalize">Vendor List</span>
     </nav>
+  </div>
 
-    <div class="p-6 space-y-4">
-      <button class="w-full py-2 border border-gray-600 text-white font-medium rounded-md hover:bg-gray-800 transition-colors">
-        Account
+  <!-- Filters Section -->
+  <div class="flex flex-col md:flex-row gap-4 items-center justify-between">
+    <!-- Search Bar -->
+    <div class="relative w-full max-w-md">
+      <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
+      <input type="text" 
+             id="searchInput"
+             placeholder="Search Vendor. . ." 
+             class="w-full bg-[#0a1425] border border-gray-800 rounded-lg py-3 pl-12 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+    </div>
+
+    <div class="flex gap-4 w-full md:w-auto">
+      <!-- Status Filter -->
+      <div class="relative w-full md:w-40">
+        <select id="statusFilter" class="w-full appearance-none bg-[#0a1425] border border-gray-800 rounded-lg px-4 py-3 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer">
+          <option value="">All Status</option>
+          <option value="false">Active</option>
+          <option value="true">Blacklisted</option>
+        </select>
+        <i class="fa-solid fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-[10px] pointer-events-none text-gray-400"></i>
+      </div>
+
+      <!-- Sort Filter -->
+      <div class="relative w-full md:w-40">
+        <select id="sortFilter" class="w-full appearance-none bg-[#0a1425] border border-gray-800 rounded-lg px-4 py-3 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer">
+          <option value="">Newest First</option>
+          <option value="az">Name: A-Z</option>
+          <option value="za">Name: Z-A</option>
+        </select>
+        <i class="fa-solid fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-[10px] pointer-events-none text-gray-400"></i>
+      </div>
+      <a href="/admin/vendors/pending"
+class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-all inline-flex items-center">
+<i class="fa-solid fa-clock mr-2"></i>
+Pending Vendors
+</a>
+    </div>
+  </div>
+
+  <!-- Table Container -->
+  <div class="table-container overflow-x-auto rounded-xl border border-gray-800">
+    <table class="w-full text-left border-collapse min-w-[1000px]">
+      <thead>
+        <tr class="bg-blue-600 text-white uppercase text-xs font-semibold tracking-wider">
+          <th class="px-6 py-4 border-r border-blue-500/30">Brand Name</th>
+          <th class="px-6 py-4 border-r border-blue-500/30">Phone</th>
+          <th class="px-6 py-4 border-r border-blue-500/30">Email</th>
+          <th class="px-6 py-4 border-r border-blue-500/30">Status</th>
+          <th class="px-6 py-4">Block/Unblock</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-800" id="vendorTableBody">
+        <% vendors.forEach((vendor) => { %>
+          <tr class="bg-[#050a14] hover:bg-gray-800/50 transition-colors text-sm vendor-row" data-vendor-id="<%= vendor._id %>">
+            <td class="px-6 py-4 border-r border-gray-800">
+              <div class="flex items-center space-x-3">
+                <div class="brand-avatar">
+                  <%= vendor.brandName.charAt(0).toUpperCase() %>
+                </div>
+                <span class="font-medium vendor-name"><%= vendor.brandName %></span>
+              </div>
+            </td>
+            <td class="px-6 py-4 border-r border-gray-800 vendor-phone"><%= vendor.phone || 'N/A' %></td>
+            <td class="px-6 py-4 border-r border-gray-800 vendor-email text-gray-300"><%= vendor.brandEmail %></td>
+            <td class="px-6 py-4 border-r border-gray-800">
+              <span class="status-badge vendor-status <%= vendor.isBlocked ? 'status-blacklisted' : 'status-active' %>">
+                <%= vendor.isBlocked ? 'Blacklisted' : 'Active' %>
+              </span>
+            </td>
+            <td class="px-6 py-4">
+              <!-- Block/Unblock Toggle -->
+              <div class="flex items-center">
+                <label class="relative inline-flex items-center cursor-pointer group">
+                  <input type="checkbox" 
+                         class="sr-only peer toggle-block-checkbox" 
+                         data-vendor-id="<%= vendor._id %>"
+                         <%= vendor.isBlocked ? 'checked' : '' %>>
+                  <div class="w-11 h-6 bg-emerald-500 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-500"></div>
+                </label>
+              </div>
+            </td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <div class="flex flex-col sm:flex-row items-center justify-between pt-4 gap-4">
+    <p class="text-sm text-gray-400">
+      Showing <span id="paginationStart">1</span>-<span id="paginationEnd">10</span> from <span id="paginationTotal">0</span>
+    </p>
+    <div class="flex items-center space-x-2" id="paginationContainer">
+      <button class="w-8 h-8 flex items-center justify-center rounded-lg bg-gray-800 hover:bg-gray-700 transition-colors text-xs" id="prevBtn">
+        <i class="fa-solid fa-chevron-left"></i>
       </button>
-      <button class="w-full py-2 bg-white text-black font-semibold rounded-md hover:bg-gray-200 transition-colors">
-        Logout
+      <div id="pageButtons"></div>
+      <button class="w-8 h-8 flex items-center justify-center rounded-lg bg-gray-800 hover:bg-gray-700 transition-colors text-xs" id="nextBtn">
+        <i class="fa-solid fa-chevron-right"></i>
       </button>
     </div>
-  </aside>
+  </div>
+</div>
 
-  <!-- Main Content -->
-  <main class="flex-1 flex flex-col overflow-x-hidden">
-    
-    <!-- Header -->
-    <header class="h-16 flex items-center justify-end px-8 border-b border-gray-800 bg-[#050a14] sticky top-0 z-10">
-      <div class="flex items-center space-x-3">
-        <div class="text-right">
-          <p class="text-sm font-semibold"><%= locals.userName || 'Vyshnav' %></p>
-          <p class="text-xs text-gray-400 uppercase tracking-tighter"><%= locals.userRole || 'Admin' %></p>
-        </div>
-        <img src="<%= locals.userAvatar || '/placeholder.svg?height=40&width=40' %>" alt="Profile" class="w-10 h-10 rounded-full border border-teal-400">
-      </div>
-    </header>
-
-    <!-- Content Area -->
-    <div class="p-8 lg:p-12 space-y-8">
-      
-      <!-- Page Title and Breadcrumbs -->
-      <div class="space-y-4">
-        <h2 class="text-4xl font-bold tracking-tight uppercase" style="font-family: 'Playfair Display', serif;">VENDOR LIST</h2>
-        <nav class="flex text-sm text-gray-400 space-x-2">
-          <a href="/admin/dashboard" class="hover:text-white capitalize">Dashboard</a>
-          <span><i class="fa-solid fa-chevron-right text-[8px] mx-1"></i></span>
-          <span class="text-white capitalize">Vendor List</span>
-        </nav>
-      </div>
-
-      <!-- Filters Section -->
-      <div class="flex flex-col md:flex-row gap-4 items-center justify-between">
-        <!-- Search Bar -->
-        <div class="relative w-full max-w-md">
-          <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
-          <input type="text" 
-                 id="searchInput"
-                 placeholder="Search Vendor. . ." 
-                 class="w-full bg-[#0a1425] border border-gray-800 rounded-lg py-3 pl-12 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
-        </div>
-
-        <div class="flex gap-4 w-full md:w-auto">
-          <!-- Status Filter -->
-          <div class="relative w-full md:w-40">
-            <select id="statusFilter" class="w-full appearance-none bg-[#0a1425] border border-gray-800 rounded-lg px-4 py-3 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer">
-              <option value="">All Status</option>
-              <option value="false">Active</option>
-              <option value="true">Blacklisted</option>
-            </select>
-            <i class="fa-solid fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-[10px] pointer-events-none text-gray-400"></i>
-          </div>
-
-          <!-- Sort Filter -->
-          <div class="relative w-full md:w-40">
-            <select id="sortFilter" class="w-full appearance-none bg-[#0a1425] border border-gray-800 rounded-lg px-4 py-3 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer">
-              <option value="">Newest First</option>
-              <option value="az">Name: A-Z</option>
-              <option value="za">Name: Z-A</option>
-            </select>
-            <i class="fa-solid fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-[10px] pointer-events-none text-gray-400"></i>
-          </div>
-        </div>
-      </div>
-
-      <!-- Table Container -->
-      <div class="table-container overflow-x-auto rounded-xl border border-gray-800">
-        <table class="w-full text-left border-collapse min-w-[1000px]">
-          <thead>
-            <tr class="bg-blue-600 text-white uppercase text-xs font-semibold tracking-wider">
-              <th class="px-6 py-4 border-r border-blue-500/30">Brand Name</th>
-              <th class="px-6 py-4 border-r border-blue-500/30">Phone</th>
-              <th class="px-6 py-4 border-r border-blue-500/30">Email</th>
-              <th class="px-6 py-4 border-r border-blue-500/30">Status</th>
-              <th class="px-6 py-4">Block/Unblock</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-gray-800" id="vendorTableBody">
-            <% (locals.vendors || []).forEach((vendor) => { %>
-              <tr class="bg-[#050a14] hover:bg-gray-800/50 transition-colors text-sm vendor-row" data-vendor-id="<%= vendor._id %>">
-                <td class="px-6 py-4 border-r border-gray-800">
-                  <div class="flex items-center space-x-3">
-                    <div class="brand-avatar">
-                      <%= vendor.brandName.charAt(0).toUpperCase() %>
-                    </div>
-                    <span class="font-medium vendor-name"><%= vendor.brandName %></span>
-                  </div>
-                </td>
-                <td class="px-6 py-4 border-r border-gray-800 vendor-phone"><%= vendor.phone || 'N/A' %></td>
-                <td class="px-6 py-4 border-r border-gray-800 vendor-email text-gray-300"><%= vendor.brandEmail %></td>
-                <td class="px-6 py-4 border-r border-gray-800">
-                  <span class="status-badge vendor-status <%= vendor.isBlocked ? 'status-blacklisted' : 'status-active' %>">
-                    <%= vendor.isBlocked ? 'Blacklisted' : 'Active' %>
-                  </span>
-                </td>
-                <td class="px-6 py-4">
-                  <!-- Block/Unblock Toggle -->
-                  <div class="flex items-center">
-                    <label class="relative inline-flex items-center cursor-pointer group">
-                      <input type="checkbox" 
-                             class="sr-only peer toggle-block-checkbox" 
-                             data-vendor-id="<%= vendor._id %>"
-                             <%= vendor.isBlocked ? 'checked' : '' %>>
-                      <div class="w-11 h-6 bg-emerald-500 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-500"></div>
-                    </label>
-                  </div>
-                </td>
-              </tr>
-            <% }); %>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Pagination -->
-      <div class="flex flex-col sm:flex-row items-center justify-between pt-4 gap-4">
-        <p class="text-sm text-gray-400">
-          Showing <span id="paginationStart">1</span>-<span id="paginationEnd">10</span> from <span id="paginationTotal">0</span>
-        </p>
-        <div class="flex items-center space-x-2" id="paginationContainer">
-          <button class="w-8 h-8 flex items-center justify-center rounded-lg bg-gray-800 hover:bg-gray-700 transition-colors text-xs" id="prevBtn">
-            <i class="fa-solid fa-chevron-left"></i>
-          </button>
-          <div id="pageButtons"></div>
-          <button class="w-8 h-8 flex items-center justify-center rounded-lg bg-gray-800 hover:bg-gray-700 transition-colors text-xs" id="nextBtn">
-            <i class="fa-solid fa-chevron-right"></i>
-          </button>
-        </div>
-      </div>
-    </div>
-  </main>
-
+<% block('scripts', `
 <script>
   // Initialize from server data
-  var currentPage = <%= locals.currentPage || 1 %>;
-  var totalVendors = <%= locals.totalVendors || 0 %>;
+  var currentPage = ${locals.currentPage || 1};
+  var totalVendors = ${locals.totalVendors || 0};
   var itemsPerPage = 10;
   var totalPages = Math.ceil(totalVendors / itemsPerPage);
 
   // Initialize
   document.addEventListener('DOMContentLoaded', function() {
-    console.log('Page loaded - currentPage:', currentPage, 'totalVendors:', totalVendors, 'totalPages:', totalPages);
     attachToggleListeners();
     attachFilterListeners();
     updatePaginationInfo();
@@ -296,15 +178,29 @@
     const vendorId = checkbox.getAttribute('data-vendor-id');
     const isBlocked = checkbox.checked;
     const row = checkbox.closest('.vendor-row');
+    const vendorName = row.querySelector('.vendor-name').textContent;
     
-    console.log('Toggle clicked - vendorId:', vendorId, 'isBlocked:', isBlocked);
-    
-    // Disable checkbox during request
+    // Revert checkbox state immediately, we'll set it after confirmation
+    checkbox.checked = !isBlocked;
+
+    const result = await Swal.fire({
+      title: isBlocked ? 'Block Vendor?' : 'Unblock Vendor?',
+      text: 'Are you sure you want to ' + (isBlocked ? 'block' : 'unblock') + ' ' + vendorName + '?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: isBlocked ? '#ef4444' : '#22c55e',
+      cancelButtonColor: '#374151',
+      confirmButtonText: isBlocked ? 'Yes, Block' : 'Yes, Unblock'
+    });
+
+    if (!result.isConfirmed) return;
+
+    // Set checkbox to desired state during request
+    checkbox.checked = isBlocked;
     checkbox.disabled = true;
 
     try {
-      const url = `/admin/vendors/${vendorId}/toggle-block`;
-      console.log('Fetching URL:', url);
+      const url = "/admin/vendors/" + vendorId + "/toggle-block";
       
       const response = await fetch(url, {
         method: 'PATCH',
@@ -316,29 +212,44 @@
         })
       });
 
-      console.log('Response status:', response.status);
       const data = await response.json();
-      console.log('Response data:', data);
 
       if (data.success) {
         // Update status badge
         const statusBadge = row.querySelector('.vendor-status');
         statusBadge.textContent = isBlocked ? 'Blacklisted' : 'Active';
-        statusBadge.className = `status-badge vendor-status ${isBlocked ? 'status-blacklisted' : 'status-active'}`;
-
-        console.log('Success:', data.message);
-        alert(data.message);
+        statusBadge.className = "status-badge vendor-status " + (isBlocked ? 'status-blacklisted' : 'status-active');
+        
+        Swal.fire({
+          icon: 'success',
+          title: 'Success',
+          text: data.message,
+          timer: 1500,
+          showConfirmButton: false,
+          background: '#0a1425',
+          color: '#fff'
+        });
       } else {
         // Revert toggle on error
         checkbox.checked = !isBlocked;
-        console.error('API Error:', data.message);
-        alert('Error: ' + (data.message || 'Failed to update status'));
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: data.message || 'Failed to update status',
+          background: '#0a1425',
+          color: '#fff'
+        });
       }
     } catch (error) {
       // Revert toggle on error
       checkbox.checked = !isBlocked;
-      console.error('Fetch Error:', error);
-      alert('Failed to update vendor status. Please try again.');
+      Swal.fire({
+        icon: 'error',
+        title: 'Network Error',
+        text: 'Failed to update vendor status. Please try again.',
+        background: '#0a1425',
+        color: '#fff'
+      });
     } finally {
       // Re-enable checkbox
       checkbox.disabled = false;
@@ -376,7 +287,7 @@
       if (sort) params.append('sort', sort);
       params.append('page', currentPage);
 
-      const response = await fetch(`/admin/vendors?${params.toString()}`);
+      const response = await fetch("/admin/vendors?" + params.toString());
       const html = await response.text();
       
       // Parse the response and extract the table body
@@ -387,11 +298,10 @@
       document.getElementById('vendorTableBody').innerHTML = newTableBody.innerHTML;
       
       // Extract totalVendors from the response
-      const scriptMatch = html.match(/var totalVendors = (\d+);/);
+      const scriptMatch = html.match(/var totalVendors = (\\d+);/);
       if (scriptMatch) {
         totalVendors = parseInt(scriptMatch[1]);
         totalPages = Math.ceil(totalVendors / itemsPerPage);
-        console.log('Updated totals - vendors:', totalVendors, 'pages:', totalPages);
       }
       
       attachToggleListeners();
@@ -405,8 +315,6 @@
   // Update pagination
   function updatePaginationInfo() {
     const pageButtons = document.getElementById('pageButtons');
-    
-    console.log('Updating pagination - currentPage:', currentPage, 'totalPages:', totalPages, 'totalVendors:', totalVendors);
     
     // Calculate start and end
     const start = totalVendors > 0 ? ((currentPage - 1) * itemsPerPage) + 1 : 0;
@@ -427,7 +335,6 @@
     var startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
     var endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
     
-    // Adjust startPage if we're near the end
     if (endPage - startPage < maxVisiblePages - 1) {
       startPage = Math.max(1, endPage - maxVisiblePages + 1);
     }
@@ -435,7 +342,7 @@
     for (var i = startPage; i <= endPage; i++) {
       const btn = document.createElement('button');
       const pageNum = i;
-      btn.className = `w-8 h-8 flex items-center justify-center rounded-lg font-bold text-xs transition-colors ${pageNum === currentPage ? 'bg-blue-600 text-white' : 'bg-white text-black hover:bg-gray-200'}`;
+      btn.className = "w-8 h-8 flex items-center justify-center rounded-lg font-bold text-xs transition-colors " + (pageNum === currentPage ? 'bg-blue-600 text-white' : 'bg-white text-black hover:bg-gray-200');
       btn.textContent = pageNum;
       btn.addEventListener('click', function() {
         goToPage(pageNum);
@@ -457,7 +364,6 @@
     prevBtn.disabled = currentPage === 1;
     nextBtn.disabled = currentPage >= totalPages;
     
-    // Add visual feedback for disabled state
     if (prevBtn.disabled) {
       prevBtn.classList.add('opacity-50', 'cursor-not-allowed');
     } else {
@@ -474,11 +380,8 @@
   // Go to page
   function goToPage(page) {
     if (page === currentPage || page < 1 || page > totalPages) {
-      console.log('Invalid page navigation attempt:', page);
       return;
     }
-    
-    console.log('Navigating to page:', page);
     
     const search = document.getElementById('searchInput').value;
     const status = document.getElementById('statusFilter').value;
@@ -490,7 +393,7 @@
     if (sort) params.append('sort', sort);
     params.append('page', page);
 
-    window.location.href = `/admin/vendors?${params.toString()}`;
+    window.location.href = "/admin/vendors?" + params.toString();
   }
 
   // Previous button
@@ -507,6 +410,4 @@
     }
   });
 </script>
-
-</body>
-</html>
+`) %>

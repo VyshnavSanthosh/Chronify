@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify OTP</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        body {
+            background: linear-gradient(135deg, #001a33 0%, #003366 100%);
+            min-height: 100vh;
+        }
+
+        .otp-input {
+            width: 50px;
+            height: 50px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            background: white;
+            color: #001a33;
+            transition: all 0.3s ease;
+        }
+
+        .otp-input:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .resend-link {
+            color: #3b82f6;
+            text-decoration: none;
+            font-weight: 500;
+            cursor: pointer;
+            transition: color 0.3s ease;
+            background: none;
+            border: none;
+            padding: 0;
+            font-size: 0.875rem;
+        }
+
+        .resend-link:hover:not(.disabled) {
+            color: #2563eb;
+            text-decoration: underline;
+        }
+
+        .resend-link.disabled {
+            color: #9ca3af;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+
+<body>
+<div class="flex items-center justify-center min-h-screen px-4">
+    <div class="w-full max-w-md">
+
+        <form id="otpForm" action="/profile/verify-otp" method="POST" class="space-y-8">
+
+            <!-- Header -->
+            <div class="text-center">
+                <h1 class="text-3xl font-bold text-white mb-4">Verify OTP</h1>
+                <p class="text-gray-400 text-sm">
+                    We've sent a verification code to<br>
+                    <span class="text-white font-semibold"><%= email %></span>
+                </p>
+            </div>
+
+            <!-- OTP Inputs -->
+            <div class="flex justify-center gap-3">
+                <% for (let i = 0; i < 4; i++) { %>
+                    <input 
+                        type="text"
+                        class="otp-input"
+                        maxlength="1"
+                        inputmode="numeric"
+                        autocomplete="off"
+                        required
+                    >
+                <% } %>
+            </div>
+
+            <!-- Hidden OTP -->
+            <input type="hidden" name="otp" id="otp">
+
+            <!-- Error -->
+            <% if (error) { %>
+                <div
+                    id="errorBox"
+                    class="bg-red-500 bg-opacity-10 border border-red-500 text-red-200 px-4 py-3 rounded-lg text-sm text-center">
+                    <%= error %>
+                </div>
+            <% } %>
+
+            <!-- Timers -->
+            <div class="text-center space-y-2">
+                <p id="resendTimerText" class="text-gray-300 text-sm">
+                    Resend code in <span id="resendTimer" class="font-mono">00:10</span>
+                </p>
+                <p id="expiryTimerText" class="text-gray-300 text-sm">
+                    OTP expires in <span id="expiryTimer" class="font-mono text-red-400">02:00</span>
+                </p>
+            </div>
+
+            <!-- Resend -->
+            <div class="text-center">
+                <button 
+                    type="button"
+                    id="resendBtn"
+                    class="resend-link disabled"
+                    onclick="resendCode()"
+                    disabled>
+                    Resend OTP
+                </button>
+            </div>
+
+            <!-- Submit -->
+            <button 
+                type="submit"
+                class="w-full bg-white text-slate-900 font-semibold py-3 rounded-lg hover:bg-gray-100 transition">
+                Verify
+            </button>
+        </form>
+
+        <div class="text-center mt-6">
+            <a href="/profile/edit" class="text-blue-400 hover:text-blue-300 text-sm">
+                Back to Profile
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Show SweetAlert messages if passed from backend
+    <% if (locals.success) { %>
+        Swal.fire({
+            icon: 'success',
+            title: 'Success!',
+            text: '<%= locals.success %>',
+            confirmButtonColor: '#2563eb',
+            background: '#001a33',
+            color: '#fff',
+            timer: 2000,
+            timerProgressBar: true
+        });
+    <% } %>
+
+    <% if (locals.info) { %>
+        Swal.fire({
+            icon: 'info',
+            title: 'Information',
+            text: '<%= locals.info %>',
+            confirmButtonColor: '#3b82f6',
+            background: '#001a33',
+            color: '#fff'
+        });
+    <% } %>
+
+    // OTP handling
+    const inputs = document.querySelectorAll(".otp-input");
+    const hiddenOtpField = document.getElementById("otp");
+
+    inputs.forEach((input, index) => {
+        input.addEventListener("input", e => {
+            if (!/^[0-9]$/.test(e.target.value)) {
+                input.value = "";
+                return;
+            }
+            if (index < inputs.length - 1) inputs[index + 1].focus();
+        });
+
+        input.addEventListener("keydown", e => {
+            if (e.key === "Backspace" && input.value === "" && index > 0) {
+                inputs[index - 1].focus();
+            }
+        });
+
+        input.addEventListener("paste", e => {
+            e.preventDefault();
+            const digits = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, 4);
+            digits.split("").forEach((d, i) => inputs[i] && (inputs[i].value = d));
+            inputs[Math.min(digits.length, 3)].focus();
+        });
+    });
+
+    window.addEventListener("DOMContentLoaded", () => inputs[0].focus());
+
+    document.getElementById("otpForm").addEventListener("submit", e => {
+        const otp = Array.from(inputs).map(i => i.value).join("");
+        if (otp.length !== 4) {
+            e.preventDefault();
+            Swal.fire({
+                icon: 'warning',
+                title: 'Incomplete OTP',
+                text: 'Please enter all 4 digits',
+                confirmButtonColor: '#fbbf24',
+                background: '#001a33',
+                color: '#fff'
+            });
+            return;
+        }
+        hiddenOtpField.value = otp;
+    });
+
+    // Timers
+    let resendCooldown = 10;
+    let otpExpiry = <%= timeRemaining || 120 %>;
+    const submitBtn = document.querySelector('button[type="submit"]');
+    let timerInterval = null;
+
+    function updateTimers() {
+        if (timerInterval) return;
+
+        timerInterval = setInterval(() => {
+            const resendTimerEl = document.getElementById("resendTimer");
+            const expiryTimerEl = document.getElementById("expiryTimer");
+            const resendBtn = document.getElementById("resendBtn");
+            const resendTimerText = document.getElementById("resendTimerText");
+            const expiryTimerText = document.getElementById("expiryTimerText");
+
+            // Update Resend Timer
+            if (resendCooldown > 0) {
+                if (resendTimerEl) {
+                    const m = Math.floor(resendCooldown / 60);
+                    const s = resendCooldown % 60;
+                    resendTimerEl.textContent = `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+                }
+                resendCooldown--;
+            } else if (resendCooldown === 0) {
+                if (resendBtn) {
+                    resendBtn.disabled = false;
+                    resendBtn.classList.remove("disabled");
+                }
+                if (resendTimerText) resendTimerText.innerHTML = '<span class="text-green-400 font-semibold">You can resend the code now</span>';
+                resendCooldown = -1;
+            }
+
+            // Update Expiry Timer
+            if (otpExpiry > 0) {
+                if (expiryTimerEl) {
+                    const m = Math.floor(otpExpiry / 60);
+                    const s = otpExpiry % 60;
+                    expiryTimerEl.textContent = `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+                }
+                otpExpiry--;
+            } else if (otpExpiry === 0) {
+                if (expiryTimerText) expiryTimerText.innerHTML = '<span class="text-red-500 font-bold">OTP Expired!</span>';
+                inputs.forEach(i => i.disabled = true);
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                }
+                otpExpiry = -1;
+            }
+
+            if (resendCooldown < 0 && otpExpiry < 0) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+        }, 1000);
+    }
+    updateTimers();
+
+    async function resendCode() {
+        if (resendBtn.disabled) return;
+
+        resendBtn.disabled = true;
+        resendBtn.classList.add("disabled");
+        const originalText = resendBtn.textContent;
+        resendBtn.textContent = "Sending...";
+
+        try {
+            const response = await fetch("/profile/resend-otp", { method: "POST" });
+            const data = await response.json();
+
+            if (data.success) {
+                await Swal.fire({
+                    icon: 'success',
+                    title: 'OTP Resent!',
+                    text: 'A new OTP has been sent to your email',
+                    confirmButtonColor: '#22c55e',
+                    background: '#001a33',
+                    color: '#fff',
+                    timer: 2000,
+                    timerProgressBar: true
+                });
+
+                // Reset timers
+                resendCooldown = 10;
+                otpExpiry = <%= timeRemaining || 120 %>;
+                
+                // Re-enable inputs if they were disabled
+                inputs.forEach(i => {
+                    i.disabled = false;
+                    i.value = "";
+                });
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                
+                // Reset UI text
+                document.getElementById("resendTimerText").innerHTML = 'Resend code in <span id="resendTimer" class="font-mono">00:10</span>';
+                document.getElementById("expiryTimerText").innerHTML = 'OTP expires in <span id="expiryTimer" class="font-mono text-red-400">02:00</span>';
+                
+                updateTimers(); // Restart loop
+                
+                inputs[0].focus();
+            } else {
+                throw new Error(data.error || "Failed to resend OTP");
+            }
+        } catch (err) {
+            await Swal.fire({
+                icon: 'error',
+                title: 'Resend Failed',
+                text: err.message || 'Something went wrong. Please try again.',
+                confirmButtonColor: '#ef4444',
+                background: '#001a33',
+                color: '#fff'
+            });
+            resendBtn.disabled = false;
+            resendBtn.classList.remove("disabled");
+        } finally {
+            resendBtn.textContent = originalText;
+        }
+    }
+
+    // ✅ Auto-hide error EXACTLY in 3 seconds
+    const errorBox = document.getElementById("errorBox");
+    if (errorBox) {
+        errorBox.style.transition = "opacity 0.5s ease";
+
+        setTimeout(() => {
+            errorBox.style.opacity = "0";
+        }, 1500);
+
+        setTimeout(() => {
+            errorBox.remove();
+        }, 2000);
+    }
+</script>
+
+</body>
+</html>

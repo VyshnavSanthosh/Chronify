@@ -1,5 +1,6 @@
-const { hashString } = require("../../../utils/bcrypt");
-module.exports = class ForgotPasswordService {
+import { hashString } from "../../../utils/bcrypt.js";
+
+export default class ForgotPasswordService {
     constructor(userRepository, redisClient, emailQueue, otpGenerator) {
         this.userRepository = userRepository;
         this.redis = redisClient;
@@ -26,7 +27,8 @@ module.exports = class ForgotPasswordService {
         const otp = this.otpGenerator();
 
         // Store OTP in Redis with prefix "forgot:" (5 minutes expiry)
-        await this.redis.set(`forgot:${user._id}`, otp, "EX", 300); // 300 seconds = 5 minutes
+        
+        await this.redis.set(`forgot:${user._id}`, otp, "EX", 120); // 300 seconds = 5 minutes
 
         console.log(`DEBUG: Password reset OTP for user ${user._id} (email: ${user.email}): ${otp}`);
 
@@ -55,8 +57,7 @@ module.exports = class ForgotPasswordService {
             throw new Error("Invalid OTP. Please try again.");
         }
 
-        // Don't delete OTP yet - we need it for the reset password step
-        // We'll delete it after password is successfully reset
+
         return true;
     }
 
@@ -73,7 +74,7 @@ module.exports = class ForgotPasswordService {
 
         // Update password in database
         user.passwordHash = hashedPassword;
-        
+
         // If user was Google-only, now they have a password (set authProvider to local)
         if (user.authProvider === "google") {
             user.authProvider = "local";
@@ -81,7 +82,6 @@ module.exports = class ForgotPasswordService {
 
         await user.save();
 
-        // Clear OTP from Redis (cleanup)
         await this.redis.del(`forgot:${userId}`);
 
         // Clear refresh token (force user to login again with new password)
@@ -96,7 +96,6 @@ module.exports = class ForgotPasswordService {
         // Generate new OTP
         const newOtp = this.otpGenerator();
 
-        // Store in Redis with prefix "forgot:" (5 minutes expiry)
         await this.redis.set(`forgot:${userId}`, newOtp, "EX", 300);
 
         console.log(`DEBUG: Resent password reset OTP for user ${userId}: ${newOtp}`);

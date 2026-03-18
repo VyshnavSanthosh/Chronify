@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cart - Chronify | Luxury Watches</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <%- include('partials/logoutScript') %>
+    <style>
+        /* SweetAlert Dark Theme Overrides */
+        div:where(.swal2-container) {
+            z-index: 9999 !important;
+        }
+        
+        div:where(.swal2-popup) {
+            background: #0f1a35 !important;
+            border: 1px solid #2a3f66 !important;
+            color: #fff !important;
+        }
+        
+        div:where(.swal2-title) {
+            color: #fff !important;
+        }
+        
+        div:where(.swal2-html-container) {
+            color: #b0b5c8 !important;
+        }
+        
+        div:where(.swal2-icon) {
+            border-color: #3b82f6 !important; 
+            color: #3b82f6 !important;
+        }
+
+        div:where(.swal2-icon.swal2-error) {
+            border-color: #dc2626 !important;
+            color: #dc2626 !important;
+        }
+
+        div:where(.swal2-icon.swal2-warning) {
+            border-color: #f59e0b !important;
+            color: #f59e0b !important;
+        }
+
+        div:where(.swal2-confirm) {
+            background-color: #3b82f6 !important;
+            box-shadow: none !important;
+        }
+
+        div:where(.swal2-cancel) {
+            background-color: #dc2626 !important; 
+            box-shadow: none !important;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
+            color: #fff;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        /* Promo Banner */
+        .promo-banner {
+            background: #000;
+            color: #fff;
+            text-align: center;
+            padding: 8px 0;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        /* Header */
+        header {
+            background: #000;
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: 600;
+            letter-spacing: 2px;
+        }
+
+        .header-center {
+            flex: 1;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            margin-left: 0;
+        }
+
+        .header-center a {
+            margin-left: 32px;
+            font-size: 14px;
+        }
+
+        .search-bar {
+            width: 280px;
+            padding: 8px 12px;
+            border-radius: 20px;
+            border: 1px solid #444;
+            background: #fff;
+            color: #000;
+            font-size: 13px;
+            margin: 0 auto;
+        }
+
+        .header-icons {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .icon-btn {
+            background: none;
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            font-size: 16px;
+            transition: color 0.3s;
+        }
+
+        .icon-btn:hover {
+            color: #3b82f6;
+        }
+
+        /* Main Container */
+        .container {
+            display: flex;
+            gap: 24px;
+            padding: 32px 24px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 200px;
+            flex-shrink: 0;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border-radius: 8px;
+            color: #fff;
+            text-decoration: none;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-link.active {
+            background: #fff;
+            color: #000;
+            font-weight: 600;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+        }
+
+        .empty-cart {
+            text-align: center;
+            padding: 64px 24px;
+        }
+
+        .empty-cart i {
+            font-size: 64px;
+            color: #444;
+            margin-bottom: 24px;
+        }
+
+        .empty-cart h2 {
+            font-size: 24px;
+            font-weight: 300;
+            margin-bottom: 16px;
+        }
+
+        .empty-cart p {
+            color: #b0b5c8;
+            margin-bottom: 32px;
+        }
+
+        /* Footer */
+        footer {
+            background: #000;
+            padding: 48px 24px 24px;
+            margin-top: 64px;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 32px;
+            margin-bottom: 32px;
+        }
+
+        .footer-section h3 {
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section li {
+            margin-bottom: 10px;
+        }
+
+        .footer-section a {
+            color: #b0b5c8;
+            text-decoration: none;
+            font-size: 12px;
+            transition: color 0.3s;
+        }
+
+        .footer-section a:hover {
+            color: #fff;
+        }
+
+        .footer-subscribe {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .footer-subscribe input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #444;
+            border-radius: 4px;
+            background: transparent;
+            color: #fff;
+            font-size: 12px;
+        }
+
+        .footer-subscribe button {
+            padding: 8px 16px;
+            background: #3b82f6;
+            border: none;
+            border-radius: 4px;
+            color: #fff;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .footer-qr {
+            margin-bottom: 16px;
+        }
+
+        .footer-qr img {
+            width: 100px;
+            height: 100px;
+        }
+
+        .footer-social {
+            display: flex;
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .footer-social a {
+            color: #b0b5c8;
+            text-decoration: none;
+            font-size: 16px;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid #333;
+            padding-top: 24px;
+            text-align: center;
+            color: #6b7280;
+            font-size: 11px;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .main-content {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+            }
+
+            .footer-content {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            header {
+                flex-wrap: wrap;
+                gap: 12px;
+            }
+
+            .header-center {
+                width: 100%;
+                margin: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="logo">CHRONIFY</div>
+        <div class="header-center">
+            <a href="/" style="color: #fff; text-decoration: none;">Home</a>
+            <a href="/products" style="color: #fff; text-decoration: none;">Shop</a>
+        </div>
+
+        <div class="header-icons">
+            <button class="icon-btn" title="Wishlist" onclick="window.location.href='/wishlist'">
+                <i class="far fa-heart"></i>
+                <% if (wishlistCount > 0) { %>
+                    <span class="badge" style="position: absolute; top: 5px; right: 86px; background-color: #ef4444; color: white; border-radius: 50%; padding: 2px 6px; font-size: 10px; font-weight: bold; min-width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.3); border: 2px solid #000; pointer-events: none;"><%= wishlistCount %></span>
+                <% } %>
+            </button>
+            <button class="icon-btn" title="Cart" onclick="window.location.href='/cart'">
+                <i class="fas fa-shopping-cart"></i>
+                <% if (cartCount > 0) { %>
+                    <span class="badge" style="position: absolute; top: 4px; right: 47px; background-color: #ef4444; color: white; border-radius: 50%; padding: 2px 6px; font-size: 10px; font-weight: bold; min-width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.3); border: 2px solid #000; pointer-events: none;"><%= cartCount %></span>
+                <% } %>
+            </button>
+            <button class="icon-btn" title="Account" onclick="window.location.href='/profile'">
+                <i class="far fa-user-circle"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <!-- User Profile Card -->
+            <div style="background: linear-gradient(135deg, #1a2855 0%, #0f1a35 100%); border: 1px solid #2a3f66; border-radius: 16px; padding: 24px; text-align: center; margin-bottom: 24px;">
+                <div style="width: 60px; height: 60px; background: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; font-size: 24px; font-weight: 700; color: #000;">
+                    <% if (user && user.firstName) { %>
+                        <%= user.firstName.charAt(0).toUpperCase() %>
+                    <% } else { %>
+                        U
+                    <% } %>
+                </div>
+                <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 16px;">
+                    <% if (user && user.firstName) { %>
+                        <%= user.firstName %>
+                    <% } else { %>
+                        User
+                    <% } %>
+                </h3>
+            </div>
+
+            <!-- Navigation Menu -->
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+                <a href="/profile" class="nav-link">
+                    <i class="fa-solid fa-user"></i> My Profile
+                </a>
+                <a href="/address" class="nav-link">
+                    <i class="fa-solid fa-location-dot"></i> My Address
+                </a>
+                <a href="/orders" class="nav-link">
+                    <i class="fa-solid fa-bag-shopping"></i> My Order
+                </a>
+                <a href="/wishlist" class="nav-link">
+                    <i class="fa-solid fa-heart"></i> My Wishlist
+                </a>
+                <a href="/cart" class="nav-link active">
+                    <i class="fa-solid fa-shopping-cart"></i> My Cart 
+                    <% if (cart && cart.items && cart.items.length > 0) { %>
+                        (<%= cart.items.length %>)
+                    <% } else { %>
+                        (0) 
+                    <% } %>
+                </a>
+                <a href="/wallet" class="nav-link">
+                    <i class="fa-solid fa-wallet"></i> My Wallet
+                </a>
+
+                <button onclick="handleLogout()" class="nav-link" style="background: none; border: none; cursor: pointer; width: 100%; text-align: left;">
+                    <i class="fa-solid fa-sign-out-alt"></i> Log Out
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content" style="display: flex; gap: 32px;">
+            <% if (!cart) { %>
+                <!-- Empty Cart State -->
+                <div style="flex: 1;">
+                    <div class="empty-cart">
+                        <i class="fas fa-shopping-cart"></i>
+                        <h2>Your cart is empty</h2>
+                        <p>Add items to your cart to see them here</p>
+                        <button onclick="window.location.href='/shop'" style="background: #3b82f6; color: #fff; border: none; padding: 12px 32px; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer;">
+                            Continue Shopping
+                        </button>
+                    </div>
+                </div>
+            <% } else { %>
+                <!-- Cart Items Section -->
+                <div style="flex: 1;">
+                    <h2 style="font-size: 24px; font-weight: 300; letter-spacing: 2px; margin-bottom: 32px; text-transform: capitalize;">Cart</h2>
+
+                    <!-- Cart Items -->
+                    <div style="display: flex; flex-direction: column; gap: 24px;">
+                        <% cart.items.forEach((item, index) => { %>
+                            <div style="background: linear-gradient(135deg, #1a2855 0%, #0f1a35 100%); border: 1px solid #2a3f66; border-radius: 12px; padding: 24px; display: flex; gap: 24px;">
+                                <!-- Checkbox removed -->
+                                <input type="hidden" class="cart-item-sku" value="<%= item.sku %>">
+
+                                <!-- Product Image -->
+                                <div style="flex-shrink: 0;">
+                                    <img src="<%= item.info?.mainImage || item.mainImage || 'https://via.placeholder.com/120' %>" 
+                                         alt="<%= item.productId?.name || item.name || 'Product' %>" 
+                                         style="width: 120px; height: 120px; object-fit: cover; border-radius: 8px;">
+                                </div>
+
+                                <!-- Product Details -->
+                                <div style="flex: 1;">
+                                    <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 8px;">
+                                        <%= item.productId?.name || item.name || 'Product Name' %>
+                                    </h3>
+                                    <% 
+                                        const itemOriginalPrice = item.info?.price || item.price || 0;
+                                        const itemOffer = item.info?.offer || 0;
+                                        const itemOfferPrice = itemOriginalPrice - (itemOriginalPrice * itemOffer / 100);
+                                    %>
+                                    <p style="color: #fff; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                                        <span style="font-weight: 600;">Price:</span>
+                                        <% if (itemOffer > 0) { %>
+                                            <span style="font-size: 13px; color: #9ca3af; text-decoration: line-through;">₹<%= itemOriginalPrice.toLocaleString('en-IN') %></span>
+                                            <span style="font-weight: 700; color: #3b82f6;">₹<%= Math.round(itemOfferPrice).toLocaleString('en-IN') %></span>
+                                            <span style="display: inline-block; background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); color: #fff; padding: 2px 6px; border-radius: 3px; font-size: 9px; font-weight: 700;"><%= itemOffer %>% OFF</span>
+                                        <% } else { %>
+                                            <span style="font-weight: 700;">₹<%= itemOriginalPrice.toLocaleString('en-IN') %></span>
+                                        <% } %>
+                                    </p>
+                                    <% if (item.info?.color || "") { %>
+                                        <p style="color: #b0b8c1; font-size: 13px; margin-bottom: 8px;">
+                                            Colour: <%= item.info?.color  %>
+                                        </p>
+                                    <% } %>
+                                    <% if (item.info.quantity > 0) { %>
+                                        <p style="color: #22c55e; font-size: 12px; font-weight: 600; margin-bottom: 12px;">
+                                            In Stock
+                                        </p>
+                                    <% } else { %>
+                                        <p style="color: #dc2626; font-size: 12px; font-weight: 600; margin-bottom: 12px;">
+                                            Out of Stock
+                                        </p>
+                                    <% } %>
+                                        
+                                    <!-- Quantity Selector -->
+                                    <div style="display: flex; align-items: center; gap: 12px; width: fit-content; background: #0a1425; border: 1px solid #2a3f66; border-radius: 6px; padding: 4px 8px; margin-bottom: 12px;">
+                                        <button onclick="decreaseQty('<%= item.sku %>')" 
+                                                style="background: none; border: none; color: #fff; cursor: pointer; font-size: 16px; padding: 4px 8px;">−</button>
+                                        <input type="number" 
+                                               value="<%= item.qty || 1 %>" 
+                                               readonly 
+                                               style="width: 40px; background: none; border: none; color: #fff; text-align: center; outline: none;">
+                                        <button onclick="increaseQty('<%= item.sku %>')" 
+                                                style="background: none; border: none; color: #fff; cursor: pointer; font-size: 16px; padding: 4px 8px;">+</button>
+                                    </div>
+
+                                    <!-- Remove Button -->
+                                    <button onclick="removeFromCart('<%= item.sku  %>')" 
+                                            style="background: #dc2626; color: #fff; border: none; padding: 6px 16px; border-radius: 4px; font-size: 12px; font-weight: 600; cursor: pointer; transition: background 0.3s;">
+                                        Remove
+                                    </button>
+                                </div>
+                            </div>
+                        <% }); %>
+                    </div>
+                </div>
+
+                <!-- Order Summary Sidebar -->
+                <div style="width: 320px; flex-shrink: 0;">
+                    <div style="background: linear-gradient(135deg, #1a2855 0%, #0f1a35 100%); border: 1px solid #2a3f66; border-radius: 12px; padding: 32px; position: sticky; top: 32px;">
+                        <!-- Total Heading -->
+                        <h3 style="font-size: 24px; font-weight: 300; letter-spacing: 2px; text-transform: capitalize; margin-bottom: 32px; text-align: center;">Total</h3>
+
+                        <!-- Subtotal -->
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid #2a3f66;">
+                            <span style="color: #b0b8c1;">Subtotal:</span>
+                            <span style="font-weight: 600;">₹<%= total || 0 %></span>
+                        </div>
+
+                        <!-- Shipping & Tax Info -->
+                        <p style="color: #6b7280; font-size: 11px; line-height: 1.6; margin-bottom: 24px;">*Shipping, taxes, and discount codes calculated at checkout.</p>
+
+                        <!-- Proceed to Checkout Button -->
+                        <button onclick="proceedToCheckout('<%= cart.id  %>')" 
+                                style="width: 100%; background: #3b82f6; color: #fff; border: none; padding: 12px; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; margin-bottom: 12px; transition: background 0.3s;">
+                            Proceed to checkout
+                        </button>
+
+                        <!-- Back to Shopping Button -->
+                        <button onclick="backToShopping()" 
+                                style="width: 100%; background: #fff; color: #000; border: 2px solid #fff; padding: 12px; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s;">
+                            Back to shopping
+                        </button>
+                    </div>
+                </div>
+            <% } %>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <!-- Exclusive Column -->
+            <div class="footer-section">
+                <h3>Exclusive</h3>
+                <p style="font-size: 12px; color: #b0b5c8; margin-bottom: 16px;">Subscribe</p>
+                <p style="font-size: 11px; color: #b0b5c8; margin-bottom: 12px;">Get 15% off your first order</p>
+                <div class="footer-subscribe">
+                    <input type="email" placeholder="Enter your email" required>
+                    <button>→</button>
+                </div>
+            </div>
+
+            <!-- Support Column -->
+            <div class="footer-section">
+                <h3>Support</h3>
+                <ul>
+                    <li><a href="#">9th Floor, Orion Business Park, Thane West, Mumbai, Maharashtra 400607</a></li>
+                    <li><a href="mailto:support@chronify.com">support@chronify.com</a></li>
+                    <li><a href="tel:+919224973488">+91 22 4973 4488</a></li>
+                </ul>
+            </div>
+
+            <!-- Account Column -->
+            <div class="footer-section">
+                <h3>Account</h3>
+                <ul>
+                    <li><a href="/profile">My Account</a></li>
+                    <li><a href="/login">Login / Register</a></li>
+                    <li><a href="/cart">Cart</a></li>
+                    <li><a href="/wishlist">Wishlist</a></li>
+                    <li><a href="/shop">Shop</a></li>
+                </ul>
+            </div>
+
+            <!-- Quick Link Column -->
+            <div class="footer-section">
+                <h3>Quick Link</h3>
+                <ul>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Terms of Use</a></li>
+                    <li><a href="#">FAQ</a></li>
+                    <li><a href="#">Contact</a></li>
+                </ul>
+            </div>
+
+            <!-- Download App Column -->
+            <div class="footer-section">
+                <h3>Download App</h3>
+                <p style="font-size: 11px; color: #b0b5c8; margin-bottom: 12px;">Save ₹5 with App New User Only</p>
+                <div class="footer-qr">
+                    <img src="https://via.placeholder.com/100x100?text=QR" alt="QR Code">
+                </div>
+                <div style="display: flex; gap: 8px; font-size: 11px;">
+                    <button style="padding: 6px 12px; background: #000; border: 1px solid #444; color: #fff; border-radius: 4px; cursor: pointer;">Google Play</button>
+                    <button style="padding: 6px 12px; background: #000; border: 1px solid #444; color: #fff; border-radius: 4px; cursor: pointer;">App Store</button>
+                </div>
+                <div class="footer-social">
+                    <a href="#" title="Facebook"><i class="fab fa-facebook"></i></a>
+                    <a href="#" title="Twitter"><i class="fab fa-twitter"></i></a>
+                    <a href="#" title="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="#" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer Bottom -->
+        <div class="footer-bottom">
+            © Copyright Chronify 2025. All rights reserved
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            <% if (locals.removedItemsCount && removedItemsCount > 0) { %>
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Cart Updated',
+                    text: 'Some products in your cart are no longer available and have been removed.',
+                    background: '#0f1a35',
+                    color: '#fff',
+                    confirmButtonColor: '#3b82f6'
+                });
+            <% } %>
+        });
+
+        // Increase item quantity        
+async function increaseQty(sku) {
+    try {
+        const response = await fetch(`/cart/increase/${sku}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            location.reload();
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'Limit Exceeded',
+                text: data.message || "Failed to increase quantity",
+                confirmButtonText: 'OK'
+            });
+        }
+
+    } catch (error) {
+        console.error('Error increasing quantity:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Something went wrong. Please try again.',
+            confirmButtonText: 'OK'
+        });
+    }
+}
+
+
+        // Decrease item quantity
+async function decreaseQty(sku) {
+    try {
+        const response = await fetch(`/cart/decrease/${sku}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            location.reload();
+        } else {
+             Swal.fire({
+                icon: 'warning',
+                title: 'Minimum Quantity',
+                text: data.message || "Failed to decrease quantity",
+                confirmButtonText: 'OK'
+            });
+        }
+
+    } catch (error) {
+        console.error('Error decreasing quantity:', error);
+         Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Something went wrong. Please try again.',
+            confirmButtonText: 'OK'
+        });
+    }
+}
+
+
+        // Remove item from cart
+        async function removeFromCart(sku) {
+            
+            const result = await Swal.fire({
+                title: 'Remove Item?',
+                text: "Are you sure you want to remove this item from your cart?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, remove it!',
+                cancelButtonText: 'No, keep it',
+                reverseButtons: true
+            });
+
+            if (result.isConfirmed) {
+                try {
+                    const response = await fetch(`/cart/remove/${sku}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    
+                    const data = await response.json();
+
+                    if (data.success) {
+                        await Swal.fire({
+                            title: 'Removed!',
+                            text: 'Item has been removed from your cart.',
+                            icon: 'success',
+                            timer: 1500,
+                            showConfirmButton: false
+                        });
+                        location.reload();
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: data.message || "Failed to delete product",
+                        });
+                    }
+                } catch (error) {
+                    console.error('Error removing item:', error);
+                     Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Something went wrong. Please try again.',
+                    });
+                }
+            }
+        }
+
+        // Proceed to checkout
+        // Proceed to checkout
+    async function proceedToCheckout(cartId) {
+        try {
+            // Get all cart item SKUs
+            const skuElements = document.querySelectorAll('.cart-item-sku');
+            
+            if (skuElements.length === 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Cart is Empty',
+                    text: 'Please add items to your cart to proceed',
+                    confirmButtonText: 'OK'
+                });
+                return;
+            }
+
+            // Extract SKUs
+            const selectedSkus = Array.from(skuElements).map(el => el.value);
+            const skuString = selectedSkus.join(',');
+
+            // Redirect with all items
+            window.location.href = `/checkout/${cartId}?items=${skuString}`;
+        } catch (err) {
+            console.error("Checkout error:", err)
+        }
+    }
+
+    // Check for moved items on load
+
+        // Back to shopping
+        function backToShopping() {
+            window.location.href = '/products';
+        }
+
+
+    </script>
+</body>
+</html>

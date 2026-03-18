@@ -1,4 +1,4 @@
-const Redis = require("ioredis");
+import Redis from "ioredis";
 
 const redis = new Redis({
     host: process.env.REDIS_HOST || "127.0.0.1",
@@ -16,4 +16,19 @@ redis.on("error", (err) => {
     console.error("❌ Redis error:", err);
 });
 
-module.exports = redis;
+redis.clearProductCache = async () => {
+    try {
+        const patterns = ["products:*", "product:*"];
+        for (const pattern of patterns) {
+            const keys = await redis.keys(pattern);
+            if (keys.length > 0) {
+                await redis.del(...keys);
+                console.log(`✅ Cleared Redis cache for pattern: ${pattern}`);
+            }
+        }
+    } catch (error) {
+        console.error("❌ Error clearing Redis cache:", error);
+    }
+};
+
+export default redis;

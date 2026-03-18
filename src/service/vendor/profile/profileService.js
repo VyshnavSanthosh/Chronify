@@ -1,9 +1,9 @@
-module.exports = class ProfileService {
+export default class ProfileService {
     constructor(vendorRepository) {
         this.vendorRepository = vendorRepository
     }
 
-    async getVendor(vendorEmail){
+    async getVendor(vendorEmail) {
         const vendor = await this.vendorRepository.findByEmail(vendorEmail)
         return vendor
     }

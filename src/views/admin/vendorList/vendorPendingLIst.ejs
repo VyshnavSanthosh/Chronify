@@ -1,0 +1,406 @@
+<% layout('admin/layout/adminLayout') %>
+
+<% block('styles', `
+  <style>
+    .brand-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #4a7ba7, #5a8bc0);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 600;
+      font-size: 14px;
+    }
+    /* Table scrollbar */
+    .table-container::-webkit-scrollbar {
+      height: 6px;
+    }
+    .table-container::-webkit-scrollbar-thumb {
+      background: #1f2937;
+      border-radius: 10px;
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+`) %>
+
+<!-- Content Area -->
+<div class="p-8 lg:p-12 space-y-8">
+  
+  <!-- Page Title and Breadcrumbs -->
+  <div class="space-y-4">
+    <h2 class="text-4xl font-bold tracking-tight uppercase" style="font-family: 'Playfair Display', serif;">VENDOR PENDING LIST</h2>
+    <nav class="flex text-sm text-gray-400 space-x-2">
+      <a href="/admin/dashboard" class="hover:text-white capitalize">Dashboard</a>
+      <span><i class="fa-solid fa-chevron-right text-[8px] mx-1"></i></span>
+      <a href="/admin/vendors" class="hover:text-white capitalize">Vendor List</a>
+      <span><i class="fa-solid fa-chevron-right text-[8px] mx-1"></i></span>
+      <span class="text-white capitalize">Pending Vendors</span>
+    </nav>
+  </div>
+
+  <!-- Controls Section -->
+  <div class="flex justify-between items-center">
+    <!-- Search Bar -->
+    <div class="relative w-full max-w-md">
+      <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
+      <input type="text" 
+             id="searchInput"
+             placeholder="Search Pending Vendor. . ." 
+             class="w-full bg-[#0a1425] border border-gray-800 rounded-lg py-3 pl-12 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+    </div>
+
+    <!-- Back to Vendor List Button -->
+    <a href="/admin/vendors" class="bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-md transition-all inline-block">
+      <i class="fa-solid fa-arrow-left mr-2"></i>Back to Vendor List
+    </a>
+  </div>
+
+  <!-- Table Container -->
+  <div class="table-container overflow-x-auto rounded-xl border border-gray-800">
+    <table class="w-full text-left border-collapse min-w-[1000px]">
+      <thead>
+        <tr class="bg-blue-600 text-white uppercase text-xs font-semibold tracking-wider">
+          <th class="px-6 py-4 border-r border-blue-500/30">Vendor Name</th>
+          <th class="px-6 py-4 border-r border-blue-500/30">Phone</th>
+          <th class="px-6 py-4 border-r border-blue-500/30">Email</th>
+          <th class="px-6 py-4 border-r border-blue-500/30">Date Applied</th>
+          <th class="px-6 py-4 text-center">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-800" id="vendorTableBody">
+        <% (vendors || []).forEach((vendor) => { %>
+          <tr class="bg-[#050a14] hover:bg-gray-800/50 transition-colors text-sm vendor-row" data-vendor-id="<%= vendor._id %>">
+            <td class="px-6 py-4 border-r border-gray-800">
+              <div class="flex items-center space-x-3">
+                <div class="brand-avatar">
+                  <%= vendor.brandName.charAt(0).toUpperCase() %>
+                </div>
+                <span class="font-medium vendor-name"><%= vendor.brandName %></span>
+              </div>
+            </td>
+            <td class="px-6 py-4 border-r border-gray-800 vendor-phone"><%= vendor.phone || 'N/A' %></td>
+            <td class="px-6 py-4 border-r border-gray-800 vendor-email text-gray-300"><%= vendor.brandEmail %></td>
+            <td class="px-6 py-4 border-r border-gray-800 text-gray-300">
+              <%= new Date(vendor.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) %>
+            </td>
+            <td class="px-6 py-4">
+              <!-- Action Buttons -->
+              <div class="flex space-x-3 justify-center">
+                <button 
+                  class="approve-btn bg-green-600 hover:bg-green-700 text-white font-semibold px-4 py-2 rounded-md transition-all text-sm"
+                  data-vendor-id="<%= vendor._id %>">
+                  <i class="fa-solid fa-check mr-1"></i>Approve
+                </button>
+                <button 
+                  class="reject-btn bg-red-600 hover:bg-red-700 text-white font-semibold px-4 py-2 rounded-md transition-all text-sm"
+                  data-vendor-id="<%= vendor._id %>">
+                  <i class="fa-solid fa-times mr-1"></i>Reject
+                </button>
+              </div>
+            </td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <div class="flex flex-col sm:flex-row items-center justify-between pt-4 gap-4">
+    <p class="text-sm text-gray-400">
+      Showing <span id="paginationStart">1</span>-<span id="paginationEnd">10</span> from <span id="paginationTotal">0</span>
+    </p>
+    <div class="flex items-center space-x-2" id="paginationContainer">
+      <button class="w-8 h-8 flex items-center justify-center rounded-lg bg-gray-800 hover:bg-gray-700 transition-colors text-xs" id="prevBtn">
+        <i class="fa-solid fa-chevron-left"></i>
+      </button>
+      <div id="pageButtons"></div>
+      <button class="w-8 h-8 flex items-center justify-center rounded-lg bg-gray-800 hover:bg-gray-700 transition-colors text-xs" id="nextBtn">
+        <i class="fa-solid fa-chevron-right"></i>
+      </button>
+    </div>
+  </div>
+</div>
+
+<% block('scripts', `
+<script>
+  // Initialize from server data
+  var currentPage = ${locals.currentPage || 1};
+  var totalVendors = ${locals.totalVendors || 0};
+  var itemsPerPage = 10;
+  var totalPages = Math.ceil(totalVendors / itemsPerPage);
+
+  // Initialize
+  document.addEventListener('DOMContentLoaded', function() {
+    attachActionListeners();
+    attachSearchListener();
+    updatePaginationInfo();
+  });
+
+  // Attach action button listeners
+  function attachActionListeners() {
+    // Approve buttons
+    document.querySelectorAll('.approve-btn').forEach(btn => {
+      btn.addEventListener('click', handleApprove);
+    });
+
+    // Reject buttons
+    document.querySelectorAll('.reject-btn').forEach(btn => {
+      btn.addEventListener('click', handleReject);
+    });
+  }
+
+  // Handle approve vendor
+  async function handleApprove(event) {
+    const btn = event.currentTarget;
+    const vendorId = btn.getAttribute('data-vendor-id');
+    const row = btn.closest('.vendor-row');
+    
+    if (!confirm('Are you sure you want to approve this vendor?')) {
+      return;
+    }
+    
+    // Disable button during request
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i>Processing...';
+
+    try {
+      const url = "/admin/vendors/pending/" + vendorId + "/approve";
+      
+      const response = await fetch(url, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        alert(data.message);
+        // Remove row from table
+        row.remove();
+        // Update pagination
+        totalVendors--;
+        totalPages = Math.ceil(totalVendors / itemsPerPage);
+        updatePaginationInfo();
+        
+        // Reload page if no more vendors on current page
+        const remainingRows = document.querySelectorAll('.vendor-row').length;
+        if (remainingRows === 0 && currentPage > 1) {
+          window.location.href = "/admin/vendors/pending?page=" + (currentPage - 1);
+        } else if (remainingRows === 0) {
+          location.reload();
+        }
+      } else {
+        alert('Error: ' + (data.message || 'Failed to approve vendor'));
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-check mr-1"></i>Approve';
+      }
+    } catch (error) {
+      alert('Failed to approve vendor. Please try again.');
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fa-solid fa-check mr-1"></i>Approve';
+    }
+  }
+
+  // Handle reject vendor
+  async function handleReject(event) {
+    const btn = event.currentTarget;
+    const vendorId = btn.getAttribute('data-vendor-id');
+    const row = btn.closest('.vendor-row');
+    
+    if (!confirm('Are you sure you want to reject this vendor application? This action cannot be undone.')) {
+      return;
+    }
+    
+    // Disable button during request
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i>Processing...';
+
+    try {
+      const url = "/admin/vendors/pending/" + vendorId + "/reject";
+      
+      const response = await fetch(url, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        alert(data.message);
+        // Remove row from table
+        row.remove();
+        // Update pagination
+        totalVendors--;
+        totalPages = Math.ceil(totalVendors / itemsPerPage);
+        updatePaginationInfo();
+        
+        // Reload page if no more vendors on current page
+        const remainingRows = document.querySelectorAll('.vendor-row').length;
+        if (remainingRows === 0 && currentPage > 1) {
+          window.location.href = "/admin/vendors/pending?page=" + (currentPage - 1);
+        } else if (remainingRows === 0) {
+          location.reload();
+        }
+      } else {
+        alert('Error: ' + (data.message || 'Failed to reject vendor'));
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-times mr-1"></i>Reject';
+      }
+    } catch (error) {
+      alert('Failed to reject vendor. Please try again.');
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fa-solid fa-times mr-1"></i>Reject';
+    }
+  }
+
+  // Attach search listener
+  function attachSearchListener() {
+    document.getElementById('searchInput').addEventListener('keyup', debounce(applySearch, 500));
+  }
+
+  // Debounce function for search
+  function debounce(func, delay) {
+    var timeoutId;
+    return function(...args) {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => func.apply(this, args), delay);
+    };
+  }
+
+  // Apply search filter
+  async function applySearch() {
+    const search = document.getElementById('searchInput').value;
+    currentPage = 1;
+    
+    try {
+      const params = new URLSearchParams();
+      if (search) params.append('search', search);
+      params.append('page', currentPage);
+
+      const response = await fetch("/admin/vendors/pending?" + params.toString());
+      const html = await response.text();
+      
+      // Parse the response and extract the table body
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+      const newTableBody = doc.getElementById('vendorTableBody');
+      
+      document.getElementById('vendorTableBody').innerHTML = newTableBody.innerHTML;
+      
+      // Extract totalVendors from the response
+      const scriptMatch = html.match(/var totalVendors = (\\d+);/);
+      if (scriptMatch) {
+        totalVendors = parseInt(scriptMatch[1]);
+        totalPages = Math.ceil(totalVendors / itemsPerPage);
+      }
+      
+      attachActionListeners();
+      updatePaginationInfo();
+    } catch (error) {
+      console.error('Error applying search:', error);
+      alert('Failed to search. Please try again.');
+    }
+  }
+
+  // Update pagination
+  function updatePaginationInfo() {
+    const pageButtons = document.getElementById('pageButtons');
+    
+    // Calculate start and end
+    const start = totalVendors > 0 ? ((currentPage - 1) * itemsPerPage) + 1 : 0;
+    const end = Math.min(currentPage * itemsPerPage, totalVendors);
+    
+    document.getElementById('paginationStart').textContent = start;
+    document.getElementById('paginationEnd').textContent = end;
+    document.getElementById('paginationTotal').textContent = totalVendors;
+    
+    // Generate page buttons
+    pageButtons.innerHTML = '';
+    
+    if (totalPages === 0) {
+      return; // Don't show pagination if no results
+    }
+    
+    const maxVisiblePages = 5;
+    var startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+    var endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+    
+    if (endPage - startPage < maxVisiblePages - 1) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+    
+    for (var i = startPage; i <= endPage; i++) {
+      const btn = document.createElement('button');
+      const pageNum = i;
+      btn.className = "w-8 h-8 flex items-center justify-center rounded-lg font-bold text-xs transition-colors " + (pageNum === currentPage ? 'bg-blue-600 text-white' : 'bg-white text-black hover:bg-gray-200');
+      btn.textContent = pageNum;
+      btn.addEventListener('click', function() {
+        goToPage(pageNum);
+      });
+      pageButtons.appendChild(btn);
+    }
+    
+    if (endPage < totalPages) {
+      const span = document.createElement('span');
+      span.className = 'px-2 text-gray-500';
+      span.textContent = '...';
+      pageButtons.appendChild(span);
+    }
+
+    // Update prev/next button state
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    
+    prevBtn.disabled = currentPage === 1;
+    nextBtn.disabled = currentPage >= totalPages;
+    
+    if (prevBtn.disabled) {
+      prevBtn.classList.add('opacity-50', 'cursor-not-allowed');
+    } else {
+      prevBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+    }
+    
+    if (nextBtn.disabled) {
+      nextBtn.classList.add('opacity-50', 'cursor-not-allowed');
+    } else {
+      nextBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+    }
+  }
+
+  // Go to page
+  function goToPage(page) {
+    if (page === currentPage || page < 1 || page > totalPages) {
+      return;
+    }
+    
+    const search = document.getElementById('searchInput').value;
+    
+    const params = new URLSearchParams();
+    if (search) params.append('search', search);
+    params.append('page', page);
+
+    window.location.href = "/admin/vendors/pending?" + params.toString();
+  }
+
+  // Previous button
+  document.getElementById('prevBtn').addEventListener('click', function() {
+    if (currentPage > 1) {
+      goToPage(currentPage - 1);
+    }
+  });
+
+  // Next button
+  document.getElementById('nextBtn').addEventListener('click', function() {
+    if (currentPage < totalPages) {
+      goToPage(currentPage + 1);
+    }
+  });
+</script>
+`) %>

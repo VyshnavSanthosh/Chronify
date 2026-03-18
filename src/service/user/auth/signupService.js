@@ -1,12 +1,12 @@
 
-const {hashString, compareString} = require('../../../utils/bcrypt');
-module.exports = class UserAuthService {
+import { hashString, compareString } from "../../../utils/bcrypt.js";
+export default class UserAuthService {
     constructor(userRepository) {
         this.userRepository = userRepository //repo dependency injection
     }
 
-    async register(userData){  // user data comes from controller
-        const{
+    async register(userData) {  // user data comes from controller
+        const {
             firstName,
             lastName,
             email,
@@ -26,7 +26,7 @@ module.exports = class UserAuthService {
         if (existingUser && !existingUser.isVerified) {
             await this.userRepository.deleteById(existingUser._id);
         }
-        
+
         // hash password
         const hashedPassword = await hashString(password);
 
@@ -59,7 +59,7 @@ module.exports = class UserAuthService {
             const savedUser = await this.userRepository.createUser(newUserData);
 
             // sanitize
-            let userObj = typeof savedUser.toObject === "function"? savedUser.toObject(): { ...savedUser }; 
+            let userObj = typeof savedUser.toObject === "function" ? savedUser.toObject() : { ...savedUser };
 
             delete userObj.passwordHash;
             return userObj;
@@ -68,16 +68,16 @@ module.exports = class UserAuthService {
             throw err; // let controller handle messaging
         }
 
-    
+
     }
 
-    
-    async generateReferralCode(name){
+
+    async generateReferralCode(name) {
         let code;
         let codeExits = true;
-        while(codeExits){
+        while (codeExits) {
             const random = Math.floor(Math.random() * 9000) + 1000;
-            code = `${name.slice(0,4).toUpperCase()}${random}`
+            code = `${name.slice(0, 4).toUpperCase()}${random}`
 
             codeExits = await this.userRepository.findByReferralCode(code)
         }

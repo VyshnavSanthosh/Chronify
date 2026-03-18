@@ -6,6 +6,7 @@
     <title>Sign Up - ChronoMy</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/css/signup.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
         @keyframes fadeOut {
@@ -89,7 +90,20 @@
             <!-- Password -->
             <div class="mb-3">
                 <label class="form-label">Password</label>
-                <input type="password" class="form-control signup-input" name="password">
+                <div class="input-wrapper">
+                    <input 
+                        type="password" 
+                        class="form-control signup-input" 
+                        id="password"
+                        name="password"
+                        required
+                    >
+                    <button type="button" class="input-icon toggle-password-btn" onclick="togglePassword('password')">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                            <path d="M8 3C4 3 1.19 5.19 1 8c.19 2.81 3 5 7 5s6.81-2.19 7-5c-.19-2.81-3-5-7-5zm0 8c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm0-5c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" fill="#999"/>
+                        </svg>
+                    </button>
+                </div>
                 <small class="text-white">* At least 8 characters</small>
                 <% if (errors?.password) { %>
                     <div class="error-text"><%= errors.password %></div>
@@ -99,7 +113,20 @@
             <!-- Confirm Password -->
             <div class="mb-3">
                 <label class="form-label">Confirm Password</label>
-                <input type="password" class="form-control signup-input" name="confirmPassword">
+                <div class="input-wrapper">
+                    <input 
+                        type="password" 
+                        class="form-control signup-input" 
+                        id="confirmPassword"
+                        name="confirmPassword"
+                        required
+                    >
+                    <button type="button" class="input-icon toggle-password-btn" onclick="togglePassword('confirmPassword')">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                            <path d="M8 3C4 3 1.19 5.19 1 8c.19 2.81 3 5 7 5s6.81-2.19 7-5c-.19-2.81-3-5-7-5zm0 8c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm0-5c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" fill="#999"/>
+                        </svg>
+                    </button>
+                </div>
                 <% if (errors?.confirmPassword) { %>
                     <div class="error-text"><%= errors.confirmPassword %></div>
                 <% } %>
@@ -135,19 +162,46 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
+    // Show SweetAlert messages if passed from backend
+    <% if (locals.success) { %>
+        Swal.fire({
+            icon: 'success',
+            title: 'Success!',
+            text: '<%= locals.success %>',
+            confirmButtonColor: '#28a745',
+            timer: 3000,
+            timerProgressBar: true
+        });
+    <% } %>
+
+    <% if (locals.info) { %>
+        Swal.fire({
+            icon: 'info',
+            title: 'Information',
+            text: '<%= locals.info %>',
+            confirmButtonColor: '#17a2b8'
+        });
+    <% } %>
+
     // ✅ Auto-dismiss general error EXACTLY in 3 seconds
     const generalError = document.getElementById("generalError");
 
     if (generalError) {
-        // Start fade at 2.5s
+        // Start fade at 1.5s
         setTimeout(() => {
             generalError.classList.add("alert-dismissing");
         }, 1500);
 
-        // Remove at 3s
+        // Remove at 2s
         setTimeout(() => {
             generalError.remove();
         }, 2000);
+    }
+
+    // Toggle password visibility
+    function togglePassword(fieldId) {
+        const passwordInput = document.getElementById(fieldId);
+        passwordInput.type = passwordInput.type === 'password' ? 'text' : 'password';
     }
 </script>
 

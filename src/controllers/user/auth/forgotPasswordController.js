@@ -1,5 +1,5 @@
-module.exports = class ForgotPasswordController {
-    constructor(forgotPasswordService,joi_forgotPassword, joi_resetPassword, validator) {
+export default class ForgotPasswordController {
+    constructor(forgotPasswordService, joi_forgotPassword, joi_resetPassword, validator) {
         this.forgotPasswordService = forgotPasswordService
         this.joi_forgotPassword = joi_forgotPassword;
         this.joi_resetPassword = joi_resetPassword
@@ -7,25 +7,25 @@ module.exports = class ForgotPasswordController {
     }
 
     // Render forgot password page
-    renderForgotPassword(req,res){
-        return res.render("user/auth/forgotPassword",{
+    renderForgotPassword(req, res) {
+        return res.render("user/auth/forgotPassword", {
             error: null,
             email: ""
         })
     }
 
-    async handleForgotPassword(req,res){
-        const {error, value} = this.validator.validate(this.joi_forgotPassword, req.body)
+    async handleForgotPassword(req, res) {
+        const { error, value } = this.validator.validate(this.joi_forgotPassword, req.body)
 
         if (error) {
             const errorMessage = error.details[0].message;
-            return res.render("user/auth/forgotPassword",{
+            return res.render("user/auth/forgotPassword", {
                 error: errorMessage,
                 email: req.body.email || ""
             })
         }
 
-        const {email} = value;
+        const { email } = value;
 
         try {
             const result = await this.forgotPasswordService.requestPasswordReset(email)
@@ -47,25 +47,25 @@ module.exports = class ForgotPasswordController {
 
 
     // Render OTP page
-    renderVerifyOtp(req,res){
+    renderVerifyOtp(req, res) {
         const email = req.session.resetEmail
-        
+
         // No email in session, redirect back to forgot password
         if (!email) {
             return res.redirect("/auth/forgot-password")
         }
-        return res.render("user/auth/verifyOtpForgotPassword",{
+        return res.render("user/auth/verifyOtpForgotPassword", {
             error: null,
             email: email,
-            timeRemaining: 300 // 5 minutes in seconds
+            timeRemaining: 120 // 2 minutes in seconds
         })
     }
 
-    async handleVerifyOtp(req,res){
-        const {otp} = req.body;
+    async handleVerifyOtp(req, res) {
+        const { otp } = req.body;
         const userId = req.session.resetUserId;
         const email = req.session.resetEmail;
-        
+
         if (!userId || !email) {
             return res.redirect("/auth/forgot-password")
         }
@@ -89,41 +89,41 @@ module.exports = class ForgotPasswordController {
         const email = req.session.resetEmail;
 
         if (!userId || !email) {
-            return res.status(400).json({ 
+            return res.status(400).json({
                 success: false,
-                error: "Session expired. Please start again." 
+                error: "Session expired. Please start again."
             });
         }
 
         try {
             await this.forgotPasswordService.resendResetOtp(userId, email);
 
-            return res.json({ 
+            return res.json({
                 success: true,
-                message: "OTP resent successfully" 
+                message: "OTP resent successfully"
             });
 
         } catch (err) {
-            return res.status(400).json({ 
+            return res.status(400).json({
                 success: false,
-                error: err.message 
+                error: err.message
             });
         }
     }
 
-    renderResetPassword(req,res){
+    renderResetPassword(req, res) {
         const userId = req.session.resetUserId
         const email = req.session.resetEmail
 
         if (!userId || !email) {
             return res.redirect("/auth/forgot-password")
         }
-        return res.render("user/auth/resetPassword",{
+        return res.render("user/auth/resetPassword", {
             error: null
         })
     }
 
-    async handleResetPassword(req,res){
+    async handleResetPassword(req, res) {
         const userId = req.session.resetUserId;
         const email = req.session.resetEmail;
 
@@ -131,7 +131,7 @@ module.exports = class ForgotPasswordController {
             return res.redirect("/auth/forgot-password");
         }
 
-        const {error, value} = this.validator.validate(this.joi_resetPassword, req.body)
+        const { error, value } = this.validator.validate(this.joi_resetPassword, req.body)
 
         if (error) {
             const errorMessage = error.details[0].message;
@@ -140,7 +140,7 @@ module.exports = class ForgotPasswordController {
             });
         }
 
-        const {newPassword} = value;
+        const { newPassword } = value;
 
         try {
             await this.forgotPasswordService.resetPassword(userId, newPassword)

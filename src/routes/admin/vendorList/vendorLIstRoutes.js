@@ -1,30 +1,44 @@
-const express = require('express');
-const router = new express.Router()
+import express from "express";
+const router = express.Router();
+import noCache from "../../../middleware/nocache.js";
+router.use(noCache);
 
 
 // Contorllers
-const vendorListContorllerFile = require("../../../controllers/admin/vendorList/vendorListControler")
-
-
-// Services
-const vendorListServiceFile = require("../../../service/admin/vendorList/vendorListService")
-
-// repositories
-const vendorRepositoryFile = require("../../../repository/vendor");
+import VendorListController from "../../../controllers/admin/vendorList/vendorListControler.js";
+import VendorPendingListController from "../../../controllers/admin/vendorList/vendorPendingListController.js";
+import VendorListService from "../../../service/admin/vendorList/vendorListService.js";
+import VendorPendingListService from "../../../service/admin/vendorList/vendorPendingListService.js";
+import VendorRepository from "../../../repository/vendor.js";
+import adminJwtMiddlewareFile from "../../../middleware/adminJwt.js";
 
 
 // Dependency Injection
-const vendorRepository = new vendorRepositoryFile()
+const adminJwtMiddleware = new adminJwtMiddlewareFile();
 
-const vendorListService = new vendorListServiceFile(vendorRepository)
+const vendorRepository = new VendorRepository()
 
-const vendorListController = new vendorListContorllerFile(vendorListService)
+const vendorListService = new VendorListService(vendorRepository)
+
+const vendorPendingListService = new VendorPendingListService(vendorRepository)
+
+const vendorListController = new VendorListController(vendorListService)
+
+const vendorPendingListController = new VendorPendingListController(vendorPendingListService)
 
 
 // Routes
 router.route("/vendors")
-    .get(vendorListController.renderVendorListPage.bind(vendorListController))
+    .get(adminJwtMiddleware.verifyToken.bind(adminJwtMiddleware),
+        vendorListController.renderVendorListPage.bind(vendorListController))
 
-router.patch("/vendors/:vendorId/toggle-block", vendorListController.toggleVendorBlock.bind(vendorListController));
+router.patch("/vendors/:vendorId/toggle-block", adminJwtMiddleware.verifyToken.bind(adminJwtMiddleware), vendorListController.toggleVendorBlock.bind(vendorListController));
 
-module.exports = router
+router.route("/vendors/pending")
+    .get(adminJwtMiddleware.verifyToken.bind(adminJwtMiddleware), vendorPendingListController.renderVendorPendingListPage.bind(vendorPendingListController))
+
+router.patch("/vendors/pending/:vendorId/approve", adminJwtMiddleware.verifyToken.bind(adminJwtMiddleware), vendorPendingListController.approveVendor.bind(vendorPendingListController))
+
+router.delete("/vendors/pending/:vendorId/reject", adminJwtMiddleware.verifyToken.bind(adminJwtMiddleware), vendorPendingListController.rejectVendor.bind(vendorPendingListController))
+
+export default router;

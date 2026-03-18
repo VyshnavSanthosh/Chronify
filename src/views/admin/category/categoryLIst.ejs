@@ -1,20 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Category List - Chronify</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<% layout('admin/layout/adminLayout') %>
+
+<% block('styles', `
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap');
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #050a14;
-        }
-        .sidebar-item-active {
-            background-color: #4b5563;
-        }
         .category-title {
             font-family: 'Playfair Display', serif;
         }
@@ -82,251 +69,154 @@
             color: white;
         }
     </style>
-</head>
-<body class="text-white min-h-screen flex">
+`) %>
 
-    <!-- Sidebar -->
-    <aside class="w-64 bg-[#0a1425] flex flex-col border-r border-gray-800 hidden md:flex shrink-0">
-        <div class="p-6">
-            <h1 class="text-2xl font-bold tracking-widest text-white uppercase italic">
-                Chronify
-            </h1>
-        </div>
+<!-- Content Area -->
+<div class="p-8 lg:p-12 space-y-8 relative">
+    
+    <!-- Add Category Button (Absolute top right of container) -->
+    <div class="absolute right-8 lg:right-12 top-8 lg:top-12">
+        <a href="/admin/category/add" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-md transition-all inline-block shadow-lg">
+            Add Category
+        </a>
+    </div>
 
-        <nav class="flex-1 px-4 space-y-2 overflow-y-auto">
-            <a href="/admin/dashboard" class="flex items-center justify-between px-4 py-3 rounded-lg transition-colors text-gray-400 hover:bg-gray-800 hover:text-white">
-                <div class="flex items-center space-x-3">
-                    <i class="fa-solid fa-house w-5 text-center"></i>
-                    <span class="text-sm font-medium">Dashboard</span>
-                </div>
-            </a>
-
-            <a href="/admin/products" class="flex items-center justify-between px-4 py-3 rounded-lg transition-colors text-gray-400 hover:bg-gray-800 hover:text-white">
-                <div class="flex items-center space-x-3">
-                    <i class="fa-solid fa-briefcase w-5 text-center"></i>
-                    <span class="text-sm font-medium">Products</span>
-                </div>
-                <i class="fa-solid fa-chevron-right text-[10px]"></i>
-            </a>
-
-            <a href="/admin/orders" class="flex items-center justify-between px-4 py-3 rounded-lg transition-colors text-gray-400 hover:bg-gray-800 hover:text-white">
-                <div class="flex items-center space-x-3">
-                    <i class="fa-solid fa-list-ul w-5 text-center"></i>
-                    <span class="text-sm font-medium">Order List</span>
-                </div>
-                <i class="fa-solid fa-chevron-right text-[10px]"></i>
-            </a>
-
-            <a href="/admin/customers" class="flex items-center justify-between px-4 py-3 rounded-lg transition-colors text-gray-400 hover:bg-gray-800 hover:text-white">
-                <div class="flex items-center space-x-3">
-                    <i class="fa-solid fa-circle-user w-5 text-center"></i>
-                    <span class="text-sm font-medium">Customer</span>
-                </div>
-                <i class="fa-solid fa-chevron-right text-[10px]"></i>
-            </a>
-
-            <a href="/admin/sales" class="flex items-center justify-between px-4 py-3 rounded-lg transition-colors text-gray-400 hover:bg-gray-800 hover:text-white">
-                <div class="flex items-center space-x-3">
-                    <i class="fa-solid fa-hand-holding-dollar w-5 text-center"></i>
-                    <span class="text-sm font-medium">Sales</span>
-                </div>
-                <i class="fa-solid fa-chevron-right text-[10px]"></i>
-            </a>
-
-            <a href="/admin/category" class="flex items-center justify-between px-4 py-3 rounded-lg transition-colors sidebar-item-active text-white">
-                <div class="flex items-center space-x-3">
-                    <i class="fa-solid fa-table-cells-large w-5 text-center"></i>
-                    <span class="text-sm font-medium">Category</span>
-                </div>
-                <i class="fa-solid fa-chevron-right text-[10px]"></i>
-            </a>
-
-            <a href="/admin/coupons" class="flex items-center justify-between px-4 py-3 rounded-lg transition-colors text-gray-400 hover:bg-gray-800 hover:text-white">
-                <div class="flex items-center space-x-3">
-                    <i class="fa-solid fa-ticket w-5 text-center"></i>
-                    <span class="text-sm font-medium">Coupons</span>
-                </div>
-                <i class="fa-solid fa-chevron-right text-[10px]"></i>
-            </a>
-
-            <a href="/admin/vendors" class="flex items-center justify-between px-4 py-3 rounded-lg transition-colors text-gray-400 hover:bg-gray-800 hover:text-white">
-                <div class="flex items-center space-x-3">
-                    <i class="fa-solid fa-users-gear w-5 text-center"></i>
-                    <span class="text-sm font-medium">Vendors</span>
-                </div>
-                <i class="fa-solid fa-chevron-right text-[10px]"></i>
-            </a>
+    <!-- Page Title and Breadcrumbs -->
+    <div class="space-y-4 pt-4">
+        <h2 class="category-title text-4xl font-bold tracking-tight uppercase">CATEGORY LIST</h2>
+        <nav class="flex text-sm text-gray-400 space-x-2">
+            <a href="/admin/dashboard" class="hover:text-white capitalize">Dashboard</a>
+            <span><i class="fa-solid fa-chevron-right text-[8px] mx-1"></i></span>
+            <span class="text-white capitalize">Category List</span>
         </nav>
+    </div>
 
-        <div class="p-6 space-y-4">
-            <button class="w-full py-2 border border-gray-600 text-white font-medium rounded-md hover:bg-gray-800 transition-colors">
-                Account
+    <!-- Filters Section -->
+    <div class="flex flex-col md:flex-row gap-4 items-center justify-between pt-4">
+        <!-- Search Bar -->
+        <div class="relative w-full max-w-md">
+            <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
+            <input type="text" 
+                   id="searchInput"
+                   placeholder="Search Category. . ." 
+                   class="w-full bg-[#0a1425] border border-gray-800 rounded-lg py-3 pl-12 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+        </div>
+
+        <div class="flex gap-4 w-full md:w-auto">
+            <!-- Status Filter -->
+            <div class="relative w-full md:w-40">
+                <select id="statusFilter" class="w-full appearance-none bg-[#0a1425] border border-gray-800 rounded-lg px-4 py-3 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer">
+                    <option value="">All Status</option>
+                    <option value="true">Listed</option>
+                    <option value="false">Unlisted</option>
+                </select>
+                <i class="fa-solid fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-[10px] pointer-events-none text-gray-400"></i>
+            </div>
+
+            <!-- Sort Filter -->
+            <div class="relative w-full md:w-40">
+                <select id="sortFilter" class="w-full appearance-none bg-[#0a1425] border border-gray-800 rounded-lg px-4 py-3 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer">
+                    <option value="">Newest First</option>
+                    <option value="az">Name: A-Z</option>
+                    <option value="za">Name: Z-A</option>
+                </select>
+                <i class="fa-solid fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-[10px] pointer-events-none text-gray-400"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Table Container -->
+    <div class="table-container overflow-x-auto rounded-xl border border-gray-800">
+        <table class="w-full text-left border-collapse min-w-[1200px]">
+            <thead>
+                <tr class="bg-[#4169a1] text-white text-xs font-semibold tracking-wider">
+                    <th class="px-6 py-4 border-r border-white/10 text-center w-20 uppercase">SNO</th>
+                    <th class="px-6 py-4 border-r border-white/10 uppercase">Category Name</th>
+                    <th class="px-6 py-4 border-r border-white/10 uppercase">Description</th>
+                    <th class="px-6 py-4 border-r border-white/10 uppercase text-center">Offer Type</th>
+                    <th class="px-6 py-4 border-r border-white/10 uppercase text-center">Offer</th>
+                    <th class="px-6 py-4 border-r border-white/10 uppercase">Added</th>
+                    <th class="px-6 py-4 border-r border-white/10 uppercase text-center">List / Unlist</th>
+                    <th class="px-6 py-4 uppercase text-center">Edit</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-800" id="categoryTableBody">
+                <% categories.forEach((category, index) => { %>
+                    <tr class="bg-[#050a14] hover:bg-gray-800/50 transition-colors text-sm category-row" data-category-id="<%= category._id %>">
+                        <td class="px-6 py-8 border-r border-gray-800 text-center font-bold">
+                            <%= ((locals.currentPage || 1) - 1) * 10 + index + 1 %>
+                        </td>
+                        <td class="px-6 py-8 border-r border-gray-800 font-medium category-name">
+                            <%= category.categoryName %>
+                        </td>
+                        <td class="px-6 py-8 border-r border-gray-800 font-medium text-gray-300">
+                            <%= category.description || 'N/A' %>
+                        </td>
+                        <td class="px-6 py-8 border-r border-gray-800 text-center">
+                            <% if (category.discountType) { %>
+                                <span class="offer-badge <%= category.offerType === 'percentage' ? 'percentage' : 'flat' %>">
+                                    <%= category.discountType === 'percentage' ? 'Percentage' : 'Flat' %>
+                                </span>
+                            <% } else { %>
+                                <span class="offer-badge none">No Offer</span>
+                            <% } %>
+                        </td>
+                        <td class="px-6 py-8 border-r border-gray-800 text-center font-bold text-emerald-400">
+                            <% if (category.discountValue && category.discountValue > 0) { %>
+                                <%= category.discountType === 'percentage' ? category.discountValue + '%' : '₹' + category.discountValue %>
+                            <% } else { %>
+                                <span class="text-gray-500">-</span>
+                            <% } %>
+                        </td>
+                        <td class="px-6 py-8 border-r border-gray-800 font-medium text-gray-300">
+                            <%= new Date(category.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) %>
+                        </td>
+                        <td class="px-6 py-8 border-r border-gray-800">
+                            <div class="flex justify-center">
+                                <div class="toggle-btn <%= category.isListed ? 'listed' : 'unlisted' %> toggle-list-btn"
+                                     data-category-id="<%= category._id %>"
+                                     data-is-listed="<%= category.isListed %>">
+                                    <span><%= category.isListed ? 'UNLIST' : 'LIST' %></span>
+                                    <div class="toggle-circle"></div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-8">
+                            <div class="flex justify-center">
+                                <a href="/admin/category/edit/<%= category._id %>" 
+                                   class="w-10 h-10 flex items-center justify-center rounded-lg bg-gray-800/50 border border-gray-700 hover:bg-gray-700 transition-all text-gray-400 hover:text-white">
+                                    <i class="fa-regular fa-pen-to-square"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                <% }); %>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="flex flex-col sm:flex-row items-center justify-between pt-4 gap-4">
+        <p class="text-sm text-gray-400">
+            Showing <span id="paginationStart">1</span>-<span id="paginationEnd">10</span> from <span id="paginationTotal">0</span>
+        </p>
+        <div class="flex items-center space-x-2" id="paginationContainer">
+            <button class="w-8 h-8 flex items-center justify-center rounded-lg bg-gray-800 hover:bg-gray-700 transition-colors text-xs" id="prevBtn">
+                <i class="fa-solid fa-chevron-left"></i>
             </button>
-            <button class="w-full py-2 bg-white text-black font-semibold rounded-md hover:bg-gray-200 transition-colors">
-                Logout
+            <div id="pageButtons"></div>
+            <button class="w-8 h-8 flex items-center justify-center rounded-lg bg-gray-800 hover:bg-gray-700 transition-colors text-xs" id="nextBtn">
+                <i class="fa-solid fa-chevron-right"></i>
             </button>
         </div>
-    </aside>
-
-    <!-- Main Content -->
-    <main class="flex-1 flex flex-col overflow-x-hidden">
-        
-        <!-- Header -->
-        <header class="h-16 flex items-center justify-end px-8 border-b border-gray-800 bg-[#050a14] sticky top-0 z-10">
-            <div class="flex items-center space-x-3">
-                <div class="text-right">
-                    <p class="text-sm font-semibold"><%= locals.userName || 'Vyshnav' %></p>
-                    <p class="text-xs text-gray-400 uppercase tracking-tighter"><%= locals.userRole || 'Admin' %></p>
-                </div>
-            </div>
-        </header>
-
-        <!-- Content Area -->
-        <div class="p-8 lg:p-12 space-y-8 relative">
-            
-            <!-- Add Category Button (Absolute top right of container) -->
-            <div class="absolute right-8 lg:right-12 top-8 lg:top-12">
-                <a href="/admin/category/add" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-md transition-all inline-block shadow-lg">
-                    Add Category
-                </a>
-            </div>
-
-            <!-- Page Title and Breadcrumbs -->
-            <div class="space-y-4 pt-4">
-                <h2 class="category-title text-4xl font-bold tracking-tight uppercase">CATEGORY LIST</h2>
-                <nav class="flex text-sm text-gray-400 space-x-2">
-                    <a href="/admin/dashboard" class="hover:text-white capitalize">Dashboard</a>
-                    <span><i class="fa-solid fa-chevron-right text-[8px] mx-1"></i></span>
-                    <span class="text-white capitalize">Category List</span>
-                </nav>
-            </div>
-
-            <!-- Filters Section -->
-            <div class="flex flex-col md:flex-row gap-4 items-center justify-between pt-4">
-                <!-- Search Bar -->
-                <div class="relative w-full max-w-md">
-                    <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
-                    <input type="text" 
-                           id="searchInput"
-                           placeholder="Search Category. . ." 
-                           class="w-full bg-[#0a1425] border border-gray-800 rounded-lg py-3 pl-12 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
-                </div>
-
-                <div class="flex gap-4 w-full md:w-auto">
-                    <!-- Status Filter -->
-                    <div class="relative w-full md:w-40">
-                        <select id="statusFilter" class="w-full appearance-none bg-[#0a1425] border border-gray-800 rounded-lg px-4 py-3 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer">
-                            <option value="">All Status</option>
-                            <option value="true">Listed</option>
-                            <option value="false">Unlisted</option>
-                        </select>
-                        <i class="fa-solid fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-[10px] pointer-events-none text-gray-400"></i>
-                    </div>
-
-                    <!-- Sort Filter -->
-                    <div class="relative w-full md:w-40">
-                        <select id="sortFilter" class="w-full appearance-none bg-[#0a1425] border border-gray-800 rounded-lg px-4 py-3 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer">
-                            <option value="">Newest First</option>
-                            <option value="az">Name: A-Z</option>
-                            <option value="za">Name: Z-A</option>
-                        </select>
-                        <i class="fa-solid fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-[10px] pointer-events-none text-gray-400"></i>
-                    </div>
-                </div>
-            </div>
-
-<!-- Table Container -->
-<div class="table-container overflow-x-auto rounded-xl border border-gray-800">
-    <table class="w-full text-left border-collapse min-w-[1200px]">
-        <thead>
-            <tr class="bg-[#4169a1] text-white text-xs font-semibold tracking-wider">
-                <th class="px-6 py-4 border-r border-white/10 text-center w-20 uppercase">SNO</th>
-                <th class="px-6 py-4 border-r border-white/10 uppercase">Category Name</th>
-                <th class="px-6 py-4 border-r border-white/10 uppercase">Description</th>
-                <th class="px-6 py-4 border-r border-white/10 uppercase text-center">Offer Type</th>
-                <th class="px-6 py-4 border-r border-white/10 uppercase text-center">Offer</th>
-                <th class="px-6 py-4 border-r border-white/10 uppercase">Added</th>
-                <th class="px-6 py-4 border-r border-white/10 uppercase text-center">List / Unlist</th>
-                <th class="px-6 py-4 uppercase text-center">Edit</th>
-            </tr>
-        </thead>
-        <tbody class="divide-y divide-gray-800" id="categoryTableBody">
-            <% (locals.categories || []).forEach((category, index) => { %>
-                <tr class="bg-[#050a14] hover:bg-gray-800/50 transition-colors text-sm category-row" data-category-id="<%= category._id %>">
-                    <td class="px-6 py-8 border-r border-gray-800 text-center font-bold">
-                        <%= ((locals.currentPage || 1) - 1) * 10 + index + 1 %>
-                    </td>
-                    <td class="px-6 py-8 border-r border-gray-800 font-medium category-name">
-                        <%= category.categoryName %>
-                    </td>
-                    <td class="px-6 py-8 border-r border-gray-800 font-medium text-gray-300">
-                        <%= category.description || 'N/A' %>
-                    </td>
-                    <td class="px-6 py-8 border-r border-gray-800 text-center">
-                        <% if (category.discountType) { %>
-                            <span class="offer-badge <%= category.offerType === 'percentage' ? 'percentage' : 'flat' %>">
-                                <%= category.discountType === 'percentage' ? 'Percentage' : 'Flat' %>
-                            </span>
-                        <% } else { %>
-                            <span class="offer-badge none">No Offer</span>
-                        <% } %>
-                    </td>
-                    <td class="px-6 py-8 border-r border-gray-800 text-center font-bold text-emerald-400">
-                        <% if (category.discountValue && category.discountValue > 0) { %>
-                            <%= category.discountType === 'percentage' ? category.discountValue + '%' : '₹' + category.discountValue %>
-                        <% } else { %>
-                            <span class="text-gray-500">-</span>
-                        <% } %>
-                    </td>
-                    <td class="px-6 py-8 border-r border-gray-800 font-medium text-gray-300">
-                        <%= new Date(category.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) %>
-                    </td>
-                    <td class="px-6 py-8 border-r border-gray-800">
-                        <div class="flex justify-center">
-                            <div class="toggle-btn <%= category.isListed ? 'listed' : 'unlisted' %> toggle-list-btn"
-                                 data-category-id="<%= category._id %>"
-                                 data-is-listed="<%= category.isListed %>">
-                                <span><%= category.isListed ? 'UNLIST' : 'LIST' %></span>
-                                <div class="toggle-circle"></div>
-                            </div>
-                        </div>
-                    </td>
-                    <td class="px-6 py-8">
-                        <div class="flex justify-center">
-                            <a href="/admin/category/edit/<%= category._id %>" 
-                               class="w-10 h-10 flex items-center justify-center rounded-lg bg-gray-800/50 border border-gray-700 hover:bg-gray-700 transition-all text-gray-400 hover:text-white">
-                                <i class="fa-regular fa-pen-to-square"></i>
-                            </a>
-                        </div>
-                    </td>
-                </tr>
-            <% }); %>
-        </tbody>
-    </table>
+    </div>
 </div>
 
-            <!-- Pagination -->
-            <div class="flex flex-col sm:flex-row items-center justify-between pt-4 gap-4">
-                <p class="text-sm text-gray-400">
-                    Showing <span id="paginationStart">1</span>-<span id="paginationEnd">10</span> from <span id="paginationTotal">0</span>
-                </p>
-                <div class="flex items-center space-x-2" id="paginationContainer">
-                    <button class="w-8 h-8 flex items-center justify-center rounded-lg bg-gray-800 hover:bg-gray-700 transition-colors text-xs" id="prevBtn">
-                        <i class="fa-solid fa-chevron-left"></i>
-                    </button>
-                    <div id="pageButtons"></div>
-                    <button class="w-8 h-8 flex items-center justify-center rounded-lg bg-gray-800 hover:bg-gray-700 transition-colors text-xs" id="nextBtn">
-                        <i class="fa-solid fa-chevron-right"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </main>
-
+<% block('scripts', `
 <script>
     // Initialize from server data
-    var currentPage = <%= locals.currentPage || 1 %>;
-    var totalCategories = <%= locals.totalCategories || 0 %>;
+    var currentPage = ${locals.currentPage || 1};
+    var totalCategories = ${locals.totalCategories || 0};
     var itemsPerPage = 10;
     var totalPages = Math.ceil(totalCategories / itemsPerPage);
 
@@ -351,17 +241,28 @@
         const categoryId = toggle.getAttribute('data-category-id');
         const currentStatus = toggle.getAttribute('data-is-listed') === 'true';
         const newStatus = !currentStatus;
-        const row = toggle.closest('.category-row');
+        const categoryName = toggle.closest('.category-row').querySelector('.category-name').textContent.trim();
         
-        console.log('Toggle clicked - categoryId:', categoryId, 'newStatus:', newStatus);
-        
+        const result = await Swal.fire({
+            title: newStatus ? 'List Category?' : 'Unlist Category?',
+            text: 'Are you sure you want to ' + (newStatus ? 'list' : 'unlist') + ' ' + categoryName + '?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: newStatus ? '#10b981' : '#ef4444',
+            cancelButtonColor: '#374151',
+            confirmButtonText: newStatus ? 'Yes, List' : 'Yes, Unlist',
+            background: '#0a1425',
+            color: '#fff'
+        });
+
+        if (!result.isConfirmed) return;
+
         // Disable toggle during request
         toggle.style.pointerEvents = 'none';
         toggle.style.opacity = '0.6';
 
         try {
-            const url = `/admin/category/${categoryId}/toggle-listing`;
-            console.log('Fetching URL:', url);
+            const url = "/admin/category/" + categoryId + "/toggle-listing";
             
             const response = await fetch(url, {
                 method: 'PATCH',
@@ -373,25 +274,40 @@
                 })
             });
 
-            console.log('Response status:', response.status);
             const data = await response.json();
-            console.log('Response data:', data);
 
             if (data.success) {
                 // Update toggle appearance
                 toggle.setAttribute('data-is-listed', newStatus);
-                toggle.className = `toggle-btn ${newStatus ? 'listed' : 'unlisted'} toggle-list-btn`;
+                toggle.className = "toggle-btn " + (newStatus ? 'listed' : 'unlisted') + " toggle-list-btn";
                 toggle.querySelector('span').textContent = newStatus ? 'UNLIST' : 'LIST';
-
-                console.log('Success:', data.message);
-                alert(data.message);
+                
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success',
+                    text: data.message,
+                    timer: 1500,
+                    showConfirmButton: false,
+                    background: '#0a1425',
+                    color: '#fff'
+                });
             } else {
-                console.error('API Error:', data.message);
-                alert('Error: ' + (data.message || 'Failed to update status'));
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: data.message || 'Failed to update status',
+                    background: '#0a1425',
+                    color: '#fff'
+                });
             }
         } catch (error) {
-            console.error('Fetch Error:', error);
-            alert('Failed to update category status. Please try again.');
+            Swal.fire({
+                icon: 'error',
+                title: 'Network Error',
+                text: 'Failed to update category status. Please try again.',
+                background: '#0a1425',
+                color: '#fff'
+            });
         } finally {
             // Re-enable toggle
             toggle.style.pointerEvents = '';
@@ -430,7 +346,7 @@
             if (sort) params.append('sort', sort);
             params.append('page', currentPage);
 
-            const response = await fetch(`/admin/category?${params.toString()}`);
+            const response = await fetch("/admin/category?" + params.toString());
             const html = await response.text();
             
             // Parse the response and extract the table body
@@ -441,11 +357,10 @@
             document.getElementById('categoryTableBody').innerHTML = newTableBody.innerHTML;
             
             // Extract totalCategories from the response
-            const scriptMatch = html.match(/var totalCategories = (\d+);/);
+            const scriptMatch = html.match(/var totalCategories = (\\d+);/);
             if (scriptMatch) {
                 totalCategories = parseInt(scriptMatch[1]);
                 totalPages = Math.ceil(totalCategories / itemsPerPage);
-                console.log('Updated totals - categories:', totalCategories, 'pages:', totalPages);
             }
             
             attachToggleListeners();
@@ -459,8 +374,6 @@
     // Update pagination
     function updatePaginationInfo() {
         const pageButtons = document.getElementById('pageButtons');
-        
-        console.log('Updating pagination - currentPage:', currentPage, 'totalPages:', totalPages, 'totalCategories:', totalCategories);
         
         // Calculate start and end
         const start = totalCategories > 0 ? ((currentPage - 1) * itemsPerPage) + 1 : 0;
@@ -481,7 +394,6 @@
         var startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
         var endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
         
-        // Adjust startPage if we're near the end
         if (endPage - startPage < maxVisiblePages - 1) {
             startPage = Math.max(1, endPage - maxVisiblePages + 1);
         }
@@ -489,7 +401,7 @@
         for (var i = startPage; i <= endPage; i++) {
             const btn = document.createElement('button');
             const pageNum = i;
-            btn.className = `w-8 h-8 flex items-center justify-center rounded-lg font-bold text-xs transition-colors ${pageNum === currentPage ? 'bg-blue-600 text-white' : 'bg-white text-black hover:bg-gray-200'}`;
+            btn.className = "w-8 h-8 flex items-center justify-center rounded-lg font-bold text-xs transition-colors " + (pageNum === currentPage ? 'bg-blue-600 text-white' : 'bg-white text-black hover:bg-gray-200');
             btn.textContent = pageNum;
             btn.addEventListener('click', function() {
                 goToPage(pageNum);
@@ -511,7 +423,6 @@
         prevBtn.disabled = currentPage === 1;
         nextBtn.disabled = currentPage >= totalPages;
         
-        // Add visual feedback for disabled state
         if (prevBtn.disabled) {
             prevBtn.classList.add('opacity-50', 'cursor-not-allowed');
         } else {
@@ -528,11 +439,8 @@
     // Go to page
     function goToPage(page) {
         if (page === currentPage || page < 1 || page > totalPages) {
-            console.log('Invalid page navigation attempt:', page);
             return;
         }
-        
-        console.log('Navigating to page:', page);
         
         const search = document.getElementById('searchInput').value;
         const status = document.getElementById('statusFilter').value;
@@ -544,7 +452,7 @@
         if (sort) params.append('sort', sort);
         params.append('page', page);
 
-        window.location.href = `/admin/category?${params.toString()}`;
+        window.location.href = "/admin/category?" + params.toString();
     }
 
     // Previous button
@@ -561,6 +469,4 @@
         }
     });
 </script>
-
-</body>
-</html>
+`) %>

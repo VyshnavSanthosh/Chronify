@@ -1,26 +1,15 @@
-const express = require("express");
+import express from "express";
 const router = express.Router();
 
-// Passport for Google OAuth
-const passport = require("../../../config/google");
-
-// Controllers
-const LoginController = require("../../../controllers/user/auth/loginController");
-
-// Services
-const LoginService = require("../../../service/user/auth/loginService");
-const JwtService = require("../../../service/jwtService");
-const GoogleOauthService = require("../../../service/user/auth/googleOauthService");
-
-// Repository
-const UserRepository = require("../../../repository/user");
-
-// Validators
-const joi_login = require("../../../utils/validators/joi_login");
-const validator = require("../../../utils/validators/validator");
-
-// Middleware
-const { verifyToken } = require("../../../middleware/jwt");
+import passport from "../../../config/google.js";
+import LoginController from "../../../controllers/user/auth/loginController.js";
+import LoginService from "../../../service/user/auth/loginService.js";
+import JwtService from "../../../service/jwtService.js";
+import GoogleOauthService from "../../../service/user/auth/googleOauthService.js";
+import UserRepository from "../../../repository/user.js";
+import joi_login from "../../../utils/validators/joi_login.js";
+import validator from "../../../utils/validators/validator.js";
+import userJwtMiddlewareFile from "../../../middleware/userJwt.js";
 
 
 
@@ -30,7 +19,7 @@ const userRepository = new UserRepository();
 const jwtService = new JwtService();
 const loginService = new LoginService(userRepository, jwtService)
 const googleOauthService = new GoogleOauthService(userRepository);
-
+const userJwtMiddleware = new userJwtMiddlewareFile()
 const loginController = new LoginController(
     loginService,
     googleOauthService,
@@ -50,14 +39,14 @@ router.route("/login")
 
 // Google OAuth - Initiate
 router.get("/google",
-    passport.authenticate("google", { 
-        scope: ["profile", "email"] 
+    passport.authenticate("google", {
+        scope: ["profile", "email"]
     })
 );
 
 // Google OAuth - Callback
 router.get("/google/callback",
-    passport.authenticate("google", { 
+    passport.authenticate("google", {
         failureRedirect: "/auth/login",
         session: false  // We use JWT, not sessions
     }),
@@ -71,11 +60,11 @@ router.post("/refresh-token",
 
 // Logout (protected route)
 router.post("/logout",
-    verifyToken,  // Middleware: verify user is logged in
+    userJwtMiddleware.verifyToken.bind(userJwtMiddleware),  // Middleware: verify user is logged in
     loginController.logout.bind(loginController)
 );
 
-router.get("/home",verifyToken,((req,res)=>{
+router.get("/home",  userJwtMiddleware.verifyToken.bind(userJwtMiddleware), ((req, res) => {
     res.send("home page")
 }))
-module.exports = router;
+export default router;

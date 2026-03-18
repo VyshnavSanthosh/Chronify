@@ -1,31 +1,35 @@
-const Vendor = require('../models/vendor/vendorSchema');
+import Vendor from "../models/vendor/vendorSchema.js";
 
-module.exports = class VendorRepository{
-    
-    async findByEmail(brandEmail){
-        return await Vendor.findOne({brandEmail})
-    } 
+export default class VendorRepository {
+
+    async findByEmail(brandEmail) {
+        return await Vendor.findOne({ brandEmail })
+    }
 
     async findById(vendorId) { // JWT purpose
         return await Vendor.findById(vendorId).select('-passwordHash -refreshToken');
     }
 
-    async createVendor(newVendorData){
+    async findWithRefreshTokenById(vendorId) {
+        return await Vendor.findById(vendorId).select('-passwordHash');
+    }
+
+    async createVendor(newVendorData) {
         try {
-                const vendor = new Vendor(newVendorData);
-                return await vendor.save();
-        
-            } catch (error) {
-    
-                // Duplicate key error (MongoDB error code 11000)
-                if (error.code === 11000) {
-                    const field = Object.keys(error.keyValue)[0];
-                    throw new Error(`${field} already exists`);
-                }
-    
-                // Re-throw other errors
-                throw error;
+            const vendor = new Vendor(newVendorData);
+            return await vendor.save();
+
+        } catch (error) {
+
+            // Duplicate key error (MongoDB error code 11000)
+            if (error.code === 11000) {
+                const field = Object.keys(error.keyValue)[0];
+                throw new Error(`${field} already exists`);
             }
+
+            // Re-throw other errors
+            throw error;
+        }
     }
 
     async setVerified(vendorId) {
@@ -39,13 +43,13 @@ module.exports = class VendorRepository{
 
 
     async updateRefreshToken(vendorId, refreshToken) {
-            return await Vendor.findByIdAndUpdate(
-                vendorId,
-                { refreshToken },
-                { new: true }
-            );
-        }
-    
+        return await Vendor.findByIdAndUpdate(
+            vendorId,
+            { refreshToken },
+            { new: true }
+        );
+    }
+
     async clearRefreshToken(vendorId) {
         return await Vendor.findByIdAndUpdate(
             vendorId,
@@ -55,10 +59,15 @@ module.exports = class VendorRepository{
     }
 
     async deleteById(vendorId) {
-        return await Vendor.findByIdAndDelete(vendorId);
+        try {
+            return await Vendor.findByIdAndDelete(vendorId);
+        } catch (error) {
+            throw new Error("Couldn't delete from db");
+
+        }
     }
 
-    async getAllVendors(limit, skip, sortOrder, search, status,sortField){
+    async getAllVendors(limit, skip, sortOrder, search, status, sortField) {
         const query = {
             isApproved: true
         }
@@ -77,13 +86,14 @@ module.exports = class VendorRepository{
         sortObj[sortField] = sortOrder;
 
         const vendors = await Vendor.find(query)
-        .sort(sortObj) 
-        .skip(skip)                     
-        .limit(limit);
-        
+            .sort(sortObj)
+            .skip(skip)
+            .limit(limit);
+
         const totalVendors = await Vendor.countDocuments(query);
 
-        return {vendors, totalVendors};
+
+        return { vendors, totalVendors };
     }
 
     async updateVendorBlockStatus(vendorId, isBlocked) {
@@ -102,5 +112,30 @@ module.exports = class VendorRepository{
         } catch (error) {
             throw new Error(`Error updating vendor block status: ${error.message}`)
         }
+    }
+
+    async getNotApprovedVendors(limit, skip) {
+        const vendors = await Vendor.find({ isApproved: false })
+            .skip(skip)
+            .limit(limit)
+        
+        
+        const totalVendors = await Vendor.countDocuments({ isApproved: false })
+
+        return { vendors, totalVendors }
+    }
+
+    async setApproved(vendorId) {
+        try {
+            const vendor = await Vendor.findByIdAndUpdate(
+                vendorId,
+                { isApproved: true },
+                { new: true }
+            )
+            return vendor
+        } catch (error) {
+            throw new Error(`Error updating vendor to is verified block status: ${error.message}`)
+        }
+
     }
 }

@@ -1,15 +1,19 @@
-const Category = require("../../models/admin/categorySchema")
+import Category from "../../models/admin/categorySchema.js";
 
-module.exports = class CategoryRepository {
-    
-    async findByName(categoryName){
-        return await Category.findOne({categoryName})
+export default class CategoryRepository {
+
+    async findByName(categoryName) {
+        return await Category.findOne({ categoryName })
     }
 
-    async findById(categoryId){
+    async findById(categoryId) {
         return await Category.findById(categoryId)
     }
-    async getAllCategories(limit, skip, sortOrder, search, status,sortField){
+    async getAllCategoriesForProductPage() {
+        return await Category.find({})
+    }
+
+    async getAllCategories(limit, skip, sortOrder, search, status, sortField) {
         const query = {}
         if (status == "true") {
             query.isListed = true
@@ -19,7 +23,7 @@ module.exports = class CategoryRepository {
         }
 
         if (search) {
-            query.categoryName = { $regex: search, $options: "i"}
+            query.categoryName = { $regex: search, $options: "i" }
         }
 
         const sortObj = {}
@@ -29,13 +33,13 @@ module.exports = class CategoryRepository {
             .sort(sortObj)
             .skip(skip)
             .limit(limit)
-        
+
         const totalCategories = await Category.countDocuments(query)
-        
-        return {categories, totalCategories}
+
+        return { categories, totalCategories }
     }
-    
-    async createCategory(categoryObj){
+
+    async createCategory(categoryObj) {
         try {
             const category = new Category(categoryObj)
             return await category.save()
@@ -51,27 +55,27 @@ module.exports = class CategoryRepository {
         }
     }
 
-    async unlistCategory(categoryId){
+    async unlistCategory(categoryId) {
         return await Category.findByIdAndUpdate(
             categoryId,
-            { isListed: false}
+            { isListed: false }
         )
     }
 
-    async updatedCategoryListingStatus(categoryId, isListed){
+    async updatedCategoryListingStatus(categoryId, isListed) {
         try {
             const updatedCategory = await Category.findByIdAndUpdate(
                 categoryId,
                 { isListed: isListed },
                 { new: true }
-                )
+            )
             return updatedCategory
         } catch (error) {
             throw new Error(`Error updating category listing status: ${error.message}`)
         }
     }
 
-    async editCategoryinDb(categoryId,categoryObj){
+    async editCategoryinDb(categoryId, categoryObj) {
         try {
             await Category.findByIdAndUpdate(
                 categoryId,
@@ -80,7 +84,7 @@ module.exports = class CategoryRepository {
             )
         } catch (error) {
             throw new Error("Problem while updating in db", error);
-            
+
         }
     }
 }

@@ -1,54 +1,40 @@
-const express = require("express");
+import express from "express";
 const router = express.Router();
+import noCache from "../../../middleware/nocache.js";
+router.use(noCache);
 
-// Controller
-const forgotPasswordControllerFile = require("../../../controllers/vendor/auth/forgotPasswordController")
-
-const forgotPasswordOtpControllerFile = require("../../../controllers/vendor/auth/forgotPasswordOtpController")
-
-const resetPasswordControllerFile = require("../../../controllers/vendor/auth/resetPasswordController")
-
-// Service
-const forgotPasswordServiceFile = require("../../../service/vendor/auth/forgotPasswordService");
-
-const forgotPasswordOtpServiceFile = require("../../../service/vendor/auth/forgotPasswordOtpService");
-
-const resetPasswordServiceFile = require("../../../service/vendor/auth/resetPasswordService");
-
-
-// Repository
-const vendorRepositoryFile = require("../../../repository/vendor");
-
-// Utils
-const redis = require("../../../utils/redis");
-const generateOtp = require("../../../utils/generateOTP");
-
-// Queue
-const emailQueue = require("../../../queues/emailQueue");
-
-// Validators
-const joi_forgotPassword = require("../../../utils/validators/joi_forgotPassword");
-const joi_resetPassword = require("../../../utils/validators/joi_resetPassword");
-const validator = require("../../../utils/validators/validator");
+import ForgotPasswordController from "../../../controllers/vendor/auth/forgotPasswordController.js";
+import ForgotPasswordOtpController from "../../../controllers/vendor/auth/forgotPasswordOtpController.js";
+import ResetPasswordController from "../../../controllers/vendor/auth/resetPasswordController.js";
+import ForgotPasswordService from "../../../service/vendor/auth/forgotPasswordService.js";
+import ForgotPasswordOtpService from "../../../service/vendor/auth/forgotPasswordOtpService.js";
+import ResetPasswordService from "../../../service/vendor/auth/resetPasswordService.js";
+import VendorRepository from "../../../repository/vendor.js";
+import redis from "../../../utils/redis.js";
+import generateOtp from "../../../utils/generateOTP.js";
+import emailQueue from "../../../queues/emailQueue.js";
+import joi_forgotPassword from "../../../utils/validators/joi_forgotPassword.js";
+import joi_resetPassword from "../../../utils/validators/joi_resetPassword.js";
+import validator from "../../../utils/validators/validator.js";
 
 
 // Dependency injection
 
-const vendorRepository = new vendorRepositoryFile()
+const vendorRepository = new VendorRepository()
 
 // Services
-const forgotPasswordService = new forgotPasswordServiceFile(vendorRepository, redis, emailQueue, generateOtp)
+const forgotPasswordService = new ForgotPasswordService(vendorRepository, redis, emailQueue, generateOtp)
 
-const forgotPasswordOtpService = new forgotPasswordOtpServiceFile(vendorRepository, redis, generateOtp, emailQueue)
+const forgotPasswordOtpService = new ForgotPasswordOtpService(vendorRepository, redis, generateOtp, emailQueue)
 
-const resetPasswordService = new resetPasswordServiceFile(vendorRepository, redis)
+const resetPasswordService = new ResetPasswordService(vendorRepository, redis)
 
 // Controllers
-const forgotPasswordController = new forgotPasswordControllerFile(forgotPasswordService, joi_forgotPassword, validator)
+const forgotPasswordController = new ForgotPasswordController(forgotPasswordService, joi_forgotPassword, validator)
 
-const forgotPasswordOtpController = new forgotPasswordOtpControllerFile(forgotPasswordOtpService)
+const forgotPasswordOtpController = new ForgotPasswordOtpController(forgotPasswordOtpService)
 
-const resetPasswordController = new resetPasswordControllerFile(resetPasswordService, joi_resetPassword, validator)
+const resetPasswordController = new ResetPasswordController(resetPasswordService, joi_resetPassword, validator)
 
 
 // Routes
@@ -73,4 +59,4 @@ router.route("/reset-password")
     .get(resetPasswordController.renderResetPasswordPage.bind(resetPasswordController))
     .post(resetPasswordController.handleResetPassword.bind(resetPasswordController));
 
-module.exports = router;
+export default router;

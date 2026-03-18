@@ -1,0 +1,558 @@
+<% layout('vendor/layout/vendorLayout') %>
+
+<% block('styles', `
+  <style>
+    .table-header-bg {
+      background: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%);
+    }
+
+    .table-row {
+      border-bottom: 1px solid #1e3a5f;
+      transition: background 0.2s ease;
+    }
+
+    .table-row:hover {
+      background: rgba(59, 130, 246, 0.1);
+    }
+
+    .product-image {
+      width: 50px;
+      height: 50px;
+      border-radius: 6px;
+      background: #1e3a5f;
+      object-fit: cover;
+    }
+
+    .status-approved {
+      color: #22c55e;
+      font-weight: 600;
+      font-size: 13px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .status-rejected {
+      color: #ef4444;
+      font-weight: 600;
+      font-size: 13px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .status-pending {
+      color: #3b82f6;
+      font-weight: 600;
+      font-size: 13px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .action-icon {
+      width: 32px;
+      height: 32px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #2d5a8c;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-left: 8px;
+      background: transparent;
+      color: #60a5fa;
+      font-size: 14px;
+    }
+
+    .action-icon:hover {
+      background: rgba(59, 130, 246, 0.2);
+      border-color: #3b82f6;
+      color: #3b82f6;
+    }
+
+    .action-icon.delete {
+      border-color: #ef4444;
+      color: #ef4444;
+    }
+
+    .action-icon.delete:hover {
+      background: rgba(239, 68, 68, 0.2);
+      border-color: #dc2626;
+      color: #dc2626;
+    }
+
+    .pagination-btn {
+      background: #1e3a5f;
+      color: #a0aec0;
+      border: 1px solid #2d5a8c;
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .pagination-btn:hover:not(:disabled) {
+      background: #2d5a8c;
+      color: #60a5fa;
+    }
+
+    .pagination-btn.active {
+      background: #3b82f6;
+      color: white;
+      border-color: #3b82f6;
+    }
+
+    .pagination-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .filter-input,
+    .filter-select {
+      background: #0f172a;
+      border: 1px solid #1e3a5f;
+      color: white;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 13px;
+    }
+
+    .filter-input::placeholder {
+      color: #64748b;
+    }
+
+    .filter-select option {
+      background: #0a1425;
+      color: white;
+    }
+
+    .btn-primary {
+      background: #3b82f6;
+      color: white;
+      padding: 10px 24px;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .btn-primary:hover {
+      background: #2563eb;
+      box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
+    }
+
+    .no-products {
+      text-align: center;
+      padding: 40px;
+      color: #a0aec0;
+    }
+
+    @keyframes fadeOut {
+      to {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+    }
+  </style>
+`) %>
+
+<div class="p-6">
+  <!-- Breadcrumbs Area -->
+  <div class="px-2 py-4">
+    <h2 class="text-gray-400 text-sm">
+      <a href="/vendor/dashboard" class="hover:text-white transition-colors">Dashboard</a>
+      <span class="mx-2">&gt;</span>
+      <span class="text-white font-medium">Products</span>
+    </h2>
+  </div>
+
+  <!-- Page Title and Add Product Button -->
+  <div class="px-2 py-4 flex justify-between items-center">
+    <h1 class="text-3xl font-bold text-white">Products</h1>
+    <a href="/vendor/products/add" class="btn-primary">
+      <i class="fas fa-plus mr-2"></i> Add Product
+    </a>
+  </div>
+
+  <!-- Search and Filters -->
+  <div class="px-2 py-4 flex gap-4 flex-wrap items-center">
+    <!-- Search Bar -->
+    <div class="relative flex-1 min-w-[300px]">
+      <input type="text" placeholder="Search product..." class="filter-input w-full pl-10" id="searchInput" value="<%= search || '' %>">
+      <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500"></i>
+    </div>
+
+    <!-- Sort By Dropdown -->
+    <select class="filter-select" id="sortBy">
+      <option value="">Sort By</option>
+      <option value="newest" <%= sort === '' || sort === 'newest' ? 'selected' : '' %>>Newest</option>
+      <option value="oldest" <%= sort === 'oldest' ? 'selected' : '' %>>Oldest</option>
+      <option value="az" <%= sort === 'az' ? 'selected' : '' %>>Name (A-Z)</option>
+      <option value="za" <%= sort === 'za' ? 'selected' : '' %>>Name (Z-A)</option>
+    </select>
+
+    <!-- Status Dropdown -->
+    <select class="filter-select" id="statusFilter">
+      <option value="">Status: All</option>
+      <option value="approved" <%= status === 'approved' ? 'selected' : '' %>>Status: Approved</option>
+      <option value="pending" <%= status === 'pending' ? 'selected' : '' %>>Status: Pending</option>
+      <option value="rejected" <%= status === 'rejected' ? 'selected' : '' %>>Status: Rejected</option>
+    </select>
+  </div>
+
+  <!-- Products Table -->
+  <div class="px-2 py-4">
+    <div class="overflow-x-auto rounded-lg border border-gray-800">
+      <table class="w-full">
+        <thead>
+          <tr class="table-header-bg">
+            <th class="px-6 py-3 text-left text-white font-semibold">Image</th>
+            <th class="px-6 py-3 text-left text-white font-semibold">Product Name</th>
+            <th class="px-6 py-3 text-left text-white font-semibold">Category</th>
+            <th class="px-6 py-3 text-left text-white font-semibold">Price</th>
+            <th class="px-6 py-3 text-left text-white font-semibold">List Status</th>
+            <th class="px-6 py-3 text-left text-white font-semibold">Offer %</th>
+            <th class="px-6 py-3 text-left text-white font-semibold">Status</th>
+            <th class="px-6 py-3 text-left text-white font-semibold">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="bg-[#0a1425]/50">
+          <% if (typeof products !== 'undefined' && products.length > 0) { %>
+            <% products.forEach((product) => { %>
+              <tr class="table-row" data-product-id="<%= product._id %>">
+                <!-- Product Image -->
+                <td class="px-6 py-4" onclick="viewProduct('<%= product._id %>')" style="cursor: pointer;">
+                  <img src="<%= product.variants && product.variants[0] ? product.variants[0].mainImage.url : '/placeholder.svg?height=50&width=50' %>" alt="<%= product.name %>" class="product-image">
+                </td>
+
+                <!-- Product Name -->
+                <td class="px-6 py-4 text-white font-medium" onclick="viewProduct('<%= product._id %>')" style="cursor: pointer;"><%= product.name %></td>
+
+                <!-- Category -->
+                <td class="px-6 py-4 text-gray-300" onclick="viewProduct('<%= product._id %>')" style="cursor: pointer;">
+                  <%= product.category && product.category.categoryName ? product.category.categoryName : 'N/A' %>
+                </td>
+
+                <!-- Price -->
+                <td class="px-6 py-4 text-white font-semibold" onclick="viewProduct('<%= product._id %>')" style="cursor: pointer;">
+                  ₹<%= product.variants && product.variants[0] ? product.variants[0].price : '0' %>
+                </td>
+
+                <!-- List/Unlist Toggle Button -->
+                <td class="px-6 py-4">
+                  <div class="flex items-center">
+                    <label class="relative inline-flex items-center cursor-pointer group">
+                      <input type="checkbox" 
+                             class="sr-only peer" 
+                             onchange="toggleProductList(event, '<%= product._id %>')"
+                             <%= product.isListed ? 'checked' : '' %>>
+                      <div class="w-11 h-6 bg-red-500 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+                    </label>
+                  </div>
+                </td>
+
+                <!-- Offer Percentage -->
+                <td class="px-6 py-4 text-gray-300">
+                  <%= product.variants && product.variants[0] ? product.variants[0].offer : '0' %>%
+                </td>
+
+                <!-- Status -->
+                <td class="px-6 py-4">
+                  <% if (product.status === 'approved') { %>
+                    <span class="status-approved">
+                      <i class="fas fa-check-circle mr-1"></i> Approved
+                    </span>
+                  <% } else if (product.status === 'rejected') { %>
+                    <span class="status-rejected">
+                      <i class="fas fa-times-circle mr-1"></i> Rejected
+                    </span>
+                  <% } else { %>
+                    <span class="status-pending">
+                      <i class="fas fa-clock mr-1"></i> Pending
+                    </span>
+                  <% } %>
+                </td>
+
+                <!-- Actions -->
+                <td class="px-6 py-4">
+                  <div class="flex items-center">
+                    <a href="/vendor/products/<%= product._id %>/edit" class="action-icon" title="Edit Product">
+                      <i class="fas fa-edit"></i>
+                    </a>
+                    <button onclick="deleteProduct(event, '<%= product._id %>')" class="action-icon delete" title="Delete Product">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            <% }); %>
+          <% } else { %>
+            <tr>
+              <td colspan="8" class="no-products">
+                <i class="fas fa-inbox text-5xl mb-4 block opacity-20"></i>
+                <p>No products found. <a href="/vendor/products/add" class="text-blue-500 hover:underline">Add your first product</a></p>
+              </td>
+            </tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  <% if (typeof totalProducts !== 'undefined' && totalProducts > 0) { %>
+    <div class="px-2 py-6 flex justify-between items-center">
+      <span class="text-gray-400 text-sm">
+        Showing <span id="showingStart"><%= ((currentPage - 1) * 10) + 1 %></span>-<span id="showingEnd"><%= Math.min(currentPage * 10, totalProducts) %></span> from <span id="totalCount"><%= totalProducts %></span>
+      </span>
+      <div class="flex gap-2" id="paginationContainer">
+        <button class="pagination-btn" id="prevBtn" onclick="goToPage(<%= currentPage - 1 %>)" <%= currentPage === 1 ? 'disabled' : '' %>>
+          <i class="fas fa-chevron-left"></i>
+        </button>
+        <div id="pageButtons" class="flex gap-2">
+          <% 
+            const totalPages = Math.ceil(totalProducts / 10);
+            const maxButtons = 5;
+            let startPage = Math.max(1, currentPage - 2);
+            let endPage = Math.min(totalPages, startPage + maxButtons - 1);
+            
+            if (endPage - startPage < maxButtons - 1) {
+              startPage = Math.max(1, endPage - maxButtons + 1);
+            }
+            
+            for (let i = startPage; i <= endPage; i++) { 
+          %>
+            <button class="pagination-btn <%= i === currentPage ? 'active' : '' %>" onclick="goToPage(<%= i %>)">
+              <%= i %>
+            </button>
+          <% } %>
+          
+          <% if (endPage < totalPages) { %>
+            <span class="px-2 text-gray-500 flex items-center">. . .</span>
+            <button class="pagination-btn" onclick="goToPage(<%= totalPages %>)">
+              <%= totalPages %>
+            </button>
+          <% } %>
+        </div>
+        <button class="pagination-btn" id="nextBtn" onclick="goToPage(<%= currentPage + 1 %>)" <%= currentPage === totalPages ? 'disabled' : '' %>>
+          <i class="fas fa-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+  <% } %>
+</div>
+
+<% block('scripts', `
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Show success/error messages
+      const successMsg = '${locals.success || ""}';
+      const errorMsg = '${locals.error || ""}';
+
+      if (successMsg) {
+        const Toast = Swal.mixin({
+          toast: true,
+          position: 'top-end',
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+        });
+        Toast.fire({
+          icon: 'success',
+          title: successMsg
+        });
+      }
+
+      if (errorMsg) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: errorMsg,
+          background: '#1f2937',
+          color: '#fff'
+        });
+      }
+
+      attachFilterListeners();
+    });
+
+    function attachFilterListeners() {
+      const searchInput = document.getElementById('searchInput');
+      const sortBy = document.getElementById('sortBy');
+      const statusFilter = document.getElementById('statusFilter');
+
+      if (searchInput) searchInput.addEventListener('keyup', debounce(applyFilters, 500));
+      if (sortBy) sortBy.addEventListener('change', applyFilters);
+      if (statusFilter) statusFilter.addEventListener('change', applyFilters);
+    }
+
+    function debounce(func, delay) {
+      let timeoutId;
+      return function(...args) {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => func.apply(this, args), delay);
+      };
+    }
+
+    function applyFilters() {
+      const search = document.getElementById('searchInput').value;
+      const status = document.getElementById('statusFilter').value;
+      const sort = document.getElementById('sortBy').value;
+      
+      const params = new URLSearchParams();
+      if (search) params.append('search', search);
+      if (status) params.append('status', status);
+      if (sort) params.append('sort', sort);
+      params.append('page', 1);
+
+      window.location.href = "/vendor/products?" + params.toString();
+    }
+
+    function goToPage(page) {
+      const search = document.getElementById('searchInput').value;
+      const status = document.getElementById('statusFilter').value;
+      const sort = document.getElementById('sortBy').value;
+      
+      const params = new URLSearchParams();
+      if (search) params.append('search', search);
+      if (status) params.append('status', status);
+      if (sort) params.append('sort', sort);
+      params.append('page', page);
+
+      window.location.href = "/vendor/products?" + params.toString();
+    }
+
+    async function toggleProductList(event, productId) {
+      const checkbox = event.target;
+      const newStatus = checkbox.checked;
+      
+      checkbox.disabled = true;
+      
+      try {
+        const response = await fetch("/vendor/products/" + productId + "/toggle-list", {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ isListed: newStatus })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          const Toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+          });
+
+          Toast.fire({
+            icon: 'success',
+            title: newStatus ? 'Product Listed Successfully' : 'Product Unlisted Successfully'
+          });
+        } else {
+          checkbox.checked = !newStatus;
+          Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: data.message || 'Failed to update product',
+            background: '#1f2937',
+            color: '#fff'
+          });
+        }
+      } catch (error) {
+        console.error('Error toggling product:', error);
+        checkbox.checked = !newStatus;
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Failed to update product status. Please try again.',
+          background: '#1f2937',
+          color: '#fff'
+        });
+      } finally {
+        checkbox.disabled = false;
+      }
+    }
+
+    async function deleteProduct(event, productId) {
+      event.preventDefault();
+      
+      const result = await Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!',
+        background: '#1f2937',
+        color: '#fff'
+      });
+
+      if (!result.isConfirmed) {
+        return;
+      }
+
+      try {
+        const response = await fetch("/vendor/products/" + productId, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          const row = document.querySelector("tr[data-product-id='" + productId + "']");
+          if (row) {
+            row.style.animation = 'fadeOut 0.3s ease';
+            setTimeout(() => {
+              row.remove();
+              window.location.reload();
+            }, 300);
+          }
+          
+          Swal.fire({
+            title: 'Deleted!',
+            text: data.message || 'Your product has been deleted.',
+            icon: 'success',
+            background: '#1f2937',
+            color: '#fff'
+          });
+        } else {
+          Swal.fire({
+            title: 'Error!',
+            text: data.message || 'Failed to delete product',
+            icon: 'error',
+            background: '#1f2937',
+            color: '#fff'
+          });
+        }
+      } catch (error) {
+        console.error('Error deleting product:', error);
+        Swal.fire({
+          title: 'Error!',
+          text: 'Failed to delete product. Please try again.',
+          icon: 'error',
+          background: '#1f2937',
+          color: '#fff'
+        });
+      }
+    }
+
+    function viewProduct(productId) {
+      window.location.href = "/products/" + productId;
+    }
+  </script>
+`) %>

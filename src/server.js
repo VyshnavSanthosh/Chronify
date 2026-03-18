@@ -1,9 +1,10 @@
-const app = require("./app")
-const {port} = require("./config/index");
-const connectDB = require('./config/db');
+import app from "./app.js";
+import { port } from "./config/index.js";
+import connectDB from "./config/db.js";
 
 // connect with mongodb
-connectDB()
-app.listen(port, () =>
-    console.log(`Chronify listening on http://localhost:${port}/auth/login`)
-);
+connectDB();
+
+app.listen(port, () => {
+    console.log(`Chronify listening on http://localhost:${port}/auth/login`);
+});

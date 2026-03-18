@@ -1,0 +1,28 @@
+<header>
+    <div class="logo" onclick="window.location.href='/'" style="cursor: pointer;">CHRONIFY</div>
+    <div class="header-center">
+        <a href="/" style="color: #fff; text-decoration: none;">Home</a>
+        <a href="/products" style="color: #fff; text-decoration: none;">Shop</a>
+    </div>
+
+    <div class="header-icons">
+        <button class="icon-btn" title="Wishlist" onclick="window.location.href='/wishlist'">
+            <i class="far fa-heart"></i>
+            <% if (wishlistCount > 0) { %>
+                <span class="badge wishlist-badge"><%= wishlistCount %></span>
+            <% } %>
+        </button>
+        <button class="icon-btn" title="Cart" onclick="window.location.href='/cart'">
+            <i class="fas fa-shopping-cart"></i>
+            <% if (cartCount > 0) { %>
+                <span class="badge cart-badge"><%= cartCount %></span>
+            <% } %>
+        </button>
+        <button class="icon-btn" title="Account" onclick="window.location.href='/profile'">
+            <i class="far fa-user-circle"></i>
+        </button>
+        <button class="icon-btn" title="Logout" onclick="handleLogout()">
+            <i class="fas fa-sign-out-alt"></i>
+        </button>
+    </div>
+</header>

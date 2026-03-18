@@ -1,16 +1,16 @@
-const { compareString } = require("../../../utils/bcrypt");
-module.exports = class LoginService{
+import { compareString } from "../../../utils/bcrypt.js";
+export default class LoginService {
     constructor(userRepository, jwtService) {
         this.userRepository = userRepository;
         this.jwtService = jwtService;
     }
 
-    async login(email, password){
+    async login(email, password) {
         let normalizedEmail = email.toLowerCase().trim();
         let user = await this.userRepository.findByEmail(normalizedEmail)
-        
+
         if (!user) {
-            throw new Error("Invalid email or password");   
+            throw new Error("Invalid email or password");
         }
         // Check if user is verified
         if (!user.isVerified) {
@@ -45,10 +45,10 @@ module.exports = class LoginService{
 
         return {
             user: userObj,
-            accessToken,
-            refreshToken
+            userAccessToken: accessToken,
+            userRefreshToken: refreshToken
         };
-    
+
     }
 
     async refreshAccessToken(refreshToken) {
@@ -56,7 +56,7 @@ module.exports = class LoginService{
         const decoded = this.jwtService.verifyRefreshToken(refreshToken);
 
         // Find user
-        const user = await this.userRepository.findById(decoded.userId);
+        const user = await this.userRepository.findWithRefreshTokenById(decoded.userId);
 
         if (!user) {
             throw new Error("User not found");
@@ -75,6 +75,7 @@ module.exports = class LoginService{
             user.email,
             user.role
         );
+        
 
         // Update refresh token in database
         await this.userRepository.updateRefreshToken(user._id, newTokens.refreshToken);
