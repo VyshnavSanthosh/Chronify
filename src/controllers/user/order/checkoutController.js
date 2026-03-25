@@ -19,8 +19,11 @@ export default class CheckoutController {
         try {
 
             const addresses = await this.orderService.getAllAddress(user._id)
-            const { cart, total, subTotal, discountAmount, shippingFee } = await this.orderService.getCartItems(user._id, selectedSkus, discount, applyType, category, maxDiscountAmount)
+            const { cart, total, subTotal, discountAmount, shippingFee, removedItemsCount } = await this.orderService.getCartItems(user._id, selectedSkus, discount, applyType, category, maxDiscountAmount)
 
+            if (removedItemsCount > 0) {
+                return res.redirect("/products?blocked=true")
+            }
 
             return res.render("user/order/checkout", {
                 user: user,
@@ -117,11 +120,11 @@ export default class CheckoutController {
         if (couponCode) {
             const isCouponValid = await this.couponService.checkCoupon(couponCode)
             if (isCouponValid == null) {
-                data.total += data.discountAmount
+                data.total = Number(data.total) + Number(data.discountAmount)
                 data.discountAmount = 0
                 return res.status(400).json({
                     success: false,
-                    message: "This coupon is no longer available"
+                    message: "This coupon is no longer available or has reached its usage limit"
                 })
             }
         }
@@ -232,7 +235,6 @@ export default class CheckoutController {
     }
 
     async handleCancel(req, res) {
-        console.log("hello")
 
         const { orderId, items } = req.body;
         try {
@@ -263,7 +265,7 @@ export default class CheckoutController {
             if (!coupon) {
                 return res.json({
                     success: false,
-                    message: "Invalid coupon code"
+                    message: "Invalid coupon code or it has reached its usage limit"
                 })
             }
             if (!coupon.isActive) {
@@ -293,7 +295,6 @@ export default class CheckoutController {
     async getAvailableCoupons(req, res) {
         try {
             const coupons = await this.couponService.getAvailableCoupons();
-            console.log("coupons", coupons)
 
             return res.json({
                 success: true,

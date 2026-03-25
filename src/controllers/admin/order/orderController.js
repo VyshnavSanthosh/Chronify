@@ -32,7 +32,6 @@ export default class AdminOrderController {
 
         try {
             const order = await this.orderService.getOrderDetail(orderId)
-            console.log("order : ", order)
 
             return res.render("user/order/orderDetail", {
                 order,

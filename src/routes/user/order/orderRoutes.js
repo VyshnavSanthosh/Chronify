@@ -27,6 +27,7 @@ import productRepositoryFile from "../../../repository/vendor/productRepository.
 import categoryRepositoryFile from "../../../repository/admin/category.js";
 import couponRepositoryFile from "../../../repository/admin/coupon.js";
 import walletRepositoryFile from "../../../repository/user/walletRepository.js";
+import VendorRepositoryFile from "../../../repository/vendor.js";
 
 import emailQueue from "../../../queues/emailQueue.js";
 
@@ -42,11 +43,12 @@ const productRepository = new productRepositoryFile();
 const categoryRepository = new categoryRepositoryFile();
 const couponRepository = new couponRepositoryFile();
 const walletRepository = new walletRepositoryFile();
+const vendorRepository = new VendorRepositoryFile();
 
 const addressService = new addressServiceFile(addressRepository);
 const productInventoryService = new productInventoryServiceFile(productInventoryRepository);
 const couponService = new couponServiceFile(couponRepository);
-const orderService = new orderServiceFile(orderRepository, addressRepository, cartRepository, returnRepository, productInventoryService, emailQueue, productRepository, categoryRepository, couponRepository, walletRepository);
+const orderService = new orderServiceFile(orderRepository, addressRepository, cartRepository, returnRepository, productInventoryService, emailQueue, productRepository, categoryRepository, couponRepository, walletRepository, vendorRepository);
 
 const orderController = new orderControllerFile(orderService, addressService, validator, joi_address, couponService, productInventoryService);
 const orderListController = new orderListControllerFile(orderService);

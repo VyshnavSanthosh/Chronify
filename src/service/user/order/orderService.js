@@ -1,6 +1,6 @@
 import crypto from "crypto"
 export default class OrderService {
-    constructor(orderRepository, addressRepository, cartRepository, returnRepository, productInventoryService, emailQueue, productRepository, categoryRepository, couponRepository, walletRepository) {
+    constructor(orderRepository, addressRepository, cartRepository, returnRepository, productInventoryService, emailQueue, productRepository, categoryRepository, couponRepository, walletRepository, vendorRepository) {
         this.orderRepository = orderRepository
         this.addressRepository = addressRepository
         this.cartRepository = cartRepository
@@ -11,6 +11,7 @@ export default class OrderService {
         this.categoryRepository = categoryRepository
         this.couponRepository = couponRepository
         this.walletRepository = walletRepository
+        this.vendorRepository = vendorRepository
     }
     async getAllAddress(userId) {
         const address = await this.addressRepository.getAllAddressByUserId(userId)
@@ -21,8 +22,8 @@ export default class OrderService {
         const { cart, count } = await this.cartRepository.getAllItemsByUserId(userId)
         let total = 0
         const filteredItems = [];
-        console.log("cart :", cart)
 
+        let removedItemsCount = 0;
         for (let item = 0; item < cart.items.length; item++) {
             if (selectedSkus && !selectedSkus.includes(cart.items[item].sku)) {
                 continue;
@@ -30,8 +31,13 @@ export default class OrderService {
             let productObj = {}
             let product = await this.cartRepository.getProductBySku(cart.items[item].sku)
 
-
             const category = await this.categoryRepository.findById(product.category)
+
+            // Check if product, category or vendor is blocked
+            if (!product || !product.isListed || product.isDeleted || (category && !category.isListed) || (product.vendorId && (await this.vendorRepository.findById(product.vendorId))?.isBlocked)) {
+                removedItemsCount++;
+                continue;
+            }
 
             productObj.name = product.name
             productObj.productId = product._id
@@ -83,7 +89,7 @@ export default class OrderService {
 
         const shippingFee = 40
 
-        return { cart, total, subTotal, discountAmount, shippingFee }
+        return { cart, total, subTotal, discountAmount, shippingFee, removedItemsCount }
     }
 
     async saveOrder(data, userId, userEmail) {
@@ -99,6 +105,9 @@ export default class OrderService {
             }
             const savedOrder = await this.orderRepository.saveOrderInDb(data, userId)
             if (savedOrder) {
+                if (data.couponCode) {
+                    await this.couponRepository.incrementUsedCount(data.couponCode);
+                }
                 const skus = data.items.map(item => item.sku);
                 await this.cartRepository.removeItemsFromCart(userId, skus);
 
@@ -119,7 +128,6 @@ export default class OrderService {
     async getAllOrders(userId, page = 1, limit = 10) {
         const skip = (page - 1) * limit;
         const { orders, totalOrders } = await this.orderRepository.getAllOrdersByUserId(userId, skip, limit);
-        console.log("orders", orders)
 
         const totalPages = Math.ceil(totalOrders / limit);
 
@@ -145,11 +153,19 @@ export default class OrderService {
         let refundableAmount = 0;
         let itemsToRelease = [];
 
+        const totalPreCoupon = order.total + (order.discountAmount || 0) - (order.shippingFee || 40);
+
         for (const item of order.items) {
             const itemStatus = item.status || 'pending';
             if (itemStatus !== 'cancelled' && itemStatus !== 'returned' && itemStatus !== 'refunded') {
-                const itemPrice = (item.price * item.quantity) - (((item.price * item.quantity) * item.offer) / 100);
-                refundableAmount += itemPrice;
+                const itemDiscountedPricePreCoupon = (item.price * item.quantity) - (((item.price * item.quantity) * (item.offer || 0)) / 100);
+
+                let itemShareOfCoupon = 0;
+                if (order.discountAmount > 0 && totalPreCoupon > 0) {
+                    itemShareOfCoupon = (itemDiscountedPricePreCoupon / totalPreCoupon) * order.discountAmount;
+                }
+
+                refundableAmount += (itemDiscountedPricePreCoupon - itemShareOfCoupon);
 
                 itemsToRelease.push({
                     id: item.productId,
@@ -190,7 +206,15 @@ export default class OrderService {
 
         if (order.paymentMethod != "COD") {
             const transactionId = "TXN" + crypto.randomBytes(8).toString("hex").toUpperCase();
-            const price = (item.price * item.quantity) - (((item.price * item.quantity) * item.offer) / 100);
+            const itemDiscountedPricePreCoupon = (item.price * item.quantity) - (((item.price * item.quantity) * (item.offer || 0)) / 100);
+            const totalPreCoupon = order.total + (order.discountAmount || 0) - (order.shippingFee || 40);
+
+            let itemShareOfCoupon = 0;
+            if (order.discountAmount > 0 && totalPreCoupon > 0) {
+                itemShareOfCoupon = (itemDiscountedPricePreCoupon / totalPreCoupon) * order.discountAmount;
+            }
+
+            const price = itemDiscountedPricePreCoupon - itemShareOfCoupon;
             await this.walletRepository.addMoney(price, transactionId, userId, "credit", "order_cancel_refund");
         }
 
@@ -201,7 +225,7 @@ export default class OrderService {
             qty: item.quantity
         }]);
 
-        await this.checkAndUpdateOrderFinalStatus(orderId);
+        await this.syncGlobalOrderStatus(orderId);
 
         return result;
     }
@@ -217,42 +241,50 @@ export default class OrderService {
         if (order.orderStatus == "return_requested") throw new Error("Return already requested for this order");
 
         for (const vendorId of vendorIds) {
-            console.log("id: ",vendorId)
-            let vendorItems = order.items.filter((item)=>{
-                return item.productId.vendorId == vendorId
+            let vendorItems = order.items.filter((item) => {
+                return item.productId.vendorId.toString() === vendorId.toString()
             })
-            const returnData = {
-                orderId: order._id,
-                userId: order.user,
-                vendorId: vendorId,
-                items: vendorItems.map(item => ({
-                    productId: item.productId._id,
-                    name: item.name,
-                    price: item.price,
-                    quantity: item.quantity,
-                    sku: item.sku,
-                    mainImage: item.mainImage,
-                    offer: item.offer,
-                    status: "return_requested"
-                })),
-                reason: reason || "No reason provided",
-                refundAmount: vendorItems.reduce((total, item) => {
 
-                    if (["returned","cancelled","refunded"].includes(item.status)) {
-                        return total
-                    }
+            // Filter active items for this vendor
+            const activeVendorItems = vendorItems.filter(item =>
+                !["returned", "cancelled", "refunded"].includes(item.status)
+            );
 
-                    const itemTotal = item.price * item.quantity
-                    const discounted = itemTotal - (itemTotal * item.offer / 100)
+            // Only create the return request if there are active items for this vendor
+            if (activeVendorItems.length > 0) {
+                const returnData = {
+                    orderId: order._id,
+                    userId: order.user,
+                    vendorId: vendorId,
+                    items: activeVendorItems.map(item => ({
+                        productId: item.productId._id,
+                        name: item.name,
+                        price: item.price,
+                        quantity: item.quantity,
+                        sku: item.sku,
+                        mainImage: item.mainImage,
+                        offer: item.offer,
+                        status: "return_requested"
+                    })),
+                    reason: reason || "No reason provided",
+                    refundAmount: activeVendorItems.reduce((total, item) => {
+                        const itemTotal = item.price * item.quantity
+                        const itemDiscountedPricePreCoupon = itemTotal - (itemTotal * (item.offer || 0) / 100)
 
-                    return total + discounted
+                        const totalPreCoupon = order.total + (order.discountAmount || 0) - (order.shippingFee || 40);
+                        let itemShareOfCoupon = 0;
+                        if (order.discountAmount > 0 && totalPreCoupon > 0) {
+                            itemShareOfCoupon = (itemDiscountedPricePreCoupon / totalPreCoupon) * order.discountAmount;
+                        }
 
-                }, 0)
+                        return total + (itemDiscountedPricePreCoupon - itemShareOfCoupon)
+                    }, 0)
+                }
+
+                await this.returnRepository.createReturnRequest(returnData);
             }
-
-            await this.returnRepository.createReturnRequest(returnData);
         }
-        
+
 
         const result = await this.orderRepository.updateOrderStatusById(orderId, "return_requested");
 
@@ -271,10 +303,8 @@ export default class OrderService {
 
 
         let item = order.items.find(i => i.sku === sku);
-        console.log("Item : ", item)
 
         let vendorId = item.productId.vendorId
-        console.log("vendorId : ", vendorId)
 
         if (!item) throw new Error("Item not found in order");
         if (item.status === "cancelled") throw new Error("The product is already cancelled");
@@ -299,7 +329,17 @@ export default class OrderService {
                 status: 'return_requested'
             }],
             reason: reason || "No reason provided",
-            refundAmount: itemPrice,
+            refundAmount: (() => {
+                const itemDiscountedPricePreCoupon = (item.price * item.quantity) - (((item.price * item.quantity) * (item.offer || 0)) / 100);
+                const totalPreCoupon = order.total + (order.discountAmount || 0) - (order.shippingFee || 40);
+
+                let itemShareOfCoupon = 0;
+                if (order.discountAmount > 0 && totalPreCoupon > 0) {
+                    itemShareOfCoupon = (itemDiscountedPricePreCoupon / totalPreCoupon) * order.discountAmount;
+                }
+
+                return itemDiscountedPricePreCoupon - itemShareOfCoupon;
+            })(),
         }
 
         await this.returnRepository.createReturnRequest(returnData);
@@ -309,25 +349,42 @@ export default class OrderService {
         return result
     }
 
-    async checkAndUpdateOrderFinalStatus(orderId) {
-        const order = await this.orderRepository.getOrderDetailById(orderId);
-        if (!order) return;
+    async syncGlobalOrderStatus(orderId) {
+        try {
+            const order = await this.orderRepository.getOrderDetailById(orderId);
+            if (!order) return;
 
-        const allItemsFinished = order.items.every(item =>
-            ['cancelled', 'returned', 'refunded', 'return_rejected'].includes(item.status)
-        );
+            const activeItems = order.items.filter(item =>
+                !['cancelled', 'returned', 'refunded'].includes(item.status)
+            );
 
-        if (allItemsFinished && order.items.length > 0) {
-            const hasReturned = order.items.some(item => ['returned', 'refunded'].includes(item.status));
-            const hasCancelled = order.items.some(item => item.status === 'cancelled');
+            if (activeItems.length === 0) {
+                const hasReturned = order.items.some(item => ['returned', 'refunded'].includes(item.status));
+                let finalStatus = 'cancelled';
+                if (hasReturned) finalStatus = 'returned';
 
-            let finalStatus = 'cancelled';
-            if (hasReturned) finalStatus = 'returned';
-            else if (hasCancelled) finalStatus = 'cancelled';
-
-            if (order.orderStatus !== finalStatus) {
-                await this.orderRepository.updateOrderStatusById(orderId, finalStatus);
+                if (order.orderStatus !== finalStatus) {
+                    await this.orderRepository.updateOrderStatusById(orderId, finalStatus);
+                }
+                return;
             }
+
+            const statusHierarchy = ['pending', 'confirmed', 'packed', 'shipped', 'out_for_delivery', 'delivered'];
+            let minStatusIndex = statusHierarchy.length - 1;
+
+            for (const item of activeItems) {
+                const itemStatusIndex = statusHierarchy.indexOf(item.status);
+                if (itemStatusIndex !== -1 && itemStatusIndex < minStatusIndex) {
+                    minStatusIndex = itemStatusIndex;
+                }
+            }
+
+            const newGlobalStatus = statusHierarchy[minStatusIndex];
+            if (order.orderStatus !== newGlobalStatus) {
+                await this.orderRepository.updateOrderStatusById(orderId, newGlobalStatus);
+            }
+        } catch (error) {
+            console.log("Error syncing global order status:", error);
         }
     }
 
@@ -349,12 +406,18 @@ export default class OrderService {
     }
 
     async updateOrderStatus(orderId, status) {
-        return await this.orderRepository.updateOrderStatusById(orderId, status)
+        const order = await this.orderRepository.getOrderDetailById(orderId);
+        if (order && order.items) {
+            for (const item of order.items) {
+                await this.orderRepository.updateOrderItemStatus(orderId, item.sku, status);
+            }
+        }
+        return await this.syncGlobalOrderStatus(orderId);
     }
 }
 
-async function renderORder(req,res){
-    let {page} = req.query
+async function renderORder(req, res) {
+    let { page } = req.query
     let limit = 10
     let skip = (1 - page) * limit
 

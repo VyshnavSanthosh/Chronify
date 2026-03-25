@@ -13,13 +13,6 @@ export default class ProductListController {
             const sort = req.query.sort || "";
             const { products, totalProducts } = await this.productListService.getAllProducts(search, category, brand, page, sort)
 
-            let sum = 0
-            for (const product of products) {
-                for (const variant of product.variants) {
-                    sum += variant.price
-                }
-            }
-            console.log(sum)
             const categories = await this.productListService.getAllCategories();
 
             const brands = await this.productListService.getAllBrands();
@@ -60,7 +53,7 @@ export default class ProductListController {
 
     async approveProduct(req, res) {
         try {
-            console.log('Approve product called with ID:', req.params.productId);
+
             const { productId } = req.params;
 
             if (!productId) {
@@ -79,7 +72,6 @@ export default class ProductListController {
                 });
             }
 
-            console.log('Product approved successfully:', updatedProduct._id);
 
             return res.status(200).json({
                 success: true,
@@ -97,7 +89,6 @@ export default class ProductListController {
 
     async rejectProduct(req, res) {
         try {
-            console.log('Reject product called with ID:', req.params.productId);
             const { productId } = req.params;
 
             if (!productId) {
@@ -116,7 +107,6 @@ export default class ProductListController {
                 });
             }
 
-            console.log('Product rejected successfully:', updatedProduct._id);
 
             return res.status(200).json({
                 success: true,

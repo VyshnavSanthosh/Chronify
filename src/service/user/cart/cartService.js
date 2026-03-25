@@ -80,8 +80,8 @@ export default class CartService {
             const item = cart.items[productIdx];
             const product = item.productId;
 
-            // Check if product or its category is blocked/deleted
-            if (!product || !product.isListed || product.isDeleted || (product.category && !product.category.isListed)) {
+            // Check if product, its category or its vendor is blocked/deleted
+            if (!product || !product.isListed || product.isDeleted || (product.category && !product.category.isListed) || (product.vendorId && product.vendorId.isBlocked)) {
                 await this.cartRepository.deleteItemFromCart(userId, item.sku);
                 removedItemsCount++;
                 continue;
@@ -156,7 +156,6 @@ export default class CartService {
                 return await this.cartRepository.incrementQty(sku, userId)
             }
             else {
-                console.log(`out of stock in service : sku ${item.sku} == ${sku} ${item.quantity} > ${cartItem.qty}`)
 
                 throw new Error("Out of Stock");
             }

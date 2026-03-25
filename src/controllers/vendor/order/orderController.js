@@ -51,8 +51,9 @@ export default class VendorOrderController {
     async updateOrderStatus(req, res) {
         const { status } = req.body
         const { orderId } = req.params
+        const vendorId = req.user._id;
         try {
-            await this.vendorOrderService.updateOrderStatus(orderId, status)
+            await this.vendorOrderService.updateOrderStatus(orderId, status, vendorId)
             return res.status(200).json({
                 success: true,
                 message: "Order status updated successfully"
@@ -62,6 +63,24 @@ export default class VendorOrderController {
             return res.status(500).json({
                 success: false,
                 message: "Failed to update order status"
+            })
+        }
+    }
+
+    async updateItemStatus(req, res) {
+        const { status } = req.body
+        const { orderId, sku } = req.params
+        try {
+            await this.vendorOrderService.updateItemStatus(orderId, sku, status)
+            return res.status(200).json({
+                success: true,
+                message: "Item status updated successfully"
+            })
+        } catch (error) {
+            console.log("Couldn't update item status", error)
+            return res.status(500).json({
+                success: false,
+                message: "Failed to update item status"
             })
         }
     }

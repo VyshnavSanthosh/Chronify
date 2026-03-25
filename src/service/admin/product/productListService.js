@@ -1,3 +1,6 @@
+import redis from "../../../utils/redis.js";
+import { deleteRedisCache } from "../../../utils/deleteFromRedis.js";
+
 export default class ProductListService {
     constructor(productRepository) {
         this.productRepository = productRepository
@@ -48,13 +51,24 @@ export default class ProductListService {
 
     async approve(productId) {
         const updatedProduct = await this.productRepository.approve(productId)
-        console.log("updated", updatedProduct)
+
+        if (updatedProduct) {
+            try {
+                // Invalidate all product list caches
+                await deleteRedisCache("products:*");
+                // Invalidate specific product cache
+                await redis.del(`product:${productId}`);
+                console.log(`✅ Redis cache invalidated for product: ${productId}`);
+            } catch (error) {
+                console.error("❌ Failed to invalidate Redis cache:", error.message);
+            }
+        }
+
         return updatedProduct
     }
 
     async reject(productId) {
         const updatedProduct = await this.productRepository.reject(productId)
-        console.log("updated", updatedProduct)
         return updatedProduct
     }
 }

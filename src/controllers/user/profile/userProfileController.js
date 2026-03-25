@@ -117,7 +117,6 @@ export default class UserProfileController {
         try {
             await this.otpService.verifyOtp(user._id, otp)
             req.session.otpVerified = true
-            console.log("verified : ", req.session.otpVerified)
 
             return res.redirect("/profile/edit")
         } catch (error) {

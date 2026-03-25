@@ -43,9 +43,7 @@
                 <input type="text" name="categoryName" placeholder="Type category name here. . ." 
                     value="<%= category?.categoryName || '' %>"
                     class="w-full bg-[#f3f4f6] text-black px-6 py-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg shadow-sm <%= locals.errors?.categoryName ? 'ring-2 ring-red-500' : '' %>">
-                <% if (locals.errors?.categoryName) { %>
-                    <div class="error-message"><%= errors.categoryName %></div>
-                <% } %>
+                <div class="error-message" id="error-categoryName"><%= locals.errors?.categoryName || '' %></div>
             </div>
 
             <!-- Description -->
@@ -53,9 +51,7 @@
                 <label class="text-sm font-medium text-gray-400">Description</label>
                 <textarea name="description" rows="10" placeholder="Type category description here. . ." 
                     class="w-full bg-[#f3f4f6] text-black px-6 py-6 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg shadow-sm resize-none <%= locals.errors?.description ? 'ring-2 ring-red-500' : '' %>"><%= category?.description || '' %></textarea>
-                <% if (locals.errors?.description) { %>
-                    <div class="error-message"><%= errors.description %></div>
-                <% } %>
+                <div class="error-message" id="error-description"><%= locals.errors?.description || '' %></div>
             </div>
 
             <!-- Discount Type and Value Row -->
@@ -68,9 +64,7 @@
                         <option value="percentage" <%= category?.discountType === 'percentage' ? 'selected' : '' %>>Percentage (%)</option>
                         <option value="flat" <%= category?.discountType === 'flat' ? 'selected' : '' %>>Flat Amount (Rs.)</option>
                     </select>
-                    <% if (locals.errors?.discountType) { %>
-                        <div class="error-message"><%= errors.discountType %></div>
-                    <% } %>
+                    <div class="error-message" id="error-discountType"><%= locals.errors?.discountType || '' %></div>
                 </div>
 
                 <div class="flex flex-col space-y-2">
@@ -78,9 +72,7 @@
                     <input type="number" name="discountValue" placeholder="Ex: 10 or 100" step="0.01"
                         value="<%= category?.discountValue || '' %>"
                         class="bg-[#f3f4f6] text-black px-6 py-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg shadow-sm <%= locals.errors?.discountValue ? 'ring-2 ring-red-500' : '' %>">
-                    <% if (locals.errors?.discountValue) { %>
-                        <div class="error-message"><%= errors.discountValue %></div>
-                    <% } %>
+                    <div class="error-message" id="error-discountValue"><%= locals.errors?.discountValue || '' %></div>
                 </div>
             </div>
 
@@ -91,10 +83,7 @@
                     value="<%= category?.maxRedeemable || '' %>"
                     class="w-full bg-[#f3f4f6] text-black px-6 py-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg shadow-sm <%= locals.errors?.maxRedeemable ? 'ring-2 ring-red-500' : '' %>"
                     id="maxRedeemableInput">
-                <% if (locals.errors?.maxRedeemable) { %>
-                    <div class="error-message"><%= errors.maxRedeemable %></div>
-                <% } %>
-                <div class="error-message" id="maxRedeemableError"></div>
+                <div class="error-message" id="error-maxRedeemable"><%= locals.errors?.maxRedeemable || '' %></div>
                 
                 <!-- Info Note -->
                 <div class="bg-blue-500/10 border border-blue-500/30 text-blue-300 px-4 py-3 rounded-lg text-sm">
@@ -131,7 +120,7 @@
     const discountTypeSelect = document.querySelector('select[name="discountType"]');
     const maxRedeemableInput = document.getElementById('maxRedeemableInput');
     const maxRedeemableRequiredLabel = document.getElementById('maxRedeemableRequired');
-    const maxRedeemableErrorDiv = document.getElementById('maxRedeemableError');
+    const maxRedeemableErrorDiv = document.getElementById('error-maxRedeemable');
 
     // Function to validate and update UI based on discount type
     function updateMaxRedeemableRequirement() {
@@ -199,13 +188,13 @@
                 if (result.errors) {
                     Object.keys(result.errors).forEach(key => {
                         const input = document.querySelector(`[name="${key}"]`);
+                        const errorDiv = document.getElementById('error-' + key);
+                        
                         if (input) {
                             input.classList.add('ring-2', 'ring-red-500');
-                            const errorDiv = input.parentElement.querySelector('.error-message') || 
-                                           document.getElementById(`${key}Error`);
-                            if (errorDiv) {
-                                errorDiv.textContent = result.errors[key];
-                            }
+                        }
+                        if (errorDiv) {
+                            errorDiv.textContent = result.errors[key];
                         }
                     });
                 }

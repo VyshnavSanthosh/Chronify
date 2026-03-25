@@ -35,7 +35,6 @@ export default class WalletRepository {
             source,
             description
         });
-        console.log(transaction)
 
 
         return transaction;
@@ -78,7 +77,6 @@ export default class WalletRepository {
             type,
             source
         });
-        console.log(transaction)
 
 
         return transaction;

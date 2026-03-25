@@ -9,7 +9,7 @@ export default class ProductDetailController {
             const { productId } = req.params
             const product = await this.productService.getProduct(productId)
 
-            if (!product || !product.isListed || (product.category && !product.category.isListed) || product.isDeleted) {
+            if (!product || !product.isListed || (product.category && !product.category.isListed) || product.isDeleted || (product.vendorId && product.vendorId.isBlocked)) {
                 return res.redirect("/products?blocked=true")
             }
 

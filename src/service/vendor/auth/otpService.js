@@ -11,7 +11,7 @@ export default class OtpService {
         try {
             await this.redis.set(`otp:${vendor._id}`, otp, "EX", 120)
 
-            await this.emailQueue.add("vendor-otp", {
+            await this.emailQueue.add("otp", {
                 email: vendor.brandEmail,
                 otp
             })

@@ -4,6 +4,7 @@ import noCache from "../../../middleware/nocache.js";
 router.use(noCache);
 
 import vendorJwtMiddlewareFile from "../../../middleware/vendorJwt.js";
+import checkVendorApproval from "../../../middleware/checkVendorApproval.js";
 
 // Repostory
 import orderRepositoryFile from "../../../repository/user/orderRepository.js";
@@ -37,27 +38,32 @@ const vendorOrderController = new vendorOrderControllerFile(vendorOrderService, 
 // Routes
 router.get("/orders",
     vendorJwtMiddleware.verifyToken.bind(vendorJwtMiddleware),
+    checkVendorApproval,
     vendorOrderController.renderOrderListPage.bind(vendorOrderController)
 );
 
 router.route("/orders/:orderId")
-    .get(vendorJwtMiddleware.verifyToken.bind(vendorJwtMiddleware), vendorOrderController.renderOrderDetailPage.bind(vendorOrderController))
+    .get(vendorJwtMiddleware.verifyToken.bind(vendorJwtMiddleware), checkVendorApproval, vendorOrderController.renderOrderDetailPage.bind(vendorOrderController))
 
-router.patch('/update-order-status/:orderId', vendorJwtMiddleware.verifyToken.bind(vendorJwtMiddleware), vendorOrderController.updateOrderStatus.bind(vendorOrderController))
+router.patch('/update-order-status/:orderId', vendorJwtMiddleware.verifyToken.bind(vendorJwtMiddleware), checkVendorApproval, vendorOrderController.updateOrderStatus.bind(vendorOrderController))
+router.patch('/update-item-status/:orderId/:sku', vendorJwtMiddleware.verifyToken.bind(vendorJwtMiddleware), checkVendorApproval, vendorOrderController.updateItemStatus.bind(vendorOrderController))
 
 // Return Management
 router.get("/returns",
     vendorJwtMiddleware.verifyToken.bind(vendorJwtMiddleware),
+    checkVendorApproval,
     vendorOrderController.renderReturnListPage.bind(vendorOrderController)
 );
 
 router.post("/returns/:returnId/approve",
     vendorJwtMiddleware.verifyToken.bind(vendorJwtMiddleware),
+    checkVendorApproval,
     vendorOrderController.approveReturn.bind(vendorOrderController)
 );
 
 router.post("/returns/:returnId/reject",
     vendorJwtMiddleware.verifyToken.bind(vendorJwtMiddleware),
+    checkVendorApproval,
     vendorOrderController.rejectReturn.bind(vendorOrderController)
 );
 

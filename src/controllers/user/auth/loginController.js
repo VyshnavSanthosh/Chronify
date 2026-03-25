@@ -70,7 +70,6 @@ export default class LoginController {
 
     async handleGoogleCallback(req, res) {
         try {
-            console.log("Google callback initiated");
             const googleProfile = req.user;
 
             if (!googleProfile) {
@@ -78,12 +77,10 @@ export default class LoginController {
                 throw new Error("Google authentication failed");
             }
 
-            console.log(`Processing Google login for: ${googleProfile.emails?.[0]?.value || 'ID: ' + googleProfile.id}`);
             const user = await this.googleOauthService.handleGoogleLogin(googleProfile);
 
             // Check if user is blocked
             if (user.isBlocked) {
-                console.warn(`Blocked user attempted Google login: ${user.email}`);
                 return res.render("user/auth/login", {
                     error: "Your account has been blocked. Please contact support.",
                     email: user.email,
@@ -99,7 +96,6 @@ export default class LoginController {
                 user.role
             );
 
-            console.log(`JWT tokens generated for user: ${user.email}`);
 
             const userAccessToken = accessToken
             const userRefreshToken = refreshToken
@@ -107,7 +103,6 @@ export default class LoginController {
 
             this.setAuthCookies(res, userAccessToken, userRefreshToken);
 
-            console.log("Authentication cookies set, redirecting to home");
             return res.redirect("/");
 
         } catch (err) {
@@ -117,7 +112,6 @@ export default class LoginController {
     }
 
     setAuthCookies(res, userAccessToken, userRefreshToken) {
-        console.log("Setting auth cookies with path '/'");
         res.cookie("userAccessToken", userAccessToken, {
             httpOnly: true,
             secure: false, // Set to true in production

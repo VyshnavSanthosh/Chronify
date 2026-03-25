@@ -24,8 +24,8 @@ export default class WishListService {
         for (const item of items) {
             const product = item.productId;
 
-            // Check if product or its category is blocked/deleted
-            if (!product || !product.isListed || product.isDeleted || (product.category && !product.category.isListed)) {
+            // Check if product, its category or its vendor is blocked/deleted
+            if (!product || !product.isListed || product.isDeleted || (product.category && !product.category.isListed) || (product.vendorId && product.vendorId.isBlocked)) {
                 await this.wishListRepository.deleteProductFromDb(item.productId._id, userId);
                 removedItemsCount++;
                 continue;

@@ -671,7 +671,7 @@
                 <div class="order-info">
                     <div class="order-info-item">
                         <span class="order-info-label">Order ID</span>
-                        <span class="order-info-value">#<%= order._id %></span>
+                        <span class="order-info-value">#<%= order._id.toString().slice(-6).toUpperCase() %></span>
                     </div>
                     <div class="order-info-item">
                         <span class="order-info-label">Placed on</span>
@@ -698,9 +698,8 @@
                         
                         // Check if this individual item can be cancelled
                         const itemStatus = item.status || 'pending';
-                        const itemCancelAllowed = ['pending', 'confirmed', 'packed', 'shipped'].includes(order.orderStatus) 
-                                                && itemStatus !== 'cancelled' 
-                                                && itemStatus !== 'returned';
+                        const itemCancelAllowed = ['pending', 'confirmed', 'packed'].includes(itemStatus) 
+                                                && !['shipped', 'out_for_delivery', 'delivered', 'cancelled', 'returned'].includes(order.orderStatus);
                     %>
                     <div class="order-item">
                         
@@ -733,7 +732,7 @@
 
                         <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 12px;">
                             <div class="item-price">
-                                ₹<%= finalPrice.toFixed(2) %>
+                                ₹<%= finalPrice.toFixed(1) %>
                             </div>
                             
                             <% if (itemCancelAllowed) { %>
@@ -814,21 +813,21 @@
                             
                             <div class="info-row">
                                 <span class="info-label">Items Total</span>
-                                <span class="info-value">₹<%= itemsTotal.toFixed(2) %></span>
+                                <span class="info-value">₹<%= itemsTotal.toFixed(1) %></span>
                             </div>
                             <div class="info-row">
                                 <span class="info-label">Shipping Charge</span>
-                                <span class="info-value">₹<%= shippingCharge.toFixed(2) %></span>
+                                <span class="info-value">₹<%= shippingCharge.toFixed(1) %></span>
                             </div>
                             <% if (order.discountAmount && order.discountAmount > 0) { %>
                             <div class="info-row">
                                 <span class="info-label">Coupon Discount <%= order.couponCode ? `(${order.couponCode})` : '' %></span>
-                                <span class="info-value" style="color: #22c55e;">- ₹<%= order.discountAmount.toFixed(2) %></span>
+                                <span class="info-value" style="color: #22c55e;">- ₹<%= order.discountAmount.toFixed(1) %></span>
                             </div>
                             <% } %>
                             <div class="info-row" style="border-top: 1px solid #e5e7eb; padding-top: 8px; margin-top: 8px;">
                                 <span class="info-label" style="font-weight: 600;">Grand Total</span>
-                                <span class="info-value" style="font-size: 16px;">₹<%= order.total.toFixed(2) %></span>
+                                <span class="info-value" style="font-size: 16px;">₹<%= order.total.toFixed(1) %></span>
                             </div>
                         </div>
                     </div>

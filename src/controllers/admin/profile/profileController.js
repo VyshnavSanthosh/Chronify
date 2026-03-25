@@ -7,7 +7,6 @@ export default class ProfileController {
         try {
             const {email} = req.user 
             const user = await this.profileService.findUser(email)            
-            console.log(user)
             
             return res.render("admin/profile/profile",{
                 user

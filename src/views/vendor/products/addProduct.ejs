@@ -46,10 +46,10 @@
                 <div>
                     <label class="block text-sm font-medium text-gray-300 mb-2">Product Name <span class="text-red-500">*</span></label>
                     <input type="text" name="name" required placeholder="Enter product name"
-                           value="<%= locals.formData?.name || locals.name || '' %>"
-                           class="w-full input-dark px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 <%= locals.errors?.name ? 'border-2 border-red-500' : '' %>">
-                    <% if (locals.errors?.name) { %>
-                        <p class="error-message"><%= locals.errors.name %></p>
+                           value="<%= formData?.name || '' %>"
+                           class="w-full input-dark px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 <%= errors?.name ? 'border-2 border-red-500' : '' %>">
+                    <% if ( errors?.name) { %>
+                        <p class="error-message"><%=  errors.name %></p>
                     <% } %>
                 </div>
 
@@ -57,10 +57,10 @@
                 <div>
                     <label class="block text-sm font-medium text-gray-300 mb-2">Brand Name <span class="text-red-500">*</span></label>
                     <input type="text" name="brand" required placeholder="Enter brand name"
-                           value="<%= locals.formData?.brand || locals.brand || '' %>"
-                           class="w-full input-dark px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 <%= locals.errors?.brand ? 'border-2 border-red-500' : '' %>">
-                    <% if (locals.errors?.brand) { %>
-                        <p class="error-message"><%= locals.errors.brand %></p>
+                           value="<%= formData?.brand || '' %>"
+                           class="w-full input-dark px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 <%= errors?.brand ? 'border-2 border-red-500' : '' %>">
+                    <% if ( errors?.brand) { %>
+                        <p class="error-message"><%=  errors.brand %></p>
                     <% } %>
                 </div>
 
@@ -68,9 +68,9 @@
                 <div>
                     <label class="block text-sm font-medium text-gray-300 mb-2">Description <span class="text-red-500">*</span></label>
                     <textarea name="description" rows="5" required placeholder="Enter product description"
-                              class="w-full input-dark px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 <%= locals.errors?.description ? 'border-2 border-red-500' : '' %>"><%= locals.formData?.description || locals.description || '' %></textarea>
-                    <% if (locals.errors?.description) { %>
-                        <p class="error-message"><%= locals.errors.description %></p>
+                              class="w-full input-dark px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 <%= errors?.description ? 'border-2 border-red-500' : '' %>"><%= formData?.description || '' %></textarea>
+                    <% if ( errors?.description) { %>
+                        <p class="error-message"><%=  errors.description %></p>
                     <% } %>
                 </div>
 
@@ -78,11 +78,11 @@
                 <div class="w-full md:w-1/2">
                     <label class="block text-sm font-medium text-gray-300 mb-4">Select Category <span class="text-red-500">*</span></label>
                     <div class="relative">
-                        <select name="category" required class="w-full bg-white border border-gray-700 text-black px-4 py-3 rounded-lg appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500 <%= locals.errors?.category ? 'border-2 border-red-500' : '' %>">
+                        <select name="category" required class="w-full bg-white border border-gray-700 text-black px-4 py-3 rounded-lg appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500 <%=  errors?.category ? 'border-2 border-red-500' : '' %>">
                             <option value="">Select a category</option>
                             <% if (categories && categories.length > 0) { %>
                                 <% categories.forEach(cat => { %>
-                                    <option value="<%= cat._id %>" <%= locals.formData?.category === cat._id.toString() ? 'selected' : '' %>><%= cat.categoryName %></option>
+                                    <option value="<%= cat._id %>" <%=  formData?.category === cat._id.toString() ? 'selected' : '' %>><%= cat.categoryName %></option>
                                 <% }); %>
                             <% } %>
                         </select>
@@ -90,8 +90,8 @@
                             <i class="fa-solid fa-chevron-down text-sm"></i>
                         </div>
                     </div>
-                    <% if (locals.errors?.category) { %>
-                        <p class="error-message"><%= locals.errors.category %></p>
+                    <% if ( errors?.category) { %>
+                        <p class="error-message"><%=  errors.category %></p>
                     <% } %>
                 </div>
             </div>
@@ -99,13 +99,17 @@
 
         <!-- Section 2: Product Variants -->
         <div id="variants-container" class="space-y-12">
-            <div class="variant-section custom-dark-card rounded-3xl p-8 md:p-10 shadow-xl space-y-10 relative group" data-variant-index="0">
+            <% 
+            const variantsToShow = ( formData?.variants &&  formData.variants.length > 0) ?  formData.variants : [{}];
+            variantsToShow.forEach((variant, index) => { 
+            %>
+            <div class="variant-section custom-dark-card rounded-3xl p-8 md:p-10 shadow-xl space-y-10 relative group" data-variant-index="<%= index %>">
                 <!-- Remove button (hidden on first variant) -->
-                <button type="button" class="remove-variant-btn absolute top-8 right-8 text-red-500 hover:text-red-700 hidden">
+                <button type="button" class="remove-variant-btn absolute top-8 right-8 text-red-500 hover:text-red-700 <%= index === 0 ? 'hidden' : '' %>">
                     <i class="fa-solid fa-trash-can text-xl"></i>
                 </button>
                 
-                <h3 class="text-lg font-bold uppercase tracking-widest text-gray-300">PRODUCT VARIANT <span class="variant-number">1</span></h3>
+                <h3 class="text-lg font-bold uppercase tracking-widest text-gray-300">PRODUCT VARIANT <span class="variant-number"><%= index + 1 %></span></h3>
                 
                 <div class="space-y-10">
                     <!-- Photos Section -->
@@ -113,8 +117,8 @@
                         <h4 class="text-sm font-medium text-gray-400">Main Photo <span class="text-red-500">*</span></h4>
                         
                         <!-- Main Image Upload -->
-                        <div class="w-full max-w-2xl mx-auto bg-white rounded-xl p-12 text-center border-2 border-dashed border-gray-300 flex flex-col items-center justify-center space-y-4 relative overflow-hidden group min-h-[300px]">
-                            <input type="file" name="variants[0][mainImage]" required class="hidden main-image-input" accept="image/*">
+                        <div class="w-full max-w-2xl mx-auto bg-white rounded-xl p-12 text-center border-2 border-dashed border-gray-300 flex flex-col items-center justify-center space-y-4 relative overflow-hidden group min-h-[300px] <%=  errors?.['variants.' + index + '.mainImage'] ? 'border-red-500' : '' %>">
+                            <input type="file" name="variants[<%= index %>][mainImage]" required class="hidden main-image-input" accept="image/*">
                             <div class="preview-container absolute inset-0 hidden">
                                 <img src="" alt="Preview" class="w-full h-full object-contain">
                             </div>
@@ -128,14 +132,17 @@
                                 Upload Image
                             </button>
                         </div>
+                        <% if ( errors?.['variants.' + index + '.mainImage']) { %>
+                            <p class="error-message text-center"><%=  errors['variants.' + index + '.mainImage'] %></p>
+                        <% } %>
 
                         <h4 class="text-sm font-medium text-gray-400">Additional Images <span class="text-red-500">*</span></h4>
                         
                         <!-- Additional Images Grid -->
                         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                             <% for(let i=0; i<3; i++) { %>
-                            <div class="bg-white rounded-xl p-6 text-center border border-gray-200 flex flex-col items-center justify-center space-y-3 relative overflow-hidden group h-40">
-                                <input type="file" name="variants[0][additionalImages]" class="hidden additional-image-input" required accept="image/*">
+                            <div class="bg-white rounded-xl p-6 text-center border border-gray-200 flex flex-col items-center justify-center space-y-3 relative overflow-hidden group h-40 <%=  errors?.['variants.' + index + '.additionalImages.' + i] ? 'border-red-500 border-2' : '' %>">
+                                <input type="file" name="variants[<%= index %>][additionalImages]" class="hidden additional-image-input" required accept="image/*">
                                 <div class="preview-container absolute inset-0 hidden">
                                     <img src="" alt="Preview" class="w-full h-full object-contain">
                                 </div>
@@ -151,62 +158,66 @@
                             </div>
                             <% } %>
                         </div>
+                        <% if ( errors?.['variants.' + index + '.additionalImages']) { %>
+                            <p class="error-message"><%=  errors['variants.' + index + '.additionalImages'] %></p>
+                        <% } %>
                     </div>
 
                     <!-- Variant Details Grid -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
                         <div>
                             <label class="block text-sm font-medium text-gray-300 mb-2">Color <span class="text-red-500">*</span></label>
-                            <input type="text" name="variants[0][color]" required placeholder="Ex. Black, Silver"
-                                   value="<%= locals.formData?.variants?.[0]?.color || '' %>"
-                                   class="w-full input-outline-dark px-4 py-3 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 <%= locals.errors?.['variants.0.color'] ? 'border-red-500' : '' %>">
-                            <% if (locals.errors?.['variants.0.color']) { %>
-                                <p class="error-message"><%= locals.errors['variants.0.color'] %></p>
+                            <input type="text" name="variants[<%= index %>][color]" required placeholder="Ex. Black, Silver"
+                                   value="<%= variant.color || '' %>"
+                                   class="w-full input-outline-dark px-4 py-3 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 <%=  errors?.['variants.' + index + '.color'] ? 'border-red-500' : '' %>">
+                            <% if ( errors?.['variants.' + index + '.color']) { %>
+                                <p class="error-message"><%=  errors['variants.' + index + '.color'] %></p>
                             <% } %>
                         </div>
 
                         <div>
                             <label class="block text-sm font-medium text-gray-300 mb-2">Strap Material <span class="text-red-500">*</span></label>
-                            <input type="text" name="variants[0][strapMaterial]" required placeholder="Ex. Leather, Metal, Silicone"
-                                   value="<%= locals.formData?.variants?.[0]?.strapMaterial || '' %>"
-                                   class="w-full input-outline-dark px-4 py-3 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 <%= locals.errors?.['variants.0.strapMaterial'] ? 'border-red-500' : '' %>">
-                            <% if (locals.errors?.['variants.0.strapMaterial']) { %>
-                                <p class="error-message"><%= locals.errors['variants.0.strapMaterial'] %></p>
+                            <input type="text" name="variants[<%= index %>][strapMaterial]" required placeholder="Ex. Leather, Metal, Silicone"
+                                   value="<%= variant.strapMaterial || '' %>"
+                                   class="w-full input-outline-dark px-4 py-3 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 <%=  errors?.['variants.' + index + '.strapMaterial'] ? 'border-red-500' : '' %>">
+                            <% if ( errors?.['variants.' + index + '.strapMaterial']) { %>
+                                <p class="error-message"><%=  errors['variants.' + index + '.strapMaterial'] %></p>
                             <% } %>
                         </div>
 
                         <div>
                             <label class="block text-sm font-medium text-gray-300 mb-2">Price (₹) <span class="text-red-500">*</span></label>
-                            <input type="number" name="variants[0][price]" required min="0" step="0.01" placeholder="Ex. 5000"
-                                   value="<%= locals.formData?.variants?.[0]?.price || '' %>"
-                                   class="w-full input-outline-dark px-4 py-3 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 <%= locals.errors?.['variants.0.price'] ? 'border-red-500' : '' %>">
-                            <% if (locals.errors?.['variants.0.price']) { %>
-                                <p class="error-message"><%= locals.errors['variants.0.price'] %></p>
+                            <input type="number" name="variants[<%= index %>][price]" required min="0" step="0.01" placeholder="Ex. 5000"
+                                   value="<%= variant.price || '' %>"
+                                   class="w-full input-outline-dark px-4 py-3 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 <%=  errors?.['variants.' + index + '.price'] ? 'border-red-500' : '' %>">
+                            <% if ( errors?.['variants.' + index + '.price']) { %>
+                                <p class="error-message"><%=  errors['variants.' + index + '.price'] %></p>
                             <% } %>
                         </div>
 
                         <div>
                             <label class="block text-sm font-medium text-gray-300 mb-2">Quantity <span class="text-red-500">*</span></label>
-                            <input type="number" name="variants[0][quantity]" required min="0" step="1" 
-                                   value="<%= locals.formData?.variants?.[0]?.quantity || '' %>"
-                                   class="w-full input-outline-dark px-4 py-3 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 <%= locals.errors?.['variants.0.quantity'] ? 'border-red-500' : '' %>">
-                            <% if (locals.errors?.['variants.0.quantity']) { %>
-                                <p class="error-message"><%= locals.errors['variants.0.quantity'] %></p>
+                            <input type="number" name="variants[<%= index %>][quantity]" required min="0" step="1" 
+                                   value="<%= variant.quantity || '' %>"
+                                   class="w-full input-outline-dark px-4 py-3 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 <%=  errors?.['variants.' + index + '.quantity'] ? 'border-red-500' : '' %>">
+                            <% if ( errors?.['variants.' + index + '.quantity']) { %>
+                                <p class="error-message"><%=  errors['variants.' + index + '.quantity'] %></p>
                             <% } %>
                         </div>
 
                         <div>
                             <label class="block text-sm font-medium text-gray-300 mb-2">Offer (%)</label>
-                            <input type="number" name="variants[0][offer]" min="0" max="100" placeholder="Ex. 10" 
-                                   value="<%= locals.formData?.variants?.[0]?.offer || 0 %>"
-                                   class="w-full input-outline-dark px-4 py-3 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 <%= locals.errors?.['variants.0.offer'] ? 'border-red-500' : '' %>">
-                            <% if (locals.errors?.['variants.0.offer']) { %>
-                                <p class="error-message"><%= locals.errors['variants.0.offer'] %></p>
+                            <input type="number" name="variants[<%= index %>][offer]" min="0" max="100" placeholder="Ex. 10" 
+                                   value="<%= variant.offer || 0 %>"
+                                   class="w-full input-outline-dark px-4 py-3 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 <%=  errors?.['variants.' + index + '.offer'] ? 'border-red-500' : '' %>">
+                            <% if ( errors?.['variants.' + index + '.offer']) { %>
+                                <p class="error-message"><%=  errors['variants.' + index + '.offer'] %></p>
                             <% } %>
                         </div>
                     </div>
                 </div>
             </div>
+            <% }); %>
         </div>
 
         <!-- Add Variant Button -->
@@ -224,30 +235,30 @@
                     <div>
                         <label class="block text-sm font-medium text-gray-300 mb-2">Weight <span class="text-red-500">*</span></label>
                         <input type="text" name="specifications[weight]" required placeholder="Ex. 150g, 0.15kg"
-                               value="<%= locals.formData?.specifications?.weight || '' %>"
-                               class="w-full input-dark px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 <%= locals.errors?.['specifications.weight'] ? 'border-2 border-red-500' : '' %>">
-                        <% if (locals.errors?.['specifications.weight']) { %>
-                            <p class="error-message"><%= locals.errors['specifications.weight'] %></p>
+                               value="<%=  formData?.specifications?.weight || '' %>"
+                               class="w-full input-dark px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 <%=  errors?.['specifications.weight'] ? 'border-2 border-red-500' : '' %>">
+                        <% if ( errors?.['specifications.weight']) { %>
+                            <p class="error-message"><%=  errors['specifications.weight'] %></p>
                         <% } %>
                     </div>
 
                     <div>
                         <label class="block text-sm font-medium text-gray-300 mb-2">Water Resistance <span class="text-red-500">*</span></label>
                         <input type="text" name="specifications[waterResistance]" required placeholder="Ex. 50m, 100m, 5ATM"
-                               value="<%= locals.formData?.specifications?.waterResistance || '' %>"
-                               class="w-full input-dark px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 <%= locals.errors?.['specifications.waterResistance'] ? 'border-2 border-red-500' : '' %>">
-                        <% if (locals.errors?.['specifications.waterResistance']) { %>
-                            <p class="error-message"><%= locals.errors['specifications.waterResistance'] %></p>
+                               value="<%=  formData?.specifications?.waterResistance || '' %>"
+                               class="w-full input-dark px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 <%=  errors?.['specifications.waterResistance'] ? 'border-2 border-red-500' : '' %>">
+                        <% if ( errors?.['specifications.waterResistance']) { %>
+                            <p class="error-message"><%=  errors['specifications.waterResistance'] %></p>
                         <% } %>
                     </div>
 
                     <div>
                         <label class="block text-sm font-medium text-gray-300 mb-2">Warranty <span class="text-red-500">*</span></label>
                         <input type="text" name="specifications[warranty]" required placeholder="Ex. 1 year, 2 years"
-                               value="<%= locals.formData?.specifications?.warranty || '' %>"
-                               class="w-full input-dark px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 <%= locals.errors?.['specifications.warranty'] ? 'border-2 border-red-500' : '' %>">
-                        <% if (locals.errors?.['specifications.warranty']) { %>
-                            <p class="error-message"><%= locals.errors['specifications.warranty'] %></p>
+                               value="<%=  formData?.specifications?.warranty || '' %>"
+                               class="w-full input-dark px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 <%=  errors?.['specifications.warranty'] ? 'border-2 border-red-500' : '' %>">
+                        <% if ( errors?.['specifications.warranty']) { %>
+                            <p class="error-message"><%=  errors['specifications.warranty'] %></p>
                         <% } %>
                     </div>
                 </div>
@@ -296,8 +307,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
     <script>
     document.addEventListener('DOMContentLoaded', () => {
-        const successMsg = <%- JSON.stringify(locals.success || "") %>;
-        const errorMsg = <%- JSON.stringify(locals.error || "") %>;
+        const successMsg = <%- JSON.stringify( success || "") %>;
+        const errorMsg = <%- JSON.stringify( error || "") %>;
 
         if (successMsg) {
             Swal.fire({
@@ -307,17 +318,6 @@
                 background: '#0a1425',
                 color: '#fff',
                 confirmButtonColor: '#2563eb'
-            });
-        }
-
-        if (errorMsg) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error!',
-                text: errorMsg,
-                background: '#0a1425',
-                color: '#fff',
-                confirmButtonColor: '#ef4444'
             });
         }
 
@@ -481,10 +481,7 @@
                     errorMessages.push('Variant ' + (index + 1) + ': Please upload all 3 additional images');
                 }
             });
-            if (!isValid) {
-                Swal.fire({ icon: 'error', title: 'Missing Images', html: errorMessages.join('<br>'), background: '#0a1425', color: '#fff' });
-                return;
-            }
+
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>UPLOADING...';
             form.submit();

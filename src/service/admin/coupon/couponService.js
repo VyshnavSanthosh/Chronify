@@ -17,10 +17,8 @@ export default class CouponService {
     }
 
     async toggleStatus(couponId, isActive) {
-        console.log("initial :", isActive)
 
         isActive = isActive === "true" ? false : true;
-        console.log("final :", isActive)
 
         return await this.couponRepository.toggleStatus(couponId, isActive)
     }

@@ -306,15 +306,7 @@
                 if (!validateField(id)) isValid = false;
             });
 
-            if (!isValid) {
-                e.preventDefault();
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Validation Error',
-                    text: 'Please fix the errors in the form before submitting.',
-                    confirmButtonColor: '#3b82f6'
-                });
-            }
+            
         });
 
         // Pincode autofill logic

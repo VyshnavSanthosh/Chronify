@@ -1,5 +1,6 @@
 import Product from '../../models/vendor/productSchema.js';
 import Category from "../../models/admin/categorySchema.js";
+import Vendor from "../../models/vendor/vendorSchema.js";
 
 export default class ProductRepository {
 
@@ -34,10 +35,14 @@ export default class ProductRepository {
 
     async getAllProduts(search, category, brand, limit, skip, sortOrder, sortField) {
         try {
+            const blockedVendors = await Vendor.find({ isBlocked: true }).select('_id');
+            const blockedVendorIds = blockedVendors.map(v => v._id);
+
             const query = {
                 isListed: true,
                 isDeleted: false,
-                status: "approved"
+                status: "approved",
+                vendorId: { $nin: blockedVendorIds }
             }
 
             if (search) {
@@ -213,10 +218,14 @@ export default class ProductRepository {
 
     async getUserProducts(search, category, brand, limit, skip, sortOrder, sortField) {
         try {
+            const blockedVendors = await Vendor.find({ isBlocked: true }).select('_id');
+            const blockedVendorIds = blockedVendors.map(v => v._id);
+
             const query = {
                 isListed: true,
                 isDeleted: false,
-                status: "approved"
+                status: "approved",
+                vendorId: { $nin: blockedVendorIds }
             };
 
             if (search) {
@@ -269,7 +278,7 @@ export default class ProductRepository {
 
     async getProductById(productId) {
         try {
-            const product = await Product.findById(productId).populate('category');
+            const product = await Product.findById(productId).populate('category').populate('vendorId');
             return product
         } catch (error) {
             console.log("Couldn't get the product")

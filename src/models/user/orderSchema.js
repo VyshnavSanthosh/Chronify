@@ -32,7 +32,7 @@ const orderItemSchema = new mongoose.Schema(
         },
         status: {
             type: String,
-            enum: ["pending", "confirmed", "shipped", "delivered", "cancelled", "returned", "refunded"],
+            enum: ["pending", "confirmed", "packed", "shipped", "out_for_delivery", "delivered", "cancelled", "returned", "refunded", "return_requested", "return_rejected"],
             default: "pending"
         }
     },

@@ -438,7 +438,7 @@
             <img src="<%= item.product.mainImage || '/images/watch.png' %>" alt="<%= item.name %>">
             <div>
               <div class="order-item-name"><%= item.product.name %></div>
-              <div class="order-item-price">₹<%= item.product.price %></div>
+              <div class="order-item-price">₹<%= (item.product.price || 0).toFixed(1) %></div>
               <% if (item.product.offer > 0) { %>
                 <div class="text-green-500 text-[10px] font-semibold"><%= item.product.offer %>% OFF</div>
               <% } %>
@@ -449,13 +449,13 @@
 
       <div class="price-row">
         <span style="color:#b0b8c1;">Subtotal:</span>
-        <span id="subtotalDisplay">₹<%= subTotal || total || 0 %></span>
+        <span id="subtotalDisplay">₹<%= (subTotal || total || 0).toFixed(1) %></span>
       </div>
 
       <% if (Number(discountAmount) > 0) { %>
       <div class="price-row" id="couponDiscountRow" style="display:flex;">
           <span style="color:#b0b8c1;" id="couponDiscountLabel">Coupon Discount:</span>
-          <span style="color:#22c55e;" id="couponDiscountAmount">- ₹<%= discountAmount %></span>
+          <span style="color:#22c55e;" id="couponDiscountAmount">- ₹<%= Number(discountAmount).toFixed(1) %></span>
       </div>
       <% } else { %>
       <div class="price-row" id="couponDiscountRow" style="display:none;">
@@ -466,12 +466,12 @@
 
       <div class="price-row" style="border-bottom:1px solid #2a3f66; padding-bottom:12px;">
         <span style="color:#b0b8c1;">Shipping:</span>
-        <span style="color:#22c55e;">₹<%= shippingFee %></span>
+        <span style="color:#22c55e;">₹<%= Number(shippingFee || 0).toFixed(1) %></span>
       </div>
 
       <div class="price-row total-row">
         <span>Total:</span>
-        <span id="totalDisplay">₹<%= (total || 0) + (shippingFee || 0) %></span>
+        <span id="totalDisplay">₹<%= ((total || 0) + (shippingFee || 0)).toFixed(1) %></span>
       </div>
 
       <!-- Removed legacy client-side calculation script as server provides accurate values now -->
@@ -790,7 +790,7 @@ async function applyCoupon(couponCode) {
         });
 
         try {
-            const response = await fetch(`http://localhost:5000/checkout/${cartId}`, {
+            const response = await fetch(`/checkout/${cartId}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -892,10 +892,8 @@ async function applyCoupon(couponCode) {
                     return;
                 }
 
-                // ⭐ CASE 2 → COD / Wallet
                 showOrderSuccess(data.orderId);
             } else {
-                // Handle non-200 responses (e.g., wallet balance error)
                 const errorData = await response.json();
                 console.error("Order failed:", errorData);
 

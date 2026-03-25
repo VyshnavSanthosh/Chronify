@@ -24,8 +24,6 @@ export default class forgotPasswordOtpService {
 
         await this.redis.set(`forgot:${vendorId}`, newOtp, "EX", 300)
 
-        console.log(`DEBUG: Resent password reset OTP for vendor ${vendorId}: ${newOtp}`);
-
         await this.emailQueue.add("vendor-forgot-password-otp", {
             email: vendorEmail,
             otp: newOtp

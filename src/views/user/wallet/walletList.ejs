@@ -171,7 +171,7 @@ const formatted = date.toLocaleDateString("en-GB", {
     timeZone: "Asia/Kolkata"
 }); %>
                             <tr>
-                                <td><%= transaction.id %></td>
+                                <td><%= transaction.id.toString().slice(-6).toUpperCase() %></td>
                                 <td><%= formatted %></td>
                                 <td><%= transaction.amount %></td>
                                 <td><%= transaction.source %></td>

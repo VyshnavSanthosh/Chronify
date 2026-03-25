@@ -145,6 +145,15 @@
         });
     <% } %>
 
+    <% if (locals.error) { %>
+        Swal.fire({
+            icon: 'error',
+            title: 'Login Failed',
+            text: '<%= locals.error %>',
+            confirmButtonColor: '#dc3545'
+        });
+    <% } %>
+
     // Check for Google auth error in query params
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('error') === 'google_auth_failed') {

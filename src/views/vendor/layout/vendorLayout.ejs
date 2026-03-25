@@ -36,6 +36,21 @@
     </main>
 
     <script src="/js/logout.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('unapproved') === 'true') {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Access Restricted',
+                    text: 'Can only accessed if admin approves your request',
+                    confirmButtonColor: '#2563eb',
+                    background: '#1f2937',
+                    color: '#fff'
+                });
+            }
+        });
+    </script>
     <%- block('scripts') %>
 </body>
 </html>

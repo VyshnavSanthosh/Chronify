@@ -4,7 +4,6 @@ export default class WalletService {
     }
 
     async addMoney(amount, transactionId, userId, type, source, description = null) {
-        console.log("userID :", userId)
         
         await this.walletRepository.addMoney(amount, transactionId, userId, type, source, description)
     }

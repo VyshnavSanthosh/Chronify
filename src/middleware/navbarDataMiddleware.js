@@ -12,21 +12,15 @@ const navbarDataMiddleware = async (req, res, next) => {
             const accessToken = req.cookies.userAccessToken;
             if (accessToken) {
                 try {
-                    console.log("Navbar Middleware: Attempting to authenticate via access token");
                     const decoded = jwtService.verifyAccessToken(accessToken);
                     const user = await userRepository.findById(decoded.userId);
                     if (user && !user.isBlocked && user.role === "customer") {
                         req.user = user;
-                        console.log(`Navbar Middleware: Successfully authenticated ${user.email}`);
-                    } else {
-                        console.log(`Navbar Middleware: User lookup failed or user blocked/wrong role. User exists: ${!!user}`);
+
                     }
                 } catch (err) {
-                    console.log(`Navbar Middleware: Access token verification failed: ${err.message}`);
                 }
-            } else {
-                console.log("Navbar Middleware: No userAccessToken found in cookies");
-            }
+            } 
         }
 
         if (req.user) {
@@ -40,7 +34,6 @@ const navbarDataMiddleware = async (req, res, next) => {
 
             res.locals.wishlistCount = wishlistCount;
         } else {
-            console.log("Navbar Middleware: No user found after check");
             res.locals.cartCount = 0;
             res.locals.wishlistCount = 0;
         }

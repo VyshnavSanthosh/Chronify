@@ -112,14 +112,15 @@ export default class CouponRepository {
     async checkCouponByCode(couponCode) {
         try {
             const now = new Date();
-            return await Coupon.findOne({ 
+            return await Coupon.findOne({
                 couponCode,
                 isActive: true,
-                expiryDate: { $gt: now }
+                expiryDate: { $gt: now },
+                $expr: { $lt: ["$usedCount", "$usageLimit"] }
             })
         } catch (error) {
             console.log("Couldn't get the coupon :", error)
-            throw new Error("There is no coupon with this code");
+            throw new Error("There is no coupon with this code or it has reached its usage limit");
         }
     }
 
@@ -128,11 +129,25 @@ export default class CouponRepository {
             const now = new Date();
             return await Coupon.find({
                 isActive: true,
-                expiryDate: { $gt: now }
-            }).sort({ expiryDate: 1 });            
+                expiryDate: { $gt: now },
+                $expr: { $lt: ["$usedCount", "$usageLimit"] }
+            }).sort({ expiryDate: 1 });
         } catch (error) {
             console.error("Error fetching active coupons:", error);
             throw new Error("Failed to fetch active coupons");
+        }
+    }
+
+    async incrementUsedCount(couponCode) {
+        try {
+            return await Coupon.findOneAndUpdate(
+                { couponCode },
+                { $inc: { usedCount: 1 } },
+                { new: true }
+            );
+        } catch (error) {
+            console.error("Error incrementing coupon used count:", error);
+            throw new Error("Failed to update coupon usage");
         }
     }
 }

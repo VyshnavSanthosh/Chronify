@@ -166,6 +166,7 @@
                             
                             <!-- Product Details -->
                             <div class="order-info">
+                                <div class="text-[10px] text-gray-400 font-mono mb-1">#<%= order._id.toString().slice(-6).toUpperCase() %></div>
                                 <div class="order-name">
                                     <% if(order.items && order.items.length){ %>
                                         <%= order.items[0].name %>

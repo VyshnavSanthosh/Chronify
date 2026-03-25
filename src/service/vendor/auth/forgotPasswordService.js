@@ -24,7 +24,6 @@ export default class forgotPasswordService {
             email: vendor.brandEmail,
             otp: otp
         })
-        console.log(`OTP: ${otp} sent to Vendor email ${vendor.brandEmail} `)
 
         return {
             email: vendor.brandEmail,

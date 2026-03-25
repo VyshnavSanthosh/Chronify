@@ -47,12 +47,14 @@ function generateCustomerInformation(doc, order, user) {
     doc.fontSize(10)
         .text('Order ID:', 50, customerInformationTop)
         .font('Helvetica-Bold')
-        .text(order._id.toString(), 150, customerInformationTop)
+        .text(order._id.toString().slice(-6).toUpperCase(), 150, customerInformationTop)
         .font('Helvetica')
         .text('Order Date:', 50, customerInformationTop + 15)
         .text(new Date(order.createdAt).toLocaleDateString(), 150, customerInformationTop + 15)
-        .text('Total Amount:', 50, customerInformationTop + 30)
-        .text(`Rs. ${order.total.toFixed(2)}`, 150, customerInformationTop + 30)
+        .text('Order Status:', 50, customerInformationTop + 30)
+        .text(order.orderStatus.replace(/_/g, ' ').toUpperCase(), 150, customerInformationTop + 30)
+        .text('Total Amount:', 50, customerInformationTop + 45)
+        .text(`Rs. ${order.total.toFixed(1)}`, 150, customerInformationTop + 45)
 
         .font('Helvetica-Bold')
         .text(order.address.name, 300, customerInformationTop)
@@ -65,7 +67,7 @@ function generateCustomerInformation(doc, order, user) {
         )
         .moveDown();
 
-    generateHr(doc, 252);
+    generateHr(doc, 270);
 }
 
 function generateInvoiceTable(doc, order) {
@@ -95,10 +97,10 @@ function generateInvoiceTable(doc, order) {
             doc,
             position,
             item.name,
-            `Rs. ${item.price.toFixed(2)}`,
+            `Rs. ${item.price.toFixed(1)}`,
             item.quantity,
             `${item.offer || 0}%`,
-            `Rs. ${lineTotal.toFixed(2)}`
+            `Rs. ${lineTotal.toFixed(1)}`
         );
 
         generateHr(doc, position + 20);
@@ -112,7 +114,7 @@ function generateInvoiceTable(doc, order) {
         '',
         'Subtotal',
         '',
-        `Rs. ${order.total.toFixed(2)}`
+        `Rs. ${order.total.toFixed(1)}`
     );
 
     const paidToDatePosition = subtotalPosition + 20;
@@ -135,7 +137,7 @@ function generateInvoiceTable(doc, order) {
         '',
         'Grand Total',
         '',
-        `Rs. ${order.total.toFixed(2)}`
+        `Rs. ${order.total.toFixed(1)}`
     );
     doc.font('Helvetica');
 }

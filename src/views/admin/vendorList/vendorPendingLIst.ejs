@@ -24,6 +24,15 @@
     }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+    .modal {
+        transition: opacity 0.25s ease;
+    }
+    body.modal-active {
+        overflow-x: hidden;
+        overflow-y: visible !important;
+    }
+    </style>
 `) %>
 
 <!-- Content Area -->
@@ -66,6 +75,7 @@
           <th class="px-6 py-4 border-r border-blue-500/30">Vendor Name</th>
           <th class="px-6 py-4 border-r border-blue-500/30">Phone</th>
           <th class="px-6 py-4 border-r border-blue-500/30">Email</th>
+          <th class="px-6 py-4 border-r border-blue-500/30">Documents</th>
           <th class="px-6 py-4 border-r border-blue-500/30">Date Applied</th>
           <th class="px-6 py-4 text-center">Actions</th>
         </tr>
@@ -81,8 +91,15 @@
                 <span class="font-medium vendor-name"><%= vendor.brandName %></span>
               </div>
             </td>
-            <td class="px-6 py-4 border-r border-gray-800 vendor-phone"><%= vendor.phone || 'N/A' %></td>
+            <td class="px-6 py-4 border-r border-gray-800 vendor-phone"><%= vendor.mobileNumber || 'N/A' %></td>
             <td class="px-6 py-4 border-r border-gray-800 vendor-email text-gray-300"><%= vendor.brandEmail %></td>
+            <td class="px-6 py-4 border-r border-gray-800">
+              <button class="view-docs-btn text-blue-400 hover:text-blue-300 transition-colors" 
+                      data-vendor-id="<%= vendor._id %>"
+                      data-docs="<%= JSON.stringify(vendor.documents || []) %>">
+                <i class="fa-solid fa-file-lines mr-1"></i>View Docs (<%= (vendor.documents || []).length %>)
+              </button>
+            </td>
             <td class="px-6 py-4 border-r border-gray-800 text-gray-300">
               <%= new Date(vendor.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) %>
             </td>
@@ -124,11 +141,12 @@
   </div>
 </div>
 
-<% block('scripts', `
+
 <script>
+  console.log("INLINE SCRIPT WORKING");
   // Initialize from server data
-  var currentPage = ${locals.currentPage || 1};
-  var totalVendors = ${locals.totalVendors || 0};
+  var currentPage = <%= currentPage || 1 %>;
+  var totalVendors = <%= totalVendors || 0 %>;
   var itemsPerPage = 10;
   var totalPages = Math.ceil(totalVendors / itemsPerPage);
 
@@ -137,7 +155,78 @@
     attachActionListeners();
     attachSearchListener();
     updatePaginationInfo();
+    attachDocListeners();
   });
+
+  // Attach document preview listeners
+  // Attach document preview listeners
+  function attachDocListeners() {
+    document.querySelectorAll('.view-docs-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const docs = JSON.parse(this.getAttribute('data-docs'));
+        showDocumentsModal(docs);
+      });
+    });
+  }
+
+  function showDocumentsModal(docs) {
+    if (!docs || docs.length === 0) {
+      Swal.fire({
+        icon: "info",
+        title: "No Documents",
+        text: "This vendor hasn't uploaded any documents yet.",
+        background: "#0a1425",
+        color: "#fff"
+      });
+      return;
+    }
+
+    let docsListHtml = `
+  <div class="flex flex-col space-y-2 pr-4 border-r border-gray-700 w-1/3 overflow-y-auto" style="max-height: 600px;">
+`;
+    docs.forEach(function(doc, index) {
+      const ringClass = (index === 0) ? "ring-2 ring-blue-500" : "";
+docsListHtml += `
+  <button onclick="window.previewDocument('${doc.cloudinaryUrl}', this)"
+    class="doc-item-btn p-3 bg-gray-800 hover:bg-gray-700 rounded-lg text-left transition-all ${ringClass}">
+    <p class="font-bold text-blue-400 uppercase text-[10px]">${doc.documentType}</p>
+    <p class="text-xs text-gray-300 truncate">${doc.filename}</p>
+  </button>
+`;
+    });
+    docsListHtml += "</div>";
+
+const previewPaneHtml = `
+  <div class="flex-1 pl-4 h-[600px] flex items-center justify-center bg-[#050a14] rounded-lg overflow-hidden">
+    <iframe src="${docs[0].cloudinaryUrl}" class="w-full h-full border-none" id="previewFrame"></iframe>
+  </div>
+`;
+
+    Swal.fire({
+      title: "Vendor Documents Preview",
+      html: 
+        "<div class=\"flex h-[600px] mt-4\">" +
+          docsListHtml +
+          previewPaneHtml +
+        "</div>",
+      width: "1000px",
+      background: "#0a1425",
+      color: "#fff",
+      showConfirmButton: true,
+      confirmButtonText: "Close",
+      confirmButtonColor: "#374151",
+      didOpen: function() {
+        window.previewDocument = function(url, btn) {
+          const frame = document.getElementById("previewFrame");
+          if (frame) frame.src = url;
+          document.querySelectorAll(".doc-item-btn").forEach(function(b) {
+             b.classList.remove("ring-2", "ring-blue-500");
+          });
+          btn.classList.add("ring-2", "ring-blue-500");
+        };
+      }
+    });
+  }
 
   // Attach action button listeners
   function attachActionListeners() {
@@ -158,13 +247,23 @@
     const vendorId = btn.getAttribute('data-vendor-id');
     const row = btn.closest('.vendor-row');
     
-    if (!confirm('Are you sure you want to approve this vendor?')) {
-      return;
-    }
+    const result = await Swal.fire({
+      title: 'Approve Vendor?',
+      text: "Are you sure you want to approve this vendor?",
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#059669',
+      cancelButtonColor: '#374151',
+      confirmButtonText: 'Yes, Approve!',
+      background: '#0a1425',
+      color: '#fff'
+    });
+
+    if (!result.isConfirmed) return;
     
     // Disable button during request
     btn.disabled = true;
-    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i>Processing...';
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i>...';
 
     try {
       const url = "/admin/vendors/pending/" + vendorId + "/approve";
@@ -179,7 +278,13 @@
       const data = await response.json();
 
       if (data.success) {
-        alert(data.message);
+        Swal.fire({
+          icon: 'success',
+          title: 'Approved!',
+          text: data.message,
+          background: '#0a1425',
+          color: '#fff'
+        });
         // Remove row from table
         row.remove();
         // Update pagination
@@ -195,12 +300,24 @@
           location.reload();
         }
       } else {
-        alert('Error: ' + (data.message || 'Failed to approve vendor'));
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: data.message || 'Failed to approve vendor',
+          background: '#0a1425',
+          color: '#fff'
+        });
         btn.disabled = false;
         btn.innerHTML = '<i class="fa-solid fa-check mr-1"></i>Approve';
       }
     } catch (error) {
-      alert('Failed to approve vendor. Please try again.');
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Failed to approve vendor. Please try again.',
+        background: '#0a1425',
+        color: '#fff'
+      });
       btn.disabled = false;
       btn.innerHTML = '<i class="fa-solid fa-check mr-1"></i>Approve';
     }
@@ -212,13 +329,23 @@
     const vendorId = btn.getAttribute('data-vendor-id');
     const row = btn.closest('.vendor-row');
     
-    if (!confirm('Are you sure you want to reject this vendor application? This action cannot be undone.')) {
-      return;
-    }
+    const result = await Swal.fire({
+      title: 'Reject Application?',
+      text: "Are you sure you want to reject this vendor? This action cannot be undone.",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#ef4444',
+      cancelButtonColor: '#374151',
+      confirmButtonText: 'Yes, Reject',
+      background: '#0a1425',
+      color: '#fff'
+    });
+
+    if (!result.isConfirmed) return;
     
     // Disable button during request
     btn.disabled = true;
-    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i>Processing...';
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i>...';
 
     try {
       const url = "/admin/vendors/pending/" + vendorId + "/reject";
@@ -233,7 +360,13 @@
       const data = await response.json();
 
       if (data.success) {
-        alert(data.message);
+        Swal.fire({
+          icon: 'success',
+          title: 'Rejected',
+          text: data.message,
+          background: '#0a1425',
+          color: '#fff'
+        });
         // Remove row from table
         row.remove();
         // Update pagination
@@ -249,12 +382,24 @@
           location.reload();
         }
       } else {
-        alert('Error: ' + (data.message || 'Failed to reject vendor'));
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: data.message || 'Failed to reject vendor',
+          background: '#0a1425',
+          color: '#fff'
+        });
         btn.disabled = false;
         btn.innerHTML = '<i class="fa-solid fa-times mr-1"></i>Reject';
       }
     } catch (error) {
-      alert('Failed to reject vendor. Please try again.');
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Failed to reject vendor. Please try again.',
+        background: '#0a1425',
+        color: '#fff'
+      });
       btn.disabled = false;
       btn.innerHTML = '<i class="fa-solid fa-times mr-1"></i>Reject';
     }
@@ -302,6 +447,7 @@
       }
       
       attachActionListeners();
+      attachDocListeners();
       updatePaginationInfo();
     } catch (error) {
       console.error('Error applying search:', error);
@@ -403,4 +549,3 @@
     }
   });
 </script>
-`) %>

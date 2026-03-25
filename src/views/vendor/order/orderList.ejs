@@ -86,13 +86,13 @@
                         <% orders.forEach(order => { %>
                             <tr class="hover:bg-gray-800/30 transition-colors group">
                                 <td class="px-6 py-4">
-                                    <span class="font-mono text-blue-400 font-medium">#<%= order._id.toString().slice(-8).toUpperCase() %></span>
+                                    <span class="font-mono text-blue-400 font-medium">#<%= order._id.toString().slice(-6).toUpperCase() %></span>
                                 </td>
                                 <td class="px-6 py-4 text-sm">
                                     <%= new Date(order.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) %>
                                 </td>
                                 <td class="px-6 py-4 text-sm font-medium">
-                                    <%= order.shippingAddress ? order.shippingAddress.name : 'N/A' %>
+                                    <%=  order.address.name %>
                                 </td>
                                 <td class="px-6 py-4">
                                     <% 
@@ -112,7 +112,7 @@
                                     </span>
                                 </td>
                                 <td class="px-6 py-4 font-semibold">
-                                    ₹<%= (order.total || 0).toLocaleString('en-IN') %>
+                                    ₹<%= (order.total || 0).toFixed(1) %>
                                 </td>
 
                                 <td class="px-6 py-4 text-right">
@@ -183,4 +183,5 @@
         url.searchParams.set('page', 1);
         window.location.href = url.toString();
     }
+    
 </script>

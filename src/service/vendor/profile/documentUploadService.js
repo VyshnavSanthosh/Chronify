@@ -22,6 +22,8 @@ export default class DocumentUploadService {
                     documentType: docType,
                     cloudinaryUrl: docData.url,
                     publicId: docData.publicId,
+                    resourceType: docData.resourceType,
+                    deliveryType: docData.deliveryType,
                     filename: docData.filename,
                     size: docData.size,
                     status: docData.status,

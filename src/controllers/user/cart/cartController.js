@@ -6,7 +6,10 @@ export default class CartControler {
         const user = req.user
         try {
             const { cart, total, count, removedItemsCount } = await this.cartService.getCartItems(user._id)
-            console.log("Count :", count)
+
+            if (removedItemsCount > 0) {
+                return res.redirect("/products?blocked=true")
+            }
 
             return res.render("user/cart", {
                 user,
@@ -61,7 +64,6 @@ export default class CartControler {
     async delteFromCart(req, res) {
         const userId = req.user._id
         const { sku } = req.params
-        console.log("SKU :", sku)
         try {
             await this.cartService.deleteItemFromCart(userId, sku)
             return res.json({

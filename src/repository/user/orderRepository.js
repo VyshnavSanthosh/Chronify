@@ -14,7 +14,6 @@ export default class OrderRepository {
                 offer: item.offer
             }));
 
-            console.log("items : ", data.items)
 
 
             const order = new Order({

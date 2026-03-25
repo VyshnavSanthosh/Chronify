@@ -1,0 +1,44 @@
+services:
+  app:
+    build: .
+    ports:
+      - "5000:5000"
+    env_file:
+      - .env
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/chronify
+      - REDIS_HOST=redis
+    depends_on:
+      - mongo
+      - redis
+## docker logs -f chronify-app-1 to see terminal logs
+
+  worker:
+    build: .
+    command: ["node", "src/queues/workers/emailWorker.js"]
+    env_file:
+      - .env
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/chronify
+      - REDIS_HOST=redis
+    depends_on:
+      - mongo
+      - redis
+## docker logs -f chronify-worker-1 to see terminal logs
+
+  mongo:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db  ## Use "docker exec -it chronify-mongo-1 mongosh "to access the mongo shell
+
+
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+
+  
+volumes:
+  mongo-data:

@@ -9,7 +9,7 @@ export default class GoogleOauthService {
      * @returns {object} User object
      */
     async handleGoogleLogin(profile) {
-        console.log("Google Profile received:", JSON.stringify(profile, null, 2));
+
 
         // Extract data from Google profile with multiple fallback options
         const googleId = profile.id;
@@ -38,7 +38,7 @@ export default class GoogleOauthService {
             lastName = profile._json.family_name || lastName;
         }
 
-        console.log(`Extracted Google data - Email: ${email}, Name: ${firstName} ${lastName}`);
+
 
         if (!email) {
             console.error("Critical: No email found in Google profile");
@@ -49,7 +49,13 @@ export default class GoogleOauthService {
         let user = await this.userRepository.findByGoogleId(googleId);
 
         if (user) {
-            console.log(`Existing Google user found: ${user.email}`);
+
+
+            // Restrict login to 'user' role only
+            if (user.role && user.role !== 'customer') {
+                throw new Error(`Access denied. ${user.role.charAt(0).toUpperCase() + user.role.slice(1)}s must use their designated login portal.`);
+            }
+
             return user;
         }
 
@@ -58,7 +64,7 @@ export default class GoogleOauthService {
         const existingEmailUser = await this.userRepository.findByEmail(email.toLowerCase().trim());
 
         if (existingEmailUser) {
-            console.log(`Linking Google ID to existing email user: ${email}`);
+
             // Link Google account to existing email account
             existingEmailUser.googleId = googleId;
             existingEmailUser.isVerified = true; // Google users are verified
@@ -68,7 +74,6 @@ export default class GoogleOauthService {
         }
 
         // Create new user with Google data
-        console.log(`Creating new Google user: ${email}`);
         // Sanitize name for referral code (remove spaces and special characters)
         const sanitizedNameForCode = firstName.replace(/[^a-zA-Z]/g, '') || "USER";
         const referralCode = await this.generateReferralCode(sanitizedNameForCode);
@@ -84,7 +89,7 @@ export default class GoogleOauthService {
         };
 
         const newUser = await this.userRepository.createGoogleUser(newUserData);
-        console.log(`Successfully created new Google user: ${email}`);
+
 
         return newUser;
     }

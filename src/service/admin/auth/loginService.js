@@ -45,13 +45,10 @@ export default class LoginService {
         const decoded = await this.jwtService.verifyRefreshToken(refreshToken)
 
         const admin = await this.userRepository.findWithRefreshTokenById(decoded.userId) // decoded will have payload data
-        console.log("admin :", admin)
         
         if (!admin) {
             throw new Error("User not found");
-        }
-        console.log(`admin refresh token ${admin.refreshToken} , refresh token ${refreshToken}`)
-        
+        }        
 
         if (admin.refreshToken !== refreshToken) {
             // Clear all tokens for security

@@ -5,7 +5,7 @@ export default class UserAuthService {
         this.userRepository = userRepository //repo dependency injection
     }
 
-    async register(userData) {  // user data comes from controller
+    async register(userData) { 
         const {
             firstName,
             lastName,
@@ -14,7 +14,7 @@ export default class UserAuthService {
             password,
             referralCode
         } = userData
-
+        
         const normalizedEmail = email.toLowerCase().trim();
         // check user already exists
         const existingUser = await this.userRepository.findByEmail(normalizedEmail)

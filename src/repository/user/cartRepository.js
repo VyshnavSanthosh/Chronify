@@ -12,12 +12,10 @@ export default class CartRepository {
                 })
                 return cart
             }
-            console.log("cart :", cart)
 
             const existingProduct = cart.items.find((item) => {
                 return item.sku == productObj.sku
             })
-            console.log("Exists :", existingProduct)
 
             if (existingProduct) {
                 if (existingProduct.qty + productObj.qty > productObj.stock) {
@@ -45,11 +43,17 @@ export default class CartRepository {
         const cart = await Cart.findOne({ userId: userId })
             .populate({
                 path: "items.productId",
-                select: "name brand isListed isDeleted variants.price variants.mainImage variants.quantity variants.offer variants.color variants.sku category",
-                populate: {
-                    path: "category",
-                    select: "isListed"
-                }
+                select: "name brand vendorId isListed isDeleted variants.price variants.mainImage variants.quantity variants.offer variants.color variants.sku category",
+                populate: [
+                    {
+                        path: "category",
+                        select: "isListed"
+                    },
+                    {
+                        path: "vendorId",
+                        select: "isBlocked"
+                    }
+                ]
             })
             .lean()
         const count = cart?.items?.length || 0

@@ -55,8 +55,6 @@ export default class AddProductService {
             const existingProduct = await this.productRepository.findByProductName(product.name)
 
             if (existingProduct) {
-                console.log("Existing: ", existingProduct)
-
                 throw new Error("Product with this name exists");
             }
             const productData = {
@@ -89,10 +87,9 @@ export default class AddProductService {
                     warranty: product.specifications.warranty
                 }
             }
-            console.log("service product data : ",productData)
             
             const savedProduct = await this.productRepository.createProduct(productData);
-            console.log("saved produt in db : ",savedProduct)
+
             
             const pattern = `products:${vendorId}:*`
             await deleteRedisCache(pattern)
@@ -113,7 +110,6 @@ export default class AddProductService {
             try {
                 await deleteRedisCache(pattern)
                 await deleteRedisCache(productDetailPattern)
-                console.log("cache deleted")
             } catch (error) {
                 console.log("couldnt delete from cache", error)
             }
@@ -132,7 +128,6 @@ export default class AddProductService {
             try {
                 await deleteRedisCache(pattern)
                 await deleteRedisCache(productDetailPattern)
-                console.log("cache deleted")
             } catch (error) {
                 console.log("couldnt delete from cache", error)
             }
@@ -207,4 +202,4 @@ export default class AddProductService {
             throw error;
         }
     }
-}console.log("cache deleted")
+}

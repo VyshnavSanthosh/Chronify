@@ -30,7 +30,6 @@ export default class ForgotPasswordService {
         
         await this.redis.set(`forgot:${user._id}`, otp, "EX", 120); // 300 seconds = 5 minutes
 
-        console.log(`DEBUG: Password reset OTP for user ${user._id} (email: ${user.email}): ${otp}`);
 
         // Send OTP email
         await this.emailQueue.add("forgot-password-otp", {
@@ -87,7 +86,6 @@ export default class ForgotPasswordService {
         // Clear refresh token (force user to login again with new password)
         await this.userRepository.clearRefreshToken(userId);
 
-        console.log(`✅ Password reset successful for user ${userId}`);
 
         return true;
     }
@@ -98,7 +96,6 @@ export default class ForgotPasswordService {
 
         await this.redis.set(`forgot:${userId}`, newOtp, "EX", 300);
 
-        console.log(`DEBUG: Resent password reset OTP for user ${userId}: ${newOtp}`);
 
         // Send OTP email
         await this.emailQueue.add("forgot-password-otp", {

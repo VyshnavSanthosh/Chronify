@@ -10,6 +10,8 @@ import VendorPendingListController from "../../../controllers/admin/vendorList/v
 import VendorListService from "../../../service/admin/vendorList/vendorListService.js";
 import VendorPendingListService from "../../../service/admin/vendorList/vendorPendingListService.js";
 import VendorRepository from "../../../repository/vendor.js";
+import VendorDocumentRepository from "../../../repository/vendor/vendorDocumentUpload.js";
+import ProductRepository from "../../../repository/vendor/productRepository.js";
 import adminJwtMiddlewareFile from "../../../middleware/adminJwt.js";
 
 
@@ -18,9 +20,13 @@ const adminJwtMiddleware = new adminJwtMiddlewareFile();
 
 const vendorRepository = new VendorRepository()
 
-const vendorListService = new VendorListService(vendorRepository)
+const vendorDocumentRepository = new VendorDocumentRepository()
 
-const vendorPendingListService = new VendorPendingListService(vendorRepository)
+const productRepository = new ProductRepository()
+
+const vendorListService = new VendorListService(vendorRepository, productRepository)
+
+const vendorPendingListService = new VendorPendingListService(vendorRepository, vendorDocumentRepository)
 
 const vendorListController = new VendorListController(vendorListService)
 

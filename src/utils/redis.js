@@ -2,10 +2,12 @@ import Redis from "ioredis";
 
 const redis = new Redis({
     host: process.env.REDIS_HOST || "127.0.0.1",
-    port: process.env.REDIS_PORT || 6379,
+    port: Number(process.env.REDIS_PORT) || 6379,
     password: process.env.REDIS_PASSWORD || undefined,
-    maxRetriesPerRequest: null,     // required for BullMQ compatibility
+    retryDelayOnFailover: 100,
+    maxRetriesPerRequest: null,
     enableReadyCheck: true,
+
 });
 
 redis.on("connect", () => {
@@ -14,6 +16,14 @@ redis.on("connect", () => {
 
 redis.on("error", (err) => {
     console.error("❌ Redis error:", err);
+});
+
+redis.on("ready", () => {
+    console.log("🚀 Redis is ready to use");
+});
+
+redis.on("reconnecting", () => {
+    console.log("🔄 Redis reconnecting...");
 });
 
 redis.clearProductCache = async () => {

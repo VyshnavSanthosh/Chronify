@@ -48,11 +48,64 @@ export default class VendorOrderService {
     }
 
     async getOrder(orderId) {
-        return await this.orderRepository.getOrderDetailById(orderId)
+        return await this.orderRepository.getOrderDetailByIdwithVendorId(orderId)
     }
 
-    async updateOrderStatus(orderId, status) {
-        return await this.orderRepository.updateOrderStatusById(orderId, status)
-        
+    async updateOrderStatus(orderId, status, vendorId) {
+        const order = await this.orderRepository.getOrderDetailByIdwithVendorId(orderId);
+        const vendorItems = order.items.filter(item =>
+            item.productId && item.productId.vendorId && item.productId.vendorId.toString() === vendorId.toString()
+        );
+
+        for (const item of vendorItems) {
+            await this.orderRepository.updateOrderItemStatus(orderId, item.sku, status);
+        }
+
+        return await this.syncGlobalOrderStatus(orderId);
+    }
+
+    async updateItemStatus(orderId, sku, status) {
+        const result = await this.orderRepository.updateOrderItemStatus(orderId, sku, status);
+        await this.syncGlobalOrderStatus(orderId);
+        return result;
+    }
+
+    async syncGlobalOrderStatus(orderId) {
+        try {
+            const order = await this.orderRepository.getOrderDetailById(orderId);
+            if (!order) return;
+
+            const activeItems = order.items.filter(item =>
+                !['cancelled', 'returned', 'refunded'].includes(item.status)
+            );
+
+            if (activeItems.length === 0) {
+                const hasReturned = order.items.some(item => ['returned', 'refunded'].includes(item.status));
+                let finalStatus = 'cancelled';
+                if (hasReturned) finalStatus = 'returned';
+
+                if (order.orderStatus !== finalStatus) {
+                    await this.orderRepository.updateOrderStatusById(orderId, finalStatus);
+                }
+                return;
+            }
+
+            const statusHierarchy = ['pending', 'confirmed', 'packed', 'shipped', 'out_for_delivery', 'delivered'];
+            let minStatusIndex = statusHierarchy.length - 1;
+
+            for (const item of activeItems) {
+                const itemStatusIndex = statusHierarchy.indexOf(item.status);
+                if (itemStatusIndex !== -1 && itemStatusIndex < minStatusIndex) {
+                    minStatusIndex = itemStatusIndex;
+                }
+            }
+
+            const newGlobalStatus = statusHierarchy[minStatusIndex];
+            if (order.orderStatus !== newGlobalStatus) {
+                await this.orderRepository.updateOrderStatusById(orderId, newGlobalStatus);
+            }
+        } catch (error) {
+            console.log("Error syncing global order status:", error);
+        }
     }
 }

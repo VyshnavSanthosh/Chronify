@@ -12,6 +12,10 @@ export default class LoginService {
         if (!user) {
             throw new Error("Invalid email or password");
         }
+
+        if (user.role && user.role !== 'customer') {
+            throw new Error(`Access denied. ${user.role.charAt(0).toUpperCase() + user.role.slice(1)}s must use their designated login portal.`);
+        }
         // Check if user is verified
         if (!user.isVerified) {
             throw new Error("Please verify your email first. Check your inbox for OTP.");
@@ -75,7 +79,7 @@ export default class LoginService {
             user.email,
             user.role
         );
-        
+
 
         // Update refresh token in database
         await this.userRepository.updateRefreshToken(user._id, newTokens.refreshToken);

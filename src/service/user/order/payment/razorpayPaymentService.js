@@ -35,7 +35,6 @@ export default class RazorpayService extends BasePaymentService {
         try {
 
             const body = paymentData.razorpay_order_id + "|" + paymentData.razorpay_payment_id
-            console.log("payment data :", paymentData)
 
             const expectedSignature = crypto.createHmac("sha256", razorpay_secret).update(body).digest("hex")
             if (expectedSignature == paymentData.razorpay_signature) {

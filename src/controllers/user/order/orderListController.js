@@ -27,7 +27,6 @@ export default class OrderListControler {
 
         try {
             const order = await this.orderService.getOrderDetail(orderId)
-            console.log("Order : ", order)
 
             return res.render("user/order/orderDetail", {
                 order,

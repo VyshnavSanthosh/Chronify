@@ -4,7 +4,7 @@ export default class CategoryService {
     }
 
     async saveCategoryToDb(categoryObj) {
-
+        categoryObj.categoryName = categoryObj.categoryName.toUpperCase()
         const exists = await this.categoryRepository.findByName(categoryObj.categoryName)
 
         if (exists) {

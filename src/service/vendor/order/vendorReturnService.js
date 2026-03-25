@@ -56,8 +56,6 @@ export default class VendorReturnService {
         const updatedOrder = await this.orderRepository.getOrderDetailById(returnRequest.orderId._id)
 
         const allItemsReturned = updatedOrder.items.every(item => item.status === 'returned');
-        console.log("Alll status : ",allItemsReturned)
-        console.log("status : ",returnRequest.orderId.orderStatus)
         
         if (allItemsReturned) {
             await this.orderRepository.updateOrderStatusById(returnRequest.orderId._id, "returned")

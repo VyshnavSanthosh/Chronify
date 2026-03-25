@@ -7,7 +7,6 @@ export default class vendorPendingListController {
         const page = parseInt(req.query.page) || 1
         try {
             const { vendors, totalVendors } = await this.vendorPendingListService.getAllNotApprovedVendors(page)
-            console.log("vendors : ",vendors)
 
 
             return res.status(200).render("admin/vendorList/vendorPendingLIst", {
@@ -24,14 +23,14 @@ export default class vendorPendingListController {
     }
 
     async approveVendor(req, res) {
+        console.log("approve hit : ")
+        
         try {
             const { vendorId } = req.params
-            console.log(vendorId)
             if (!vendorId) {
                 return res.status(400).json({
                     success: false,
-                    message: "Vendor ID is required",
-                    vendor: approvedVendor
+                    message: "Vendor ID is required"
                 })
             }
             const approvedVendor = await this.vendorPendingListService.approveVendor(vendorId)
@@ -53,13 +52,12 @@ export default class vendorPendingListController {
     }
 
     async rejectVendor(req, res) {
+        console.log("reject hit : ")
         const { vendorId } = req.params
-        console.log(vendorId)
         if (!vendorId) {
             return res.status(400).json({
                 success: false,
-                message: "Vendor ID is required",
-                vendor: approvedVendor
+                message: "Vendor ID is required"
             })
         }
         try {

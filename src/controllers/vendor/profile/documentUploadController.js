@@ -46,6 +46,8 @@ export default class DocumentUploadController {
                         uploadedDocuments[docType] = {
                             url: cloudinaryResult.secure_url,
                             publicId: cloudinaryResult.public_id,
+                            resourceType: cloudinaryResult.resource_type,
+                            deliveryType: cloudinaryResult.type,
                             filename: cloudinaryResult.original_filename,
                             size: cloudinaryResult.bytes,
                             uploadedAt: new Date(),

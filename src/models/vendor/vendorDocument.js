@@ -54,6 +54,14 @@ const vendorDocumentSchema = new mongoose.Schema(
         rejectionReason: {
             type: String,
             default: null
+        },
+        resourceType: {
+            type: String,
+            default: 'image'
+        },
+        deliveryType: {
+            type: String,
+            default: 'upload'
         }
     },
     {

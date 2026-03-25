@@ -27,11 +27,17 @@ export default class WishListRepository {
         try {
             const result = await Wishlist.find({ userId: userId }).populate({
                 path: "productId",
-                select: "name brand isListed isDeleted variants.price variants.mainImage variants.sku category",
-                populate: {
-                    path: "category",
-                    select: "isListed"
-                }
+                select: "name brand vendorId isListed isDeleted variants.price variants.mainImage variants.sku category",
+                populate: [
+                    {
+                        path: "category",
+                        select: "isListed"
+                    },
+                    {
+                        path: "vendorId",
+                        select: "isBlocked"
+                    }
+                ]
             })
             // console.log("result", result[0]?.productId?.variants)
             return result

@@ -7,7 +7,6 @@ export default class InventoryService {
         const productDetailPattern = `product:*`
         try {
             await deleteRedisCache(productDetailPattern)
-            console.log("cache deleted")
         } catch (error) {
             console.log("couldnt delete from cache", error)
         }
@@ -21,7 +20,6 @@ export default class InventoryService {
         const productDetailPattern = `product:*`
         try {
             await deleteRedisCache(productDetailPattern)
-            console.log("cache deleted")
             
         } catch (error) {
             console.log("couldnt    delete from cache", error)
@@ -33,7 +31,6 @@ export default class InventoryService {
         const productDetailPattern = `product:*`
         try {
             await deleteRedisCache(productDetailPattern)
-            console.log("cache deleted")
         } catch (error) {
             console.log("couldnt delete from cache", error)
         }

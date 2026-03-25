@@ -18,10 +18,8 @@ export default class VendorAuthController {
     }
 
     async handleSignup(req, res) {
-        console.log("hello")
-        
-        console.log(req.body)
-        
+
+
         const { error, value } = this.validator.validate(this.joi_signup, req.body)
 
         let errors = {}
@@ -43,7 +41,6 @@ export default class VendorAuthController {
         const { brandName, brandEmail, mobileNumber, password } = value
 
         try {
-            console.log("Starting signup process...")
 
             const vendor = await this.signupService.register({
                 brandName,
@@ -52,22 +49,13 @@ export default class VendorAuthController {
                 password
             })
 
-            console.log("Vendor created successfully:", vendor._id)
 
             // Store in session
             req.session.tempVendorId = vendor._id;
             req.session.tempVendorEmail = vendor.brandEmail;
 
-            console.log("Session data stored:", {
-                tempVendorId: req.session.tempVendorId,
-                tempVendorEmail: req.session.tempVendorEmail
-            })
-
-            // Send OTP
-            console.log("Sending OTP to vendor...")
-            await this.otpService.sendOtp(vendor)
-
-            console.log("OTP sent successfully, redirecting to verify page...")
+            // Send initial OTP
+            await this.otpService.sendOtp(vendor);
 
             // Redirect to OTP verification
             return res.redirect("/vendor/auth/verify-otp")

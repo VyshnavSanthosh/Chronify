@@ -22,9 +22,7 @@ export default class AddProductController {
             delete req.session.error;
             return res.status(200).render("vendor/products/addProduct", {
                 errors: {},
-                name: "",
-                brand: "",
-                description: "",
+                formData: {},
                 categories,
                 success: success || null,
                 error: error || null,
@@ -34,6 +32,7 @@ export default class AddProductController {
             console.log("error in loading", error)
             return res.status(500).render("vendor/products/addProduct", {
                 errors: {},
+                formData: {},
                 categories: [],
                 success: null,
                 error: "Failed to load page. Please try again."
@@ -42,15 +41,10 @@ export default class AddProductController {
     }
 
     async handleAddProducts(req, res) {
-    console.log("RAW body variants[0]:", JSON.stringify(
-    Object.fromEntries(
-        Object.entries(req.body.variants?.[0] ?? {})
-    ), null, 2
-));
+
 
         const { error, value } = this.validator.validate(this.joi_product, req.body)
         const category = req.body.category
-        console.log("value : ", value)
 
         let errors = {}
         if (error) {
@@ -87,7 +81,6 @@ export default class AddProductController {
         const vendorId = req.user._id
 
         if (!req.files || req.files.length < 4) {
-            console.log("Less no of uploads ")
 
             const categories = await this.productService.getAllCategories();
 
@@ -175,7 +168,6 @@ export default class AddProductController {
                 }
                 finalVariants[variantNumber].additionalImages.push(image)
             }
-            console.log("final Varient : ", finalVariants)
 
             const product = {
                 name: name.toUpperCase(),
@@ -185,7 +177,6 @@ export default class AddProductController {
                 variants: finalVariants,
                 specifications: specifications
             }
-            console.log("Controller Final Produt :", product)
 
 
             try {
@@ -199,9 +190,7 @@ export default class AddProductController {
                 const categories = await this.productService.getAllCategories();
 
                 try {
-                    console.log(`Attempting to delete folder: ${folderPath}`);
                     await deleteFolder(folderPath);
-                    console.log(`Folder deleted successfully: ${folderPath}`);
                 } catch (folderError) {
                     console.error(`Failed to delete folder ${folderPath}:`, folderError.message);
                 }

@@ -90,13 +90,13 @@
                             : 'pending';
                         
                         // Format Order ID (show last 8 characters of MongoDB _id)
-                        const orderId = order._id.toString().slice(-8).toUpperCase();
+                        const orderId = order._id.toString().slice(-6).toUpperCase();
                         
                         // Count items
                         const itemCount = order.items ? order.items.length : 0;
                         
-                        // Format total with 2 decimal places
-                        const formattedTotal = order.total ? order.total.toFixed(2) : '0.00';
+                        // Format total with 1 decimal place
+                        const formattedTotal = order.total ? order.total.toFixed(1) : '0.0';
                     %>
                         <tr class="bg-[#050a14] hover:bg-gray-800/50 transition-colors text-sm group" data-order-id="<%= orderId %>">
                             <td class="px-6 py-4 border-r border-gray-800 font-medium text-blue-400 group-hover:text-blue-300">
