@@ -33,7 +33,7 @@ export default class VendorReturnService {
         for (const item of returnRequest.items) {
             const itemStatus = item.status;
             if (itemStatus !== 'returned') {
-                const price = (item.price * item.quantity) - (((item.price * item.quantity) * item.offer) / 100);
+                const price = item.price;
                 total += price
                 await this.orderRepository.updateOrderItemStatus(returnRequest.orderId, item.sku, 'returned');
             }

@@ -452,7 +452,7 @@
                                     </div>
                                 </td>
                                 <td><%= coupon.applyType %></td>
-                                <td><%= coupon.expiryDate %></td>
+                                <td><%= new Date(coupon.expiryDate).toLocaleDateString('en-GB') %></td>
                                 <td>
                                     <div class="action-buttons">
                                         <button class="action-btn" onclick="editCoupon('<%= coupon._id %>')" title="Edit">

@@ -434,8 +434,7 @@
                     <div style="display: flex; flex-direction: column; gap: 24px;">
                         <% cart.items.forEach((item, index) => { %>
                             <div style="background: linear-gradient(135deg, #1a2855 0%, #0f1a35 100%); border: 1px solid #2a3f66; border-radius: 12px; padding: 24px; display: flex; gap: 24px;">
-                                <!-- Checkbox removed -->
-                                <input type="hidden" class="cart-item-sku" value="<%= item.sku %>">
+
 
                                 <!-- Product Image -->
                                 <div style="flex-shrink: 0;">
@@ -612,12 +611,14 @@
         document.addEventListener('DOMContentLoaded', function() {
             <% if (locals.removedItemsCount && removedItemsCount > 0) { %>
                 Swal.fire({
-                    icon: 'info',
-                    title: 'Cart Updated',
-                    text: 'Some products in your cart are no longer available and have been removed.',
+                    icon: 'warning',
+                    title: 'Availability Update',
+                    text: 'Some items in your cart are no longer available and have been removed.',
                     background: '#0f1a35',
                     color: '#fff',
                     confirmButtonColor: '#3b82f6'
+                }).then(() => {
+                    window.location.href = "/products?message=blocked";
                 });
             <% } %>
         });
@@ -747,31 +748,12 @@ async function decreaseQty(sku) {
         // Proceed to checkout
     async function proceedToCheckout(cartId) {
         try {
-            // Get all cart item SKUs
-            const skuElements = document.querySelectorAll('.cart-item-sku');
-            
-            if (skuElements.length === 0) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Cart is Empty',
-                    text: 'Please add items to your cart to proceed',
-                    confirmButtonText: 'OK'
-                });
-                return;
-            }
-
-            // Extract SKUs
-            const selectedSkus = Array.from(skuElements).map(el => el.value);
-            const skuString = selectedSkus.join(',');
-
             // Redirect with all items
-            window.location.href = `/checkout/${cartId}?items=${skuString}`;
+            window.location.href = `/checkout/${cartId}`;
         } catch (err) {
             console.error("Checkout error:", err)
         }
     }
-
-    // Check for moved items on load
 
         // Back to shopping
         function backToShopping() {

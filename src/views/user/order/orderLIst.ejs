@@ -254,13 +254,13 @@
         // Download invoice
         function downloadInvoice(orderId) {
             console.log('[v0] Downloading invoice for order:', orderId);
-            window.open('/invoice/' + orderId, '_blank');
+            window.open(`/<%= user._id %>/orders/${orderId}/invoice`, '_blank');
         }
 
         // View order details
         function viewOrderDetails(orderId) {
             console.log('[v0] Viewing details for order:', orderId);
-            window.location.href = '/orders/' + orderId;
+            window.location.href = `/<%= user._id %>/orders/${orderId}`;
         }
 
         // Go to specific page

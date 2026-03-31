@@ -22,8 +22,12 @@ export default class OrderListControler {
     }
 
     async renderOrderDetailPage(req, res) {
-        const { orderId } = req.params
+        const { userId, orderId } = req.params
         const user = req.user
+
+        if (userId !== user._id.toString()) {
+            return res.status(404).render("error/404");
+        }
 
         try {
             const order = await this.orderService.getOrderDetail(orderId)
@@ -38,8 +42,12 @@ export default class OrderListControler {
     }
 
     async downloadInvoice(req, res) {
-        const { orderId } = req.params;
+        const { userId, orderId } = req.params;
         const user = req.user;
+
+        if (userId !== user._id.toString()) {
+            return res.status(404).render("error/404");
+        }
 
         try {
             const order = await this.orderService.getOrderDetail(orderId);
@@ -62,9 +70,15 @@ export default class OrderListControler {
 
     async cancelOrder(req, res) {
         try {
-            const userId = req.user._id
-            const { orderId } = req.params
-            await this.orderService.cancelOrder(orderId, userId)
+            const user = req.user;
+            const { userId, orderId } = req.params;
+
+            if (userId !== user._id.toString()) {
+                return res.status(404).render("error/404");
+            }
+
+            const currentUserId = user._id;
+            await this.orderService.cancelOrder(orderId, currentUserId)
             return res.json({ success: true, message: "Order cancelled successfully" });
         } catch (error) {
             console.error("Error cancelling order:", error);
@@ -74,9 +88,15 @@ export default class OrderListControler {
 
     async cancelOrderItem(req, res) {
         try {
-            const userId = req.user._id;
-            const { orderId, sku } = req.params;
-            await this.orderService.cancelOrderItem(orderId, sku, userId);
+            const user = req.user;
+            const { userId, orderId, sku } = req.params;
+
+            if (userId !== user._id.toString()) {
+                return res.status(404).render("error/404");
+            }
+
+            const currentUserId = user._id;
+            await this.orderService.cancelOrderItem(orderId, sku, currentUserId);
             return res.json({ success: true, message: "Item cancelled successfully" });
         } catch (error) {
             console.error("Error cancelling order item:", error);
@@ -86,10 +106,16 @@ export default class OrderListControler {
 
     async returnOrder(req, res) {
         try {
-            const userId = req.user._id
-            const { orderId } = req.params;
+            const user = req.user;
+            const { userId, orderId } = req.params;
+
+            if (userId !== user._id.toString()) {
+                return res.status(404).render("error/404");
+            }
+
+            const currentUserId = user._id;
             const { reason } = req.body;
-            await this.orderService.returnOrder(orderId, reason, userId);
+            await this.orderService.returnOrder(orderId, reason, currentUserId);
             return res.json({ success: true, message: "Return request submitted successfully" });
         } catch (error) {
             console.error("Error submitting return request:", error);
@@ -99,11 +125,17 @@ export default class OrderListControler {
 
     async returnOrderItem(req, res) {
         try {
-            const userId = req.user._id;
-            const { orderId, sku } = req.params;
+            const user = req.user;
+            const { userId, orderId, sku } = req.params;
+
+            if (userId !== user._id.toString()) {
+                return res.status(404).render("error/404");
+            }
+
+            const currentUserId = user._id;
             const { reason } = req.body;
-            
-            await this.orderService.returnOrderItem(orderId, sku, userId, reason);
+
+            await this.orderService.returnOrderItem(orderId, sku, currentUserId, reason);
             return res.json({ success: true, message: "Item return request submitted successfully" });
         } catch (error) {
             console.error("Error returning order item:", error);

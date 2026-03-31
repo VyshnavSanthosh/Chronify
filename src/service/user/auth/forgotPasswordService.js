@@ -27,7 +27,7 @@ export default class ForgotPasswordService {
         const otp = this.otpGenerator();
 
         // Store OTP in Redis with prefix "forgot:" (5 minutes expiry)
-        
+
         await this.redis.set(`forgot:${user._id}`, otp, "EX", 120); // 300 seconds = 5 minutes
 
 
@@ -42,6 +42,11 @@ export default class ForgotPasswordService {
             userId: user._id,
             message: "OTP sent to your email"
         };
+    }
+
+    async getOtpTtl(userId) {
+        const ttl = await this.redis.ttl(`forgot:${userId}`);
+        return ttl > 0 ? ttl : 0;
     }
 
     async verifyResetOtp(userId, otp) {
@@ -94,7 +99,7 @@ export default class ForgotPasswordService {
         // Generate new OTP
         const newOtp = this.otpGenerator();
 
-        await this.redis.set(`forgot:${userId}`, newOtp, "EX", 300);
+        await this.redis.set(`forgot:${userId}`, newOtp, "EX", 120);
 
 
         // Send OTP email

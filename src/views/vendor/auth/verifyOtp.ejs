@@ -134,6 +134,8 @@
     </div>
 </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
     // OTP handling
     const inputs = document.querySelectorAll(".otp-input");
@@ -155,14 +157,66 @@
         });
     });
 
-    document.getElementById("otpForm").addEventListener("submit", e => {
+    document.getElementById("otpForm").addEventListener("submit", async e => {
+        e.preventDefault();
         const otp = Array.from(inputs).map(i => i.value).join("");
+        
         if (otp.length !== 4) {
-            e.preventDefault();
-            alert("Please enter a valid 4-digit OTP");
+            Swal.fire({
+                icon: 'warning',
+                title: 'Incomplete OTP',
+                text: 'Please enter all 4 digits',
+                confirmButtonColor: '#fbbf24',
+                background: '#001a33',
+                color: '#fff'
+            });
             return;
         }
-        hiddenOtpField.value = otp;
+
+        const submitBtn = e.target.querySelector('button[type="submit"]');
+        const originalBtnText = submitBtn.textContent;
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Verifying...";
+
+        try {
+            const response = await fetch("/vendor/auth/verify-otp", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ otp })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Signup successful!',
+                    text: 'Welcome to Chronify',
+                    showConfirmButton: false,
+                    timer: 2000,
+                    timerProgressBar: true,
+                    background: '#001a33',
+                    color: '#fff'
+                }).then(() => {
+                    window.location.href = "/vendor/auth/login";
+                });
+            } else {
+                throw new Error(data.error || "Verification failed");
+            }
+        } catch (err) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Verification Failed',
+                text: err.message,
+                confirmButtonColor: '#ef4444',
+                background: '#001a33',
+                color: '#fff'
+            });
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalBtnText;
+        }
     });
 
     // Timers
@@ -224,13 +278,31 @@
     }
     updateTimers();
 
-    function resendCode() {
+    async function resendCode() {
         if (resendBtn.disabled) return;
-        resendBtn.disabled = true;
-        resendBtn.classList.add("disabled");
 
-        fetch("/vendor/auth/resend-otp", { method: "POST" })
-            .then(() => {
+        const resendBtnEl = document.getElementById("resendBtn");
+        resendBtnEl.disabled = true;
+        resendBtnEl.classList.add("disabled");
+        const originalText = resendBtnEl.textContent;
+        resendBtnEl.textContent = "Sending...";
+
+        try {
+            const response = await fetch("/vendor/auth/resend-otp", { method: "POST" });
+            const data = await response.json();
+
+            if (data.success) {
+                await Swal.fire({
+                    icon: 'success',
+                    title: 'OTP Resent!',
+                    text: 'A new OTP has been sent to your email',
+                    confirmButtonColor: '#22c55e',
+                    background: '#001a33',
+                    color: '#fff',
+                    timer: 2000,
+                    timerProgressBar: true
+                });
+
                 // Reset timers
                 resendCooldown = 60;
                 otpExpiry = <%= timeRemaining || 120 %>;
@@ -250,7 +322,23 @@
                 updateTimers(); // Restart loop
                 
                 inputs[0].focus();
+            } else {
+                throw new Error(data.error || "Failed to resend OTP");
+            }
+        } catch (err) {
+            await Swal.fire({
+                icon: 'error',
+                title: 'Resend Failed',
+                text: err.message || 'Something went wrong. Please try again.',
+                confirmButtonColor: '#ef4444',
+                background: '#001a33',
+                color: '#fff'
             });
+            resendBtnEl.disabled = false;
+            resendBtnEl.classList.remove("disabled");
+        } finally {
+            resendBtnEl.textContent = originalText;
+        }
     }
 
     // ✅ Auto-hide error in EXACTLY 3 seconds

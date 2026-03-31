@@ -21,7 +21,7 @@ const CategorySchema = new mongoose.Schema(
 
         discountType: {
             type: String,
-            enum: ["percentage", "flat"],
+            enum: ["percentage"],
             required: true,
             default: "percentage"
         },
@@ -31,10 +31,6 @@ const CategorySchema = new mongoose.Schema(
             required: true
         },
 
-        maxRedeemable: {
-            type: Number,
-            default: null
-        }
 
     },
     { timestamps: true }

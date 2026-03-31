@@ -46,18 +46,19 @@ export default class ForgotPasswordController {
     }
 
 
-    // Render OTP page
-    renderVerifyOtp(req, res) {
+    async renderVerifyOtp(req, res) {
         const email = req.session.resetEmail
+        const userId = req.session.resetUserId
 
         // No email in session, redirect back to forgot password
-        if (!email) {
+        if (!email || !userId) {
             return res.redirect("/auth/forgot-password")
         }
+        const timeRemaining = await this.forgotPasswordService.getOtpTtl(userId);
         return res.render("user/auth/verifyOtpForgotPassword", {
             error: null,
             email: email,
-            timeRemaining: 120 // 2 minutes in seconds
+            timeRemaining
         })
     }
 

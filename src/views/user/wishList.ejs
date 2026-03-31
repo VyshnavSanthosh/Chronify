@@ -119,11 +119,22 @@
                 <%= item.productId.name %> - <%= variant.color || '' %>
             </div>
 
-            <% 
-                const originalPrice = variant.price || 0;
-                const offer = variant.offer || 0;
-                const offerPrice = originalPrice - (originalPrice * offer / 100);
-            %>
+<%
+    const originalPrice = variant.price || 0;
+
+    const categoryOffer = item.productId.category?.discountValue || 0;
+    const variantOffer = variant.offer || 0;
+
+    let offer = 0;
+
+    if (categoryOffer > variantOffer) {
+        offer = categoryOffer;
+    } else {
+        offer = variantOffer;
+    }
+
+    const offerPrice = originalPrice - (originalPrice * offer / 100);
+%>
             <div class="product-price" style="display: flex; flex-direction: column; gap: 4px;">
                 <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
                     <% if (offer > 0) { %>
@@ -170,12 +181,14 @@
         document.addEventListener('DOMContentLoaded', function() {
             <% if (locals.removedItemsCount && removedItemsCount > 0) { %>
                 Swal.fire({
-                    icon: 'info',
-                    title: 'Wishlist Updated',
-                    text: 'Some products in your wishlist are no longer available and have been removed.',
-                    background: '#1a2855',
+                    icon: 'warning',
+                    title: 'Availability Update',
+                    text: 'Some items in your wishlist are no longer available and have been removed.',
+                    background: '#0f1a35',
                     color: '#fff',
                     confirmButtonColor: '#3b82f6'
+                }).then(() => {
+                    window.location.href = "/products?message=blocked";
                 });
             <% } %>
         });

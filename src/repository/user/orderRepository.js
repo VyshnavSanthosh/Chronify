@@ -3,11 +3,12 @@ import mongoose from "mongoose";
 
 export default class OrderRepository {
     async saveOrderInDb(data, userId) {
+        
         try {
             const orderItems = data.items.map(item => ({
                 productId: new mongoose.Types.ObjectId(item.productId),
                 name: item.name,
-                price: Number(item.price),
+                price: Number(item.totalPricePerProduct),
                 quantity: Number(item.quantity),
                 sku: item.sku,
                 mainImage: item.mainImage,

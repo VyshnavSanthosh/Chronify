@@ -96,7 +96,6 @@ app.use("/", userProfileRoutes);
 app.use("/", userAddressRoutes)
 app.use("/", userWishlistRoutes)
 app.use("/", userCartRoutes)
-app.use("/", userOrderRoutes)
 app.use("/", userWalletRoutes)
 
 import vendorUserMiddleware from "./middleware/vendorUserMiddleware.js";
@@ -120,5 +119,12 @@ app.use("/admin", adminProfileRoutes);
 app.use("/admin", adminOrderRoutes);
 app.use("/admin", adminCouponRoutes)
 app.use("/admin", adminStatsRoutes)
+
+app.use("/", userOrderRoutes)
+
+// Catch-all 404 Route
+app.use((req, res) => {
+    res.status(404).render("error/404");
+});
 
 export default app;

@@ -23,6 +23,11 @@ export default class OtpService {
 
     }
 
+    async getOtpTtl(userId) {
+        const ttl = await this.redis.ttl(`otp:${userId}`);
+        return ttl > 0 ? ttl : 0;
+    }
+
     async verifyOtp(userId, otpInput) {
 
         const attemptsKey = `otp:attempts:${userId}`;
@@ -58,7 +63,7 @@ export default class OtpService {
         return true;
     }
 
-    async getUserById(userId){
+    async getUserById(userId) {
         return await this.userRepository.findById(userId)
     }
 }

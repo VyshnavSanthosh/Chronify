@@ -47,7 +47,7 @@ export default class CartRepository {
                 populate: [
                     {
                         path: "category",
-                        select: "isListed"
+                        select: "isListed discountValue"
                     },
                     {
                         path: "vendorId",

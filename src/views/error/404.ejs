@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 Not Found - Chronify</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <%- include('../user/partials/userStyles') %>
+    <style>
+        .error-container {
+            min-height: 70vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 80px 24px;
+        }
+        .error-title {
+            font-size: 80px;
+            font-weight: 500;
+            margin-bottom: 16px;
+            letter-spacing: 2px;
+            color: #fff;
+        }
+        .error-message {
+            font-size: 16px;
+            color: #b0b5c8;
+            margin-bottom: 40px;
+            max-width: 500px;
+        }
+        .btn-home {
+            background-color: #3b82f6;
+            color: white;
+            padding: 14px 40px;
+            border-radius: 4px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-home:hover {
+            background-color: #2563eb;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+    </style>
+</head>
+<body class="bg-[#0a0e27] text-white min-h-screen flex flex-col">
+    <!-- Navbar -->
+    <header class="bg-black border-b border-[#1a1f3a]">
+        <div class="max-w-[1400px] mx-auto px-6 py-4 flex items-center justify-between">
+            <div class="logo cursor-pointer text-xl font-bold tracking-widest" onclick="window.location.href='/'">CHRONIFY</div>
+            
+            <nav class="hidden md:flex items-center space-x-8">
+                <a href="/" class="text-sm hover:text-blue-500 transition-colors">HOME</a>
+                <a href="/products" class="text-sm hover:text-blue-500 transition-colors">SHOP</a>
+            </nav>
+
+            <div class="flex items-center space-x-6 text-lg">
+                <a href="/wishlist" class="hover:text-blue-500 transition-colors relative">
+                    <i class="far fa-heart"></i>
+                    <% if (locals.wishlistCount > 0) { %>
+                        <span class="absolute -top-2 -right-2 bg-red-600 text-[10px] rounded-full px-1.5 py-0.5 line-height-none"><%= locals.wishlistCount %></span>
+                    <% } %>
+                </a>
+                <a href="/cart" class="hover:text-blue-500 transition-colors relative">
+                    <i class="fas fa-shopping-cart text-sm"></i>
+                    <% if (locals.cartCount > 0) { %>
+                        <span class="absolute -top-2 -right-2 bg-red-600 text-[10px] rounded-full px-1.5 py-0.5 line-height-none"><%= locals.cartCount %></span>
+                    <% } %>
+                </a>
+                <a href="/profile" class="hover:text-blue-500 transition-colors">
+                    <i class="far fa-user-circle"></i>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- 404 Content -->
+    <main class="flex-grow flex items-center justify-center p-6">
+        <div class="max-w-xl w-full text-center">
+            <h1 class="text-7xl md:text-9xl font-bold mb-6 tracking-tight">404 Not Found</h1>
+            <p class="text-[#b0b5c8] text-lg mb-10">Your visited page not found. You may go home page.</p>
+            <a href="/" class="bg-[#3b82f6] hover:bg-[#2563eb] text-white px-10 py-4 rounded font-medium transition-all inline-block shadow-lg shadow-blue-500/20">
+                Back to home page
+            </a>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-black py-16 px-6 mt-auto border-t border-[#1a1f3a]">
+        <div class="max-w-[1400px] mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 text-sm">
+            <div class="space-y-4">
+                <h3 class="font-bold uppercase tracking-wider text-white">Exclusive</h3>
+                <div class="space-y-2">
+                    <p class="font-medium">Subscribe</p>
+                    <p class="text-[#b0b5c8]">Get 10% off your first order</p>
+                    <div class="relative max-w-xs pt-2">
+                        <input type="email" placeholder="Enter your email" class="w-full bg-transparent border border-[#b0b5c8]/30 rounded px-4 py-2.5 text-xs focus:border-blue-500 focus:outline-none pr-10">
+                        <button class="absolute right-3 top-[1.2rem] text-[#b0b5c8] hover:text-white">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <h3 class="font-bold uppercase tracking-wider text-white">Support</h3>
+                <ul class="space-y-3 text-[#b0b5c8]">
+                    <li class="leading-relaxed text-[#b0b5c8]">9th Floor, Orion Business Park, Thane West, Mumbai, Maharashtra 400607</li>
+                    <li><a href="mailto:nexoratech@gmail.com" class="hover:text-white transition-colors">nexoratech@gmail.com</a></li>
+                    <li><a href="tel:+912249734581" class="hover:text-white transition-colors">+91 22 4973 4581</a></li>
+                </ul>
+            </div>
+
+            <div class="space-y-4">
+                <h3 class="font-bold uppercase tracking-wider text-white">Account</h3>
+                <ul class="space-y-3 text-[#b0b5c8]">
+                    <li><a href="/profile" class="hover:text-white transition-colors">My Account</a></li>
+                    <li><a href="/auth/login" class="hover:text-white transition-colors">Login / Register</a></li>
+                    <li><a href="/cart" class="hover:text-white transition-colors">Cart</a></li>
+                    <li><a href="/wishlist" class="hover:text-white transition-colors">Wishlist</a></li>
+                    <li><a href="/products" class="hover:text-white transition-colors">Shop</a></li>
+                </ul>
+            </div>
+
+            <div class="space-y-4">
+                <h3 class="font-bold uppercase tracking-wider text-white">Quick Link</h3>
+                <ul class="space-y-3 text-[#b0b5c8]">
+                    <li><a href="#" class="hover:text-white transition-colors">Privacy Policy</a></li>
+                    <li><a href="#" class="hover:text-white transition-colors">Terms Of Use</a></li>
+                    <li><a href="#" class="hover:text-white transition-colors">FAQ</a></li>
+                    <li><a href="#" class="hover:text-white transition-colors">Contact</a></li>
+                </ul>
+            </div>
+
+            <div class="space-y-4">
+                <h3 class="font-bold uppercase tracking-wider text-white">Download App</h3>
+                <p class="text-xs text-[#b0b5c8]">Save $3 with App New User Only</p>
+                <div class="flex items-start gap-3">
+                    <div class="bg-white p-2 rounded">
+                        <i class="fas fa-qrcode text-black text-4xl"></i>
+                    </div>
+                    <div class="space-y-2">
+                        <a href="#"><img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" alt="Google Play" class="h-8"></a>
+                        <a href="#"><img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" alt="App Store" class="h-8"></a>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-6 pt-4 text-xl">
+                    <a href="#" class="hover:text-blue-500 transition-colors"><i class="fab fa-facebook-f text-sm"></i></a>
+                    <a href="#" class="hover:text-blue-500 transition-colors"><i class="fab fa-twitter text-sm"></i></a>
+                    <a href="#" class="hover:text-blue-500 transition-colors"><i class="fab fa-instagram text-sm"></i></a>
+                    <a href="#" class="hover:text-blue-500 transition-colors"><i class="fab fa-linkedin-in text-sm"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="max-w-[1400px] mx-auto border-t border-[#1a1f3a] mt-16 pt-6 text-center text-[#4b5563] text-sm">
+            <p>© Copyright Chronify 2026. All right reserved</p>
+        </div>
+    </footer>
+</body>
+</html>

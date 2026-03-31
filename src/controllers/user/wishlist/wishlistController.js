@@ -8,7 +8,7 @@ export default class WishListController {
             const { wishlist, removedItemsCount } = await this.wishListService.getAllItems(user._id)
 
             if (removedItemsCount > 0) {
-                return res.redirect("/products?blocked=true")
+                return res.redirect("/products?message=blocked")
             }
 
             return res.render("user/wishList", {

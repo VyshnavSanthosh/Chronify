@@ -155,11 +155,17 @@
                         <div class="form-group">
                             <label class="form-label">First Name</label>
                             <input type="text" name="firstName" class="form-input" value="<%= user.firstName || '' %>" required>
+                            <% if (errors && errors.firstName) { %>
+        <p style="color:red; font-size:12px;"><%= errors.firstName %></p>
+    <% } %>
                         </div>
 
                         <div class="form-group">
                             <label class="form-label">Last Name</label>
                             <input type="text" name="lastName" class="form-input" value="<%= user.lastName || '' %>" required>
+                            <% if (errors && errors.lastName) { %>
+    <p style="color:red; font-size:12px;"><%= errors.lastName %></p>
+<% } %>
                         </div>
 
                         <div class="form-group">
@@ -183,12 +189,16 @@
                         <div class="form-group">
                             <label class="form-label">Phone Number</label>
                             <input type="text" name="phone" class="form-input" value="<%= user.phone || '' %>" required>
+                            <% if (errors && errors.phone) { %>
+    <p style="color:red; font-size:12px;"><%= errors.phone %></p>
+<% } %>
                         </div>
                     </div>
 
-                    <div style="margin-top: 32px; text-align: center;">
+                    <div style="margin-top: 32px; text-align: center; display: flex; justify-content: center; gap: 16px; align-items: center;">
                         <button type="submit" class="btn-save">Save Changes</button>
-                        <a href="/profile" style="margin-left: 16px; color: #b0b5c8; text-decoration: none; font-size: 14px;">Cancel</a>
+                        <button type="button" onclick="initPasswordReset()" class="btn-verify" style="background: #ef4444; color: #fff;">Reset Password</button>
+                        <a href="/profile" style="color: #b0b5c8; text-decoration: none; font-size: 14px;">Cancel</a>
                     </div>
                 </form>
             </div>
@@ -229,6 +239,46 @@ async function sendOtpAndRedirect() {
         }
     } catch (err) {
         Swal.fire("Error", "Network error while sending OTP", "error");
+    }
+}
+
+async function initPasswordReset() {
+    try {
+        const result = await Swal.fire({
+            title: 'Are you sure?',
+            text: "A reset OTP will be sent to your email.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, reset it!'
+        });
+
+        if (result.isConfirmed) {
+            const response = await fetch("/profile/reset-password-init", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                await Swal.fire({
+                    icon: 'success',
+                    title: 'OTP Sent!',
+                    text: 'Please verify the OTP to reset your password.',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+                window.location.href = "/auth/forgot-password/verify-otp";
+            } else {
+                Swal.fire("Error", data.message || "Failed to initiate reset", "error");
+            }
+        }
+    } catch (err) {
+        Swal.fire("Error", "Network error while initiated reset", "error");
     }
 }
 </script>

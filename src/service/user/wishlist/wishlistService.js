@@ -17,7 +17,7 @@ export default class WishListService {
 
     async getAllItems(userId) {
         const items = await this.wishListRepository.getAllItemsByUserId(userId);
-
+        
         let validItems = [];
         let removedItemsCount = 0;
 

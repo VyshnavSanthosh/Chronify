@@ -835,9 +835,15 @@
                             <div class="card-brand"><%= relatedProduct.brand %></div>
                             <div class="card-title"><%= relatedProduct.name %></div>
                             <% 
-                                const relatedOriginalPrice = firstVariant?.price || 0;
-                                const relatedOffer = firstVariant?.offer || 0;
-                                const relatedOfferPrice = relatedOriginalPrice - (relatedOriginalPrice * relatedOffer / 100);
+const relatedOriginalPrice = firstVariant?.price || 0;
+let relatedOffer = 0
+if(product.category.discountValue > firstVariant.offer){
+        relatedOffer = product.category.discountValue
+    }
+else{
+    relatedOffer = firstVariant.offer
+    }               
+const relatedOfferPrice = relatedOriginalPrice - (relatedOriginalPrice * relatedOffer / 100);
                             %>
                             <div class="card-price" style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
                                 <% if (relatedOffer > 0) { %>
@@ -1019,11 +1025,19 @@
         }
 
         function updateVariantDisplay() {
-            const variant = productData.variants[currentVariantIndex];
             
+            const variant = productData.variants[currentVariantIndex];
+            const categoryOffer = productData.category.discountValue
             // Update price with offer calculation
+            let offer = 0
+            if (categoryOffer > variant.offer) {
+                offer = categoryOffer
+            }
+            else{
+                offer = variant.offer
+            }
+            
             const originalPrice = variant.price;
-            const offer = variant.offer || 0;
             const offerPrice = originalPrice - (originalPrice * offer / 100);
             
             const priceElement = document.getElementById('variantPrice');

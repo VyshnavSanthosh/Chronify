@@ -11,9 +11,8 @@ export default class AddCategoryController {
                 errors: {},
                 categoryName: "",
                 description: "",
-                discountType: "",
-                discountValue: "",
-                maxRedeemable: ""
+                discountType: "percentage",
+                discountValue: ""
             });
         }
         catch (error) {

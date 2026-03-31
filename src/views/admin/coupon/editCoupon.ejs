@@ -3,6 +3,10 @@
 <% block('styles', `
     <!-- SweetAlert2 CDN -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Flatpickr CDN -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <style>
         /* SweetAlert Dark Theme Overrides */
         div:where(.swal2-container) {
@@ -492,29 +496,39 @@ placeholder="Enter max discount amount" min="1" >
 
     <!-- JavaScript -->
     <script>
-        // Set minimum dates on page load
-        function setMinDates() {
+        // Set minimum dates and initialize flatpickr on page load
+        let startPicker, expiryPicker;
+
+        function initFlatpickr() {
             const today = new Date().toISOString().split('T')[0];
-            document.getElementById('startingDate').setAttribute('min', today);
-            document.getElementById('expiryDate').setAttribute('min', today);
+            
+            startPicker = flatpickr("#startingDate", {
+                dateFormat: "Y-m-d",
+                altInput: true,
+                altFormat: "d/m/Y",
+                minDate: "today",
+                defaultDate: document.getElementById('startingDate').getAttribute('value'),
+                onChange: function(selectedDates, dateStr, instance) {
+                    if (selectedDates.length > 0) {
+                        const minExpiry = new Date(selectedDates[0]);
+                        minExpiry.setDate(minExpiry.getDate() + 1);
+                        expiryPicker.set('minDate', minExpiry);
+                    }
+                }
+            });
+
+            expiryPicker = flatpickr("#expiryDate", {
+                dateFormat: "Y-m-d",
+                altInput: true,
+                altFormat: "d/m/Y",
+                minDate: "today",
+                defaultDate: document.getElementById('expiryDate').getAttribute('value')
+            });
         }
 
         // Update expiry date minimum when starting date changes
         document.addEventListener('DOMContentLoaded', function() {
-            setMinDates();
-            
-            const startingDateInput = document.getElementById('startingDate');
-            const expiryDateInput = document.getElementById('expiryDate');
-            
-            startingDateInput.addEventListener('change', function() {
-                const startDate = this.value;
-                if (startDate) {
-                    // Set expiry date minimum to be at least one day after starting date
-                    const minExpiryDate = new Date(startDate);
-                    minExpiryDate.setDate(minExpiryDate.getDate() + 1);
-                    expiryDateInput.setAttribute('min', minExpiryDate.toISOString().split('T')[0]);
-                }
-            });
+            initFlatpickr();
         });
 
         // Handle form submission

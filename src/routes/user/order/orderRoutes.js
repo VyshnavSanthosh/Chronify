@@ -89,27 +89,27 @@ router.post("/checkout/payment/cancel",
 router.get("/orders",
     userJwtMiddleware.verifyToken.bind(userJwtMiddleware), orderListController.renderOrderListPage.bind(orderListController)
 )
-router.route("/orders/:orderId")
+router.route("/:userId/orders/:orderId")
     .get(userJwtMiddleware.verifyToken.bind(userJwtMiddleware), orderListController.renderOrderDetailPage.bind(orderListController)
     )
-router.get("/orders/:orderId/invoice",
+router.get("/:userId/orders/:orderId/invoice",
     userJwtMiddleware.verifyToken.bind(userJwtMiddleware),
     orderListController.downloadInvoice.bind(orderListController)
 )
-router.post("/orders/:orderId/cancel",
+router.post("/:userId/orders/:orderId/cancel",
     userJwtMiddleware.verifyToken.bind(userJwtMiddleware),
     orderListController.cancelOrder.bind(orderListController)
 )
-router.post("/orders/:orderId/items/:sku/cancel",
+router.post("/:userId/orders/:orderId/items/:sku/cancel",
     userJwtMiddleware.verifyToken.bind(userJwtMiddleware),
     orderListController.cancelOrderItem.bind(orderListController)
 )
-router.post("/orders/:orderId/return",
+router.post("/:userId/orders/:orderId/return",
     userJwtMiddleware.verifyToken.bind(userJwtMiddleware),
     orderListController.returnOrder.bind(orderListController)
 )
 
-router.post("/orders/:orderId/items/:sku/return",
+router.post("/:userId/orders/:orderId/items/:sku/return",
     userJwtMiddleware.verifyToken.bind(userJwtMiddleware),
     orderListController.returnOrderItem.bind(orderListController)
 )

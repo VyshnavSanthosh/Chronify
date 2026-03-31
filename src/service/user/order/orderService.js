@@ -18,78 +18,70 @@ export default class OrderService {
         return address
     }
 
-    async getCartItems(userId, selectedSkus = null, couponDiscount, couponApplyType, maxDiscountAmount) {
+    async getCartItems(userId, discount = 0, couponCode = "", maxDiscountAmount = 0, couponApplied = false) {
         const { cart, count } = await this.cartRepository.getAllItemsByUserId(userId)
+        if (!cart) return { validItems: [], total: 0, shippingFee: 40, removedItems: [], totalDiscountAmount: 0 }
+
         let total = 0
         const filteredItems = [];
-
-        let removedItemsCount = 0;
+        let removedItems = [];
         for (let item = 0; item < cart.items.length; item++) {
-            if (selectedSkus && !selectedSkus.includes(cart.items[item].sku)) {
-                continue;
-            }
-            let productObj = {}
+
+
             let product = await this.cartRepository.getProductBySku(cart.items[item].sku)
 
             const category = await this.categoryRepository.findById(product.category)
 
             // Check if product, category or vendor is blocked
             if (!product || !product.isListed || product.isDeleted || (category && !category.isListed) || (product.vendorId && (await this.vendorRepository.findById(product.vendorId))?.isBlocked)) {
-                removedItemsCount++;
-                continue;
+                removedItems.push(product.name);
             }
-
-            productObj.name = product.name
-            productObj.productId = product._id
-            for (const variant of product.variants) {
-                if (variant.sku == cart.items[item].sku) {
+            if (product.isListed || !product.isDeleted || (category && category.isListed) || (product.vendorId && (!await this.vendorRepository.findById(product.vendorId))?.isBlocked)) {
+                filteredItems.push(cart.items[item]);
+            }
+        }
+        let validItems = []
+        let totalPricePerProduct = 0
+        let totalDiscountAmount = 0
+        for (const product of filteredItems) {
+            const category = await this.categoryRepository.findById(product.productId.category._id)
+            let productObj = {}
+            productObj.name = product.productId.name
+            productObj.productId = product.productId._id
+            for (const variant of product.productId.variants) {
+                if (variant.sku == product.sku) {
                     productObj.price = variant.price
-                    productObj.offer = variant.offer
+                    if (category.discountValue > variant.offer) {
+                        productObj.offer = category.discountValue
+                    }
+                    else {
+                        productObj.offer = variant.offer
+                    }
+
                     productObj.mainImage = variant.mainImage.url
+                    productObj.qty = product.qty
+                    productObj.sku = product.sku
                 }
             }
 
-            cart.items[item].product = productObj
-
-            let totalPricePerProduct = (cart.items[item].qty * productObj.price) - (((cart.items[item].qty * productObj.price) * productObj.offer) / 100)
-
-            if (category && category.discountType == "percentage" && category.discountValue > productObj.offer) {
-                productObj.offer = category.discountValue
-                console.log("Category discount % applied")
-
-                totalPricePerProduct = (cart.items[item].qty * productObj.price) - (((cart.items[item].qty * productObj.price) * productObj.offer) / 100)
-            }
-            else if (category && category.discountType == "flat") {
-                const categoryMaxDiscount = (productObj.price * category.maxRedeemable) / 100
-                const categoryDiscount = Math.min(category.discountValue, categoryMaxDiscount)
-                if (categoryDiscount > ((price * productObj.offer) / 100)) {
-                    productObj.offer = categoryDiscount
+            totalPricePerProduct = (productObj.qty * productObj.price) - (((productObj.qty * productObj.price) * productObj.offer) / 100)
+            let couponDiscountAmount = totalPricePerProduct * (discount / 100)
+            if (couponApplied) {
+                if (couponDiscountAmount > maxDiscountAmount) {
+                    couponDiscountAmount = maxDiscountAmount
                 }
+
+                totalPricePerProduct -= couponDiscountAmount
+                totalDiscountAmount += couponDiscountAmount
             }
+            productObj.totalPricePerProduct = totalPricePerProduct
+            validItems.push(productObj)
 
             total += totalPricePerProduct
-            filteredItems.push(cart.items[item]);
         }
-
-        const subTotal = total;
-        let discountAmount = 0;
-
-        if (couponApplyType == "all" && couponDiscount) {
-            let potentialDiscount = (total * couponDiscount) / 100;
-
-            if (maxDiscountAmount && potentialDiscount > Number(maxDiscountAmount)) {
-                potentialDiscount = Number(maxDiscountAmount);
-            }
-
-            discountAmount = potentialDiscount;
-            total = total - discountAmount;
-        }
-
-        cart.items = filteredItems;
-
         const shippingFee = 40
 
-        return { cart, total, subTotal, discountAmount, shippingFee, removedItemsCount }
+        return { validItems, total, shippingFee, removedItems, totalDiscountAmount }
     }
 
     async saveOrder(data, userId, userEmail) {
@@ -153,20 +145,11 @@ export default class OrderService {
         let refundableAmount = 0;
         let itemsToRelease = [];
 
-        const totalPreCoupon = order.total + (order.discountAmount || 0) - (order.shippingFee || 40);
 
         for (const item of order.items) {
             const itemStatus = item.status || 'pending';
-            if (itemStatus !== 'cancelled' && itemStatus !== 'returned' && itemStatus !== 'refunded') {
-                const itemDiscountedPricePreCoupon = (item.price * item.quantity) - (((item.price * item.quantity) * (item.offer || 0)) / 100);
-
-                let itemShareOfCoupon = 0;
-                if (order.discountAmount > 0 && totalPreCoupon > 0) {
-                    itemShareOfCoupon = (itemDiscountedPricePreCoupon / totalPreCoupon) * order.discountAmount;
-                }
-
-                refundableAmount += (itemDiscountedPricePreCoupon - itemShareOfCoupon);
-
+            if (itemStatus !== 'cancelled' && itemStatus !== 'returned' && itemStatus !== 'refunded' && order.paymentStatus !== "pending" && order.paymentStatus !== "cancelled") {
+                refundableAmount += item.price;
                 itemsToRelease.push({
                     id: item.productId,
                     sku: item.sku,
@@ -184,7 +167,7 @@ export default class OrderService {
         const result = await this.orderRepository.updateOrderStatusById(orderId, "cancelled");
 
         for (const item of order.items) {
-            if (item.status !== 'cancelled' && item.status !== 'returned' && item.status !== 'refunded') {
+            if (item.status !== 'cancelled' && item.status !== 'returned' && item.status !== 'refunded' && order.paymentStatus !== "pending") {
                 await this.orderRepository.updateOrderItemStatus(orderId, item.sku, "cancelled");
             }
         }
@@ -203,18 +186,12 @@ export default class OrderService {
         if (!item) throw new Error("Item not found in order");
         if (item.status === "cancelled") throw new Error("The product is already cancelled");
         if (order.orderStatus === "cancelled") throw new Error("The order is already cancelled");
-
+        if (order.paymentStatus === "cancelled") throw new Error("The order is already cancelled");
+        if (order.paymentStatus === "pending") throw new Error("The order payment is not completed");
         if (order.paymentMethod != "COD") {
             const transactionId = "TXN" + crypto.randomBytes(8).toString("hex").toUpperCase();
-            const itemDiscountedPricePreCoupon = (item.price * item.quantity) - (((item.price * item.quantity) * (item.offer || 0)) / 100);
-            const totalPreCoupon = order.total + (order.discountAmount || 0) - (order.shippingFee || 40);
 
-            let itemShareOfCoupon = 0;
-            if (order.discountAmount > 0 && totalPreCoupon > 0) {
-                itemShareOfCoupon = (itemDiscountedPricePreCoupon / totalPreCoupon) * order.discountAmount;
-            }
-
-            const price = itemDiscountedPricePreCoupon - itemShareOfCoupon;
+            const price = item.price;
             await this.walletRepository.addMoney(price, transactionId, userId, "credit", "order_cancel_refund");
         }
 
@@ -268,16 +245,7 @@ export default class OrderService {
                     })),
                     reason: reason || "No reason provided",
                     refundAmount: activeVendorItems.reduce((total, item) => {
-                        const itemTotal = item.price * item.quantity
-                        const itemDiscountedPricePreCoupon = itemTotal - (itemTotal * (item.offer || 0) / 100)
-
-                        const totalPreCoupon = order.total + (order.discountAmount || 0) - (order.shippingFee || 40);
-                        let itemShareOfCoupon = 0;
-                        if (order.discountAmount > 0 && totalPreCoupon > 0) {
-                            itemShareOfCoupon = (itemDiscountedPricePreCoupon / totalPreCoupon) * order.discountAmount;
-                        }
-
-                        return total + (itemDiscountedPricePreCoupon - itemShareOfCoupon)
+                        return total + item.price
                     }, 0)
                 }
 
@@ -313,7 +281,6 @@ export default class OrderService {
         if (order.orderStatus === "returned") throw new Error("The order is already returned");
 
 
-        const itemPrice = (item.price * item.quantity) - (((item.price * item.quantity) * item.offer) / 100);
         const returnData = {
             orderId: order._id,
             userId: order.user,
@@ -329,17 +296,7 @@ export default class OrderService {
                 status: 'return_requested'
             }],
             reason: reason || "No reason provided",
-            refundAmount: (() => {
-                const itemDiscountedPricePreCoupon = (item.price * item.quantity) - (((item.price * item.quantity) * (item.offer || 0)) / 100);
-                const totalPreCoupon = order.total + (order.discountAmount || 0) - (order.shippingFee || 40);
-
-                let itemShareOfCoupon = 0;
-                if (order.discountAmount > 0 && totalPreCoupon > 0) {
-                    itemShareOfCoupon = (itemDiscountedPricePreCoupon / totalPreCoupon) * order.discountAmount;
-                }
-
-                return itemDiscountedPricePreCoupon - itemShareOfCoupon;
-            })(),
+            refundAmount: item.price,
         }
 
         await this.returnRepository.createReturnRequest(returnData);
@@ -389,6 +346,8 @@ export default class OrderService {
     }
 
     async sendProductDataToInventoryToReserve(products) {
+        console.log("prod : ", products)
+
         let productsArr = []
         for (const product of products) {
             let productObj = {

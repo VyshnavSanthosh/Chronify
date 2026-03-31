@@ -5,14 +5,15 @@ export default class OtpController {
         this.walletService = walletService
     }
 
-    renderOtpPage(req, res) {
+    async renderOtpPage(req, res) {
         if (!req.session.tempUserId || !req.session.tempEmail) {
             return res.redirect("/auth/signup");
         }
+        const timeRemaining = await this.otpService.getOtpTtl(req.session.tempUserId);
         res.render("user/auth/verifyOtp", {
             email: req.session.tempEmail,
             error: null,
-            timeRemaining: 120,
+            timeRemaining,
             success: null,
             info: "OTP has been sent to your email"
         });
@@ -38,16 +39,15 @@ export default class OtpController {
             delete req.session.tempEmail;
             delete req.session.tempUserId;
 
-            req.session.successMessage = "Account verified successfully! Please login to continue.";
-            return res.redirect("/auth/login");
+            return res.json({
+                success: true,
+                message: "Signup successful! Welcome to Chronify"
+            });
 
         } catch (error) {
-            return res.render("user/auth/verifyOtp", {
-                email: req.session.tempEmail,
-                error: error.message,
-                timeRemaining: 120,
-                success: null,
-                info: null
+            return res.status(400).json({
+                success: false,
+                error: error.message
             });
         }
     }

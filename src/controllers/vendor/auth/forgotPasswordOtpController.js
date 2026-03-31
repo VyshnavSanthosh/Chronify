@@ -3,11 +3,19 @@ export default class forgotPasswordOtpController {
         this.forgotPasswordOtpService = forgotPasswordOtpService
     }
 
-    renderVerifyOtpPage(req, res) {
+    async renderVerifyOtpPage(req, res) {
+        const vendorId = req.session.resetVendorId;
+        const email = req.session.resetVendorEmail;
+
+        if (!vendorId) {
+            return res.redirect("/vendor/auth/forgot-password");
+        }
+
+        const timeRemaining = await this.forgotPasswordOtpService.getOtpTtl(vendorId);
         return res.render("vendor/auth/verifyOtpForgotPassword", {
-            email: req.session.resetVendorEmail,
+            email: email,
             error: null,
-            timeRemaining: 300
+            timeRemaining
         })
     }
 

@@ -35,46 +35,25 @@ export default Joi.object({
     discountType: Joi.string()
         .trim()
         .lowercase()
-        .valid("percentage", "flat")
+        .valid("percentage")
         .required()
         .messages({
             "string.empty": "Discount type is required",
-            "any.only": "Discount type must be either 'percentage' or 'flat'",
+            "any.only": "Discount type must be 'percentage'",
             "any.required": "Discount type is required"
         }),
 
     // ---------- Discount Value ----------
     discountValue: Joi.number()
-        .positive()
         .precision(2)
         .max(100000)
         .required()
         .messages({
             "number.base": "Discount value must be a valid number",
-            "number.positive": "Discount value must be greater than 0",
             "number.max": "Discount value cannot exceed 100000",
             "any.required": "Discount value is required"
         }),
 
-    // ---------- Max Redeemable Amount ----------
-    maxRedeemable: Joi.alternatives()
-        .try(
-            Joi.number()
-                .positive()
-                .precision(2)
-                .max(999999.99),
-            Joi.string()
-                .trim()
-                .empty("")
-                .allow(null)
-        )
-        .optional()
-        .default(null)
-        .messages({
-            "number.base": "Max redeemable amount must be a valid number",
-            "number.positive": "Max redeemable amount must be greater than 0",
-            "number.max": "Max redeemable amount cannot exceed 999999.99"
-        }),
 
     // ---------- Is Listed ----------
     isListed: Joi.boolean()

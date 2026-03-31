@@ -23,15 +23,23 @@ export default class WishListRepository {
         }
     }
 
+    async deleteWishlistItemById(wishlistItemId) {
+        try {
+            return await Wishlist.findByIdAndDelete(wishlistItemId);
+        } catch (error) {
+            console.log("Couldn't delete wishlist item by ID: ", error);
+        }
+    }
+
     async getAllItemsByUserId(userId) {
         try {
             const result = await Wishlist.find({ userId: userId }).populate({
                 path: "productId",
-                select: "name brand vendorId isListed isDeleted variants.price variants.mainImage variants.sku category",
+                select: "name brand vendorId isListed isDeleted variants.price variants.offer variants.mainImage variants.sku category",
                 populate: [
                     {
                         path: "category",
-                        select: "isListed"
+                        select: "isListed discountValue categoryName"
                     },
                     {
                         path: "vendorId",
@@ -39,7 +47,8 @@ export default class WishListRepository {
                     }
                 ]
             })
-            // console.log("result", result[0]?.productId?.variants)
+
+
             return result
         } catch (error) {
             console.log("Couldn't get wishlist products from db", error)

@@ -82,7 +82,7 @@ export default class ProductListController {
             const vendorId = req.user._id
 
             await this.productService.deleteProduct(productId, vendorId)
-
+            await redis.clearProductCache()
             res.status(200).json({
                 success: true,
                 message: "Product deleted successfully"
@@ -296,7 +296,7 @@ export default class ProductListController {
             };
 
             await this.productService.updateProduct(productId, vendorId, productData);
-
+            await redis.clearProductCache()
             // Set success message in session
             req.session.success = "Product updated successfully!";
 

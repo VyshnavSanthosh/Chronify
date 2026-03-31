@@ -435,12 +435,12 @@
       <div class="order-items">
         <% orderItems.forEach(item => { %>
           <div class="order-item">
-            <img src="<%= item.product.mainImage || '/images/watch.png' %>" alt="<%= item.name %>">
+            <img src="<%= item.mainImage || '/images/watch.png' %>" alt="<%= item.name %>">
             <div>
-              <div class="order-item-name"><%= item.product.name %></div>
-              <div class="order-item-price">₹<%= (item.product.price || 0).toFixed(1) %></div>
-              <% if (item.product.offer > 0) { %>
-                <div class="text-green-500 text-[10px] font-semibold"><%= item.product.offer %>% OFF</div>
+              <div class="order-item-name"><%= item.name %></div>
+              <div class="order-item-price">₹<%= (item.price || 0).toFixed(1) %></div>
+              <% if (item.offer > 0) { %>
+                <div class="text-green-500 text-[10px] font-semibold"><%= item.offer %>% OFF</div>
               <% } %>
             </div>
           </div>
@@ -449,7 +449,7 @@
 
       <div class="price-row">
         <span style="color:#b0b8c1;">Subtotal:</span>
-        <span id="subtotalDisplay">₹<%= (subTotal || total || 0).toFixed(1) %></span>
+        <span id="subtotalDisplay">₹<%= (total + discountAmount || 0).toFixed(1) %></span>
       </div>
 
       <% if (Number(discountAmount) > 0) { %>
@@ -626,7 +626,7 @@
 
     function addNewAddress(cartId) {
         console.log("clicked : ", cartId);
-        window.location.href = `/checkout/:${cartId}/add-address`;
+        window.location.href = `/checkout/${cartId}/add-address`;
     }
 
     function showCoupons() {
@@ -720,7 +720,7 @@ async function applyCoupon(couponCode) {
             cancelButtonText: 'Continue Shopping'
         }).then((result) => {
             if (result.isConfirmed) {
-                window.location.href = "/orders";
+                window.location.href = `/<%= user._id %>/orders/${orderId}`;
             } else {
                 window.location.href = "/products";
             }
@@ -744,19 +744,20 @@ async function applyCoupon(couponCode) {
         }
 
         const addressSelected = JSON.parse(selectedAddress);
-        const cartId = '<%= cart?._id %>';
+        const cartId = '<%= cartId %>';
         
         // Prepare items array from orderItems
         const items = [
             <% orderItems.forEach((item, index) => { %>
             {
-                productId: '<%= item.productId._id || item._id %>',
-                name: '<%= item.product.name %>',
-                price: '<%= item.product.price %>',
+                productId: '<%= item.productId %>',
+                name: '<%= item.name %>',
+                price: '<%= item.price %>',
+                totalPricePerProduct: '<%= item.totalPricePerProduct %>',
                 sku: '<%= item.sku %>',
                 quantity: '<%= item.qty || 0 %>',
-                mainImage: '<%= item.product.mainImage || "" %>',
-                offer: '<%= item.product.offer || 0 %>'
+                mainImage: '<%= item.mainImage || "" %>',
+                offer: '<%= item.offer || 0 %>'
             }<%= index < orderItems.length - 1 ? ',' : '' %>
             <% }) %>
         ];

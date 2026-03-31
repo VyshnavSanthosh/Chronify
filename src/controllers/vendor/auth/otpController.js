@@ -20,12 +20,14 @@ export default class OtpController {
 
             delete req.session.tempVendorEmail
             delete req.session.tempVendorId
-            return res.redirect("/vendor/auth/login")
+            return res.json({
+                success: true,
+                message: "Signup successful! Welcome to Chronify"
+            });
         } catch (error) {
-            return res.render("vendor/auth/verifyOtp", {
-                email: req.session.tempVendorEmail,
-                error: error.message,
-                timeRemaining: 120
+            return res.status(400).json({
+                success: false,
+                error: error.message
             });
         }
     }

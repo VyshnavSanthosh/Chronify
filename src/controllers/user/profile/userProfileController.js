@@ -1,9 +1,34 @@
 import fs from "fs";
 import { uploadToCloudinary } from "../../../utils/cloudinary.js";
+import { errors } from "mongodb-memory-server";
 export default class UserProfileController {
-    constructor(profileService, otpService) {
+    constructor(profileService, otpService, forgotPasswordService, validator, joi_profile) {
         this.profileService = profileService
         this.otpService = otpService
+        this.forgotPasswordService = forgotPasswordService
+        this.validator = validator
+        this.joi_profile = joi_profile
+    }
+
+    async handleResetPasswordInit(req, res) {
+        try {
+            const result = await this.forgotPasswordService.requestPasswordReset(req.user.email);
+
+            // Set session for the forgot password flow
+            req.session.resetEmail = result.email;
+            req.session.resetUserId = result.userId;
+
+            return res.status(200).json({
+                success: true,
+                message: "OTP sent to your email"
+            });
+        } catch (error) {
+            console.error("Error initiating password reset from profile:", error);
+            return res.status(500).json({
+                success: false,
+                message: error.message || "Failed to initiate password reset"
+            });
+        }
     }
 
     async renderProfilePage(req, res) {
@@ -28,6 +53,7 @@ export default class UserProfileController {
             const user = await this.profileService.findUser(email)
             return res.render("user/profile/editProfile", {
                 user,
+                errors: {},
                 verified: req.session.otpVerified
             })
         } catch (error) {
@@ -38,7 +64,24 @@ export default class UserProfileController {
 
     async handleEditProfile(req, res) {
         try {
-            const userObj = req.body
+            const { error, value } = this.validator.validate(this.joi_profile, req.body)
+            let errors = {}
+            if (error) {
+                error.details.forEach(err => {
+                    errors[err.context.key] = err.message;
+                });
+                return res.status(400).render("user/profile/editProfile", {
+                    user: req.user,
+                    errors,
+                    oldData: req.body
+                })
+
+            }
+            console.log("value :", value)
+
+
+            const userObj = value
+
             const user = req.user
             const folderPath = `chronify/users/${user.firstName}-${user._id}`
             let imageObj = {}

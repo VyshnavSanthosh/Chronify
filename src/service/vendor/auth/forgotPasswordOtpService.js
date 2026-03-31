@@ -22,12 +22,17 @@ export default class forgotPasswordOtpService {
     async resendOtp(vendorEmail, vendorId) {
         const newOtp = await this.otpGenerator()
 
-        await this.redis.set(`forgot:${vendorId}`, newOtp, "EX", 300)
+        await this.redis.set(`forgot:${vendorId}`, newOtp, "EX", 120)
 
         await this.emailQueue.add("vendor-forgot-password-otp", {
             email: vendorEmail,
             otp: newOtp
         })
         return true;
+    }
+
+    async getOtpTtl(vendorId) {
+        const ttl = await this.redis.ttl(`forgot:${vendorId}`);
+        return ttl > 0 ? ttl : 0;
     }
 }

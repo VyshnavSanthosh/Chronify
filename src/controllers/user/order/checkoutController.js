@@ -12,32 +12,34 @@ export default class CheckoutController {
     async renderCheckoutPage(req, res) {
         const user = req.user
         const { cartId } = req.params
-        const { items, discount, applyType, category, maxDiscountAmount } = req.query
-
-        const selectedSkus = items ? items.split(',') : null
-
+        const { discount, couponCode, maxDiscountAmount, couponApplied } = req.query;
         try {
 
             const addresses = await this.orderService.getAllAddress(user._id)
-            const { cart, total, subTotal, discountAmount, shippingFee, removedItemsCount } = await this.orderService.getCartItems(user._id, selectedSkus, discount, applyType, category, maxDiscountAmount)
+            const { validItems, total, shippingFee, removedItems, totalDiscountAmount } = await this.orderService.getCartItems(user._id, discount, couponCode, maxDiscountAmount, couponApplied)
 
-            if (removedItemsCount > 0) {
-                return res.redirect("/products?blocked=true")
+            if (removedItems.length > 0) {
+                console.log(removedItems)
+
             }
+
 
             return res.render("user/order/checkout", {
                 user: user,
                 addresses,
-                cart,
+                cart: {
+                    items: validItems,
+                    _id: cartId
+                },
                 total: total,
-                subTotal: subTotal,
-                discountAmount: discountAmount,
+                subTotal: total,
+                discountAmount: totalDiscountAmount,
                 shippingFee,
-
+                cartId
             })
         } catch (error) {
             console.log("Couldn't load checkout page : ", error)
-
+            return res.redirect("/cart?error=checkout_failed");
         }
     }
 
@@ -295,7 +297,6 @@ export default class CheckoutController {
     async getAvailableCoupons(req, res) {
         try {
             const coupons = await this.couponService.getAvailableCoupons();
-
             return res.json({
                 success: true,
                 coupons

@@ -8,7 +8,7 @@ export default class CartControler {
             const { cart, total, count, removedItemsCount } = await this.cartService.getCartItems(user._id)
 
             if (removedItemsCount > 0) {
-                return res.redirect("/products?blocked=true")
+                return res.redirect("/products?message=blocked")
             }
 
             return res.render("user/cart", {

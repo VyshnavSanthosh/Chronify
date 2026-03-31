@@ -691,10 +691,7 @@
                     %>
                     
                     <% orderItems.forEach(item => { 
-                        // Calculate final price with offer
-                        const basePrice = item.price * (item.quantity || 1);
-                        const discount = (basePrice * (item.offer || 0)) / 100;
-                        const finalPrice = basePrice - discount;
+                        const finalPrice = item.price;
                         
                         // Check if this individual item can be cancelled
                         const itemStatus = item.status || 'pending';
@@ -799,15 +796,7 @@
                         <div class="info-card-title">Order Summary</div>
                         <div class="info-card-content">
                             <%
-                            // Calculate items total (only non-cancelled items)
-                            let itemsTotal = 0;
-                            orderItems.forEach(item => {
-                                if ((item.status || 'pending') !== 'cancelled') {
-                                    const basePrice = item.price * (item.quantity || 1);
-                                    const discount = (basePrice * (item.offer || 0)) / 100;
-                                    itemsTotal += (basePrice - discount);
-                                }
-                            });
+                            let itemsTotal = order.total - 40
                             const shippingCharge = 40;
                             %>
                             
@@ -1048,7 +1037,7 @@
 
             if (result.isConfirmed) {
                 try {
-                    const res = await fetch(`/orders/${orderId}/items/${sku}/cancel`, {
+                    const res = await fetch(`/<%= user._id %>/orders/${orderId}/items/${sku}/cancel`, {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json"
@@ -1093,7 +1082,7 @@
 
             if (result.isConfirmed) {
                 try {
-                    const res = await fetch(`/orders/${orderId}/cancel`, {
+                    const res = await fetch(`/<%= user._id %>/orders/${orderId}/cancel`, {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json"
@@ -1172,7 +1161,7 @@
                     : `${returnData.reason}${returnData.customText ? ': ' + returnData.customText : ''}`;
 
                 try {
-                    const res = await fetch(`/orders/${orderId}/return`, {
+                    const res = await fetch(`/<%= user._id %>/orders/${orderId}/return`, {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json"
@@ -1262,7 +1251,7 @@
                     : `${returnData.reason}${returnData.customText ? ': ' + returnData.customText : ''}`;
 
                 try {
-                    const res = await fetch(`/orders/${orderId}/items/${sku}/return`, {
+                    const res = await fetch(`/<%= user._id %>/orders/${orderId}/items/${sku}/return`, {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json"
@@ -1298,7 +1287,7 @@
 
         function downloadInvoice() {
             const orderId = '<%= order._id %>';
-            window.open(`/orders/${orderId}/invoice`, '_blank');
+            window.open(`/<%= user._id %>/orders/${orderId}/invoice`, '_blank');
         }
 
 

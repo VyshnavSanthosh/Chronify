@@ -27,7 +27,7 @@ services:
 ## docker logs -f chronify-worker-1 to see terminal logs
 
   mongo:
-    image: mongo:latest
+    image: mongo:8
     ports:
       - "27017:27017"
     volumes:
@@ -35,7 +35,7 @@ services:
 
 
   redis:
-    image: redis:latest
+    image: redis:8-alpine
     ports:
       - "6379:6379"
 
