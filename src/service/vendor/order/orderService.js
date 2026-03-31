@@ -58,6 +58,7 @@ export default class VendorOrderService {
         );
 
         for (const item of vendorItems) {
+            if (['cancelled', 'returned', 'refunded'].includes(item.status)) continue;
             await this.orderRepository.updateOrderItemStatus(orderId, item.sku, status);
         }
 
@@ -65,6 +66,13 @@ export default class VendorOrderService {
     }
 
     async updateItemStatus(orderId, sku, status) {
+        const order = await this.orderRepository.getOrderDetailById(orderId);
+        const item = order.items.find(i => i.sku === sku);
+
+        if (item && ['cancelled', 'returned', 'refunded'].includes(item.status)) {
+            throw new Error(`Cannot update status of a ${item.status} item`);
+        }
+
         const result = await this.orderRepository.updateOrderItemStatus(orderId, sku, status);
         await this.syncGlobalOrderStatus(orderId);
         return result;
