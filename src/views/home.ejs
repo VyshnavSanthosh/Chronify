@@ -21,6 +21,7 @@
         .hero-content {
             flex: 1;
             max-width: 600px;
+            z-index: 2;
         }
 
         .hero-tagline {
@@ -45,6 +46,7 @@
             height: auto;
             z-index: 2;
             filter: drop-shadow(0 20px 50px rgba(0,0,0,0.5));
+            transition: transform 0.3s ease;
         }
 
         .moon-bg {
@@ -140,52 +142,99 @@
             margin: 0;
         }
 
+        /* Media Queries */
         @media (max-width: 1200px) {
+            .hero-section {
+                padding: 60px 32px;
+            }
+            .hero-tagline {
+                font-size: 40px;
+            }
             .products-grid {
                 grid-template-columns: repeat(3, 1fr);
+                gap: 24px;
+            }
+            .moon-bg {
+                width: 400px;
+                height: 400px;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .hero-tagline {
+                font-size: 32px;
+            }
+            .explore-section {
+                padding: 60px 32px;
             }
         }
 
         @media (max-width: 768px) {
-            .products-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
             .hero-section {
                 flex-direction: column;
                 text-align: center;
-                padding: 40px 24px;
+                padding: 60px 24px;
+                min-height: auto;
+                gap: 40px;
             }
+            
+            .hero-content {
+                max-width: 100%;
+            }
+
             .hero-tagline {
-                font-size: 32px;
+                font-size: 28px;
+                letter-spacing: 1px;
+            }
+
+            .hero-image-container img {
+                max-width: 80%;
+            }
+
+            .products-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 20px;
+            }
+
+            .section-title {
+                margin-bottom: 40px;
+                font-size: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-section {
+                padding: 40px 16px;
+            }
+
+            .hero-tagline {
+                font-size: 24px;
+            }
+
+            .explore-section {
+                padding: 40px 16px;
+            }
+
+            .products-grid {
+                grid-template-columns: 1fr;
+                max-width: 340px;
+                margin: 0 auto;
+                gap: 32px;
+            }
+
+            .product-card {
+                padding: 20px;
+            }
+
+            .moon-bg {
+                width: 300px;
+                height: 300px;
             }
         }
     </style>
 </head>
 <body>
-    <header>
-        <div class="logo" style="cursor: pointer;" onclick="window.location.href='/'">CHRONIFY</div>
-        <div class="header-center">
-            <a href="/" style="color: #fff; text-decoration: none;">Home</a>
-            <a href="/products" style="color: #fff; text-decoration: none;">Shop</a>
-        </div>
-        <div class="header-icons">
-            <button class="icon-btn" title="Wishlist" onclick="window.location.href='/wishlist'">
-                <i class="far fa-heart"></i>
-                <% if (wishlistCount > 0) { %>
-                    <span class="badge wishlist-badge"><%= wishlistCount %></span>
-                <% } %>
-            </button>
-            <button class="icon-btn" title="Cart" onclick="window.location.href='/cart'">
-                <i class="fas fa-shopping-cart"></i>
-                <% if (cartCount > 0) { %>
-                    <span class="badge cart-badge"><%= cartCount %></span>
-                <% } %>
-            </button>
-            <button class="icon-btn" title="Account" onclick="window.location.href='/profile'">
-                <i class="far fa-user-circle"></i>
-            </button>
-        </div>
-    </header>
+    <%- include('user/partials/userNavbar') %>
 
     <!-- Hero Section -->
     <section class="hero-section">
@@ -311,16 +360,5 @@
         </div>
     </footer>
 
-    <script>
-        function previousHero() {
-            console.log("[v0] Previous hero clicked");
-            // Backend API call to load previous hero slide
-        }
-
-        function nextHero() {
-            console.log("[v0] Next hero clicked");
-            // Backend API call to load next hero slide
-        }
-    </script>
 </body>
 </html>

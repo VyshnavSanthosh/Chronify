@@ -331,31 +331,7 @@
 </head>
 <body>
 
-  <header>
-    <div class="logo">CHRONIFY</div>
-    <div class="header-center">
-      <a href="/">Home</a>
-      <a href="/products">Shop</a>
-    </div>
-
-    <div class="header-icons">
-      <button class="icon-btn" title="Wishlist" onclick="window.location.href='/wishlist'">
-        <i class="far fa-heart"></i>
-        <% if (wishlistCount > 0) { %>
-          <span class="badge wishlist-badge"><%= wishlistCount %></span>
-        <% } %>
-      </button>
-      <button class="icon-btn" title="Cart" onclick="window.location.href='/cart'">
-        <i class="fas fa-shopping-cart"></i>
-        <% if (cartCount > 0) { %>
-          <span class="badge cart-badge"><%= cartCount %></span>
-        <% } %>
-      </button>
-      <button class="icon-btn" title="Account" onclick="window.location.href='/profile'">
-        <i class="far fa-user-circle"></i>
-      </button>
-    </div>
-  </header>
+  <%- include('../partials/userNavbar') %>
 
 <div class="container">
 
@@ -535,6 +511,8 @@
             closeCouponModal();
         }
     }
+
+
 
     document.addEventListener('DOMContentLoaded', () => {
         const urlParams = new URLSearchParams(window.location.search);

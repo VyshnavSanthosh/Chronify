@@ -28,24 +28,30 @@
             padding: 20px 40px;
             background: rgba(5, 10, 20, 0.95);
             border-bottom: 1px solid #1a2f4d;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
         }
 
         .logo {
             font-size: 24px;
             font-weight: bold;
             letter-spacing: 2px;
+            cursor: pointer;
         }
 
         .header-links {
-            flex: 1;
-            margin-left: 360px;
-            gap: 20px;
+            display: flex;
+            gap: 40px;
         }
 
         .header-links a {
             color: #fff;
             text-decoration: none;
             font-size: 14px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 2px;
             transition: color 0.3s;
         }
 
@@ -55,7 +61,8 @@
 
         .header-icons {
             display: flex;
-            gap: 30px;
+            gap: 24px;
+            align-items: center;
         }
 
         .icon-btn {
@@ -68,8 +75,50 @@
             position: relative;
         }
 
-        .icon-btn:hover {
-            color: #3b82f6;
+        .hamburger-btn {
+            display: none;
+        }
+
+        .mobile-nav {
+            display: none;
+            background: #000;
+            padding: 24px;
+            flex-direction: column;
+            gap: 16px;
+            border-bottom: 2px solid #3b82f6;
+            animation: slideDown 0.3s ease-out;
+            width: 100%;
+            position: sticky;
+            top: 73px; /* Default Header height */
+            z-index: 999;
+        }
+
+        @media (max-width: 768px) {
+            .mobile-nav {
+                top: 60px; /* Adjusted for smaller header padding */
+            }
+        }
+            .header-center {
+                display: none;
+            }
+
+        .mobile-nav.active {
+            display: flex;
+        }
+
+        .mobile-nav a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            padding-bottom: 4px;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         /* Main Container */
@@ -163,10 +212,18 @@
         .gallery {
             display: flex;
             gap: 12px;
+            overflow-x: auto;
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none;  /* IE and Edge */
+            padding-bottom: 4px;
+        }
+
+        .gallery::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
         }
 
         .gallery-thumb {
-            width: 80px;
+            flex: 0 0 80px;
             height: 80px;
             border: 2px solid transparent;
             border-radius: 8px;
@@ -609,16 +666,23 @@
         }
 
         @media (max-width: 1024px) {
+            .container {
+                padding: 30px;
+            }
+
             .product-section {
                 grid-template-columns: 1fr;
+                gap: 40px;
             }
 
             .specs-grid {
                 grid-template-columns: 1fr;
+                gap: 30px;
             }
 
             .products-grid {
                 grid-template-columns: repeat(2, 1fr);
+                gap: 20px;
             }
 
             .footer-grid {
@@ -627,43 +691,105 @@
         }
 
         @media (max-width: 768px) {
+            header {
+                padding: 12px 20px;
+            }
+
+            .header-links {
+                display: none;
+            }
+
+            .hamburger-btn {
+                display: flex;
+            }
+
+            .logo {
+                font-size: 20px;
+            }
+
+            .container {
+                padding: 20px;
+            }
+
+            .main-image {
+                height: 400px;
+            }
+
+            .product-info h1 {
+                font-size: 32px;
+            }
+
+            .price-rating {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .stock-status {
+                margin-left: 0;
+            }
+
+            .section-title {
+                font-size: 28px;
+                margin-bottom: 24px;
+            }
+
+            .products-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 576px) {
+            .main-image {
+                height: 300px;
+            }
+
+            .product-info h1 {
+                font-size: 26px;
+            }
+
+            .price {
+                font-size: 24px;
+            }
+
+            .offer-price {
+                font-size: 24px;
+            }
+
+            .original-price {
+                font-size: 18px;
+            }
+
+            .gallery-thumb {
+                flex: 0 0 60px;
+                height: 60px;
+            }
+
+            .add-to-cart {
+                width: 100%;
+            }
+
             .products-grid {
                 grid-template-columns: 1fr;
             }
 
             .footer-grid {
                 grid-template-columns: 1fr;
+                gap: 30px;
+            }
+
+            .description-content {
+                padding: 20px;
+            }
+
+            .specs-grid {
+                gap: 20px;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Header -->
-    <header>
-        <div class="logo">CHRONIFY</div>
-        <div class="header-links">
-            <a href="/">Home</a>
-            <a href="/products">Shop</a>
-        </div>
-        
-        <div class="header-icons">
-            <button class="icon-btn" title="Wishlist" onclick="window.location.href='/wishlist'">
-                <i class="far fa-heart"></i>
-                <% if (wishlistCount > 0) { %>
-                    <span class="badge" style="position: absolute; top: -8px; right: -8px; background-color: #ef4444; color: white; border-radius: 50%; padding: 2px 6px; font-size: 10px; font-weight: bold; min-width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.3); border: 2px solid #000; pointer-events: none;"><%= wishlistCount %></span>
-                <% } %>
-            </button>
-            <button class="icon-btn" title="Cart" onclick="window.location.href='/cart'">
-                <i class="fas fa-shopping-cart"></i>
-                <% if ( cartCount > 0) { %>
-                    <span class="badge" style="position: absolute; top: -8px; right: -8px; background-color: #ef4444; color: white; border-radius: 50%; padding: 2px 6px; font-size: 10px; font-weight: bold; min-width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.3); border: 2px solid #000; pointer-events: none;"><%= cartCount %></span>
-                <% } %>
-            </button>
-            <button class="icon-btn" title="Account" onclick="window.location.href='/profile'">
-                <i class="far fa-user-circle"></i>
-            </button>
-        </div>
-    </header>
+    <%- include('../partials/userNavbar') %>
 
     <!-- Main Container -->
     <div class="container">
@@ -1267,7 +1393,8 @@ async function addToCart() {
         // Initialize on page load
         init();
         initZoom();
-    </script>
+
+
     </script>
 </body>
 </html>

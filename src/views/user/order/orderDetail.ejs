@@ -584,37 +584,7 @@
     </style>
 </head>
 <body>
-    <!-- Header -->
-    <header>
-        <div class="header-left">
-            <div class="logo">CHRONIFY</div>
-            <a href="/" class="nav-link">Home</a>
-            <a href="/products" class="nav-link">Shop</a>
-        </div>
-
-        <div class="header-right">
-            <input type="text" class="search-bar" placeholder="What are you looking for?">
-            
-            <button class="icon-btn" title="Wishlist" onclick="window.location.href='/wishlist'">
-                <i class="far fa-heart"></i>
-                <% if (wishlistCount > 0) { %>
-                    <span class="badge wishlist-badge"><%= wishlistCount %></span>
-                <% } %>
-            </button>
-
-            <button class="icon-btn" title="Cart" onclick="window.location.href='/cart'">
-                <i class="fas fa-shopping-cart"></i>
-                <% if (cartCount > 0) { %>
-                    <span class="badge cart-badge"><%= cartCount %></span>
-                <% } %>
-            </button>
-
-            <div class="user-profile">
-                <i class="far fa-user-circle"></i>
-                <span style="font-size: 13px;"><%= user?.firstName || 'User' %></span>
-            </div>
-        </div>
-    </header>
+    <%- include('../partials/userNavbar') %>
 
     <!-- Main Container -->
     <div class="container">
@@ -1289,7 +1259,6 @@
             const orderId = '<%= order._id %>';
             window.open(`/<%= user._id %>/orders/${orderId}/invoice`, '_blank');
         }
-
 
     </script>
 </body>

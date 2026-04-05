@@ -82,41 +82,40 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
         }
 
         .logo {
             font-size: 20px;
             font-weight: 600;
             letter-spacing: 2px;
+            cursor: pointer;
         }
 
         .header-center {
-            flex: 1;
             display: flex;
-            justify-content: flex-start;
-            align-items: center;
-            margin-left: 0;
+            gap: 40px;
         }
 
         .header-center a {
-            margin-left: 32px;
+            color: #fff;
+            text-decoration: none;
             font-size: 14px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: color 0.3s;
         }
 
-        .search-bar {
-            width: 280px;
-            padding: 8px 12px;
-            border-radius: 20px;
-            border: 1px solid #444;
-            background: #fff;
-            color: #000;
-            font-size: 13px;
-            margin: 0 auto;
+        .header-center a:hover {
+            color: #3b82f6;
         }
 
         .header-icons {
             display: flex;
-            gap: 20px;
+            gap: 24px;
             align-items: center;
         }
 
@@ -125,12 +124,46 @@
             border: none;
             color: #fff;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 18px;
             transition: color 0.3s;
+            position: relative;
         }
 
-        .icon-btn:hover {
-            color: #3b82f6;
+        .hamburger-btn {
+            display: none;
+        }
+
+        .mobile-nav {
+            display: none;
+            background: #000;
+            padding: 24px;
+            flex-direction: column;
+            gap: 16px;
+            border-bottom: 2px solid #3b82f6;
+            animation: slideDown 0.3s ease-out;
+            width: 100%;
+            position: sticky;
+            top: 50px; /* Adjust based on header height */
+            z-index: 999;
+        }
+
+        .mobile-nav.active {
+            display: flex;
+        }
+
+        .mobile-nav a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            padding-bottom: 4px;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         /* Main Container */
@@ -304,8 +337,33 @@
         }
 
         @media (max-width: 768px) {
+            header {
+                padding: 12px 16px;
+            }
+
+            .header-center {
+                display: none;
+            }
+
+            .hamburger-btn {
+                display: flex;
+            }
+
+            .header-icons {
+                gap: 12px;
+            }
+
+            .header-icons .icon-btn {
+                font-size: 14px;
+            }
+
+            .logo {
+                font-size: 18px;
+            }
+
             .container {
                 flex-direction: column;
+                padding: 16px;
             }
 
             .sidebar {
@@ -315,47 +373,12 @@
             .footer-content {
                 grid-template-columns: repeat(2, 1fr);
             }
-
-            header {
-                flex-wrap: wrap;
-                gap: 12px;
-            }
-
-            .header-center {
-                width: 100%;
-                margin: 0;
-            }
         }
     </style>
 </head>
 <body>
 
-    <!-- Header -->
-    <header>
-        <div class="logo">CHRONIFY</div>
-        <div class="header-center">
-            <a href="/" style="color: #fff; text-decoration: none;">Home</a>
-            <a href="/products" style="color: #fff; text-decoration: none;">Shop</a>
-        </div>
-
-        <div class="header-icons">
-            <button class="icon-btn" title="Wishlist" onclick="window.location.href='/wishlist'">
-                <i class="far fa-heart"></i>
-                <% if (wishlistCount > 0) { %>
-                    <span class="badge" style="position: absolute; top: 5px; right: 86px; background-color: #ef4444; color: white; border-radius: 50%; padding: 2px 6px; font-size: 10px; font-weight: bold; min-width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.3); border: 2px solid #000; pointer-events: none;"><%= wishlistCount %></span>
-                <% } %>
-            </button>
-            <button class="icon-btn" title="Cart" onclick="window.location.href='/cart'">
-                <i class="fas fa-shopping-cart"></i>
-                <% if (cartCount > 0) { %>
-                    <span class="badge" style="position: absolute; top: 4px; right: 47px; background-color: #ef4444; color: white; border-radius: 50%; padding: 2px 6px; font-size: 10px; font-weight: bold; min-width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.3); border: 2px solid #000; pointer-events: none;"><%= cartCount %></span>
-                <% } %>
-            </button>
-            <button class="icon-btn" title="Account" onclick="window.location.href='/profile'">
-                <i class="far fa-user-circle"></i>
-            </button>
-        </div>
-    </header>
+    <%- include('partials/userNavbar') %>
 
     <!-- Main Content -->
     <div class="container">
@@ -609,6 +632,7 @@
     <!-- JavaScript -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+
             <% if (locals.removedItemsCount && removedItemsCount > 0) { %>
                 Swal.fire({
                     icon: 'warning',
