@@ -689,7 +689,7 @@
                             </div>
 
                             <div style="font-size:12px;color:#b0b8c1;margin-top:8px;">
-                                <div>Price: ₹<%= item.price %></div>
+                                <div>Price: ₹<%= Math.round(item.price) %></div>
                                 <% if(item.offer && item.offer > 0) { %>
                                     <div style="color:#22c55e;">Discount: <%= item.offer %>% off</div>
                                 <% } %>
@@ -699,7 +699,7 @@
 
                         <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 12px;">
                             <div class="item-price">
-                                ₹<%= finalPrice.toFixed(1) %>
+                                ₹<%= Math.round(finalPrice) %>
                             </div>
                             
                             <% if (itemCancelAllowed) { %>
@@ -772,21 +772,21 @@
                             
                             <div class="info-row">
                                 <span class="info-label">Items Total</span>
-                                <span class="info-value">₹<%= itemsTotal.toFixed(1) %></span>
+                                <span class="info-value">₹<%= Math.round(itemsTotal) %></span>
                             </div>
                             <div class="info-row">
                                 <span class="info-label">Shipping Charge</span>
-                                <span class="info-value">₹<%= shippingCharge.toFixed(1) %></span>
+                                <span class="info-value">₹<%= Math.round(shippingCharge) %></span>
                             </div>
                             <% if (order.discountAmount && order.discountAmount > 0) { %>
                             <div class="info-row">
                                 <span class="info-label">Coupon Discount <%= order.couponCode ? `(${order.couponCode})` : '' %></span>
-                                <span class="info-value" style="color: #22c55e;">- ₹<%= order.discountAmount.toFixed(1) %></span>
+                                <span class="info-value" style="color: #22c55e;">- ₹<%= Math.round(order.discountAmount) %></span>
                             </div>
                             <% } %>
                             <div class="info-row" style="border-top: 1px solid #e5e7eb; padding-top: 8px; margin-top: 8px;">
                                 <span class="info-label" style="font-weight: 600;">Grand Total</span>
-                                <span class="info-value" style="font-size: 16px;">₹<%= order.total.toFixed(1) %></span>
+                                <span class="info-value" style="font-size: 16px;">₹<%= Math.round(order.total) %></span>
                             </div>
                         </div>
                     </div>
@@ -907,10 +907,12 @@
                         <i class="fas fa-rotate-left"></i> Return Order
                     </button>
 
-                    <!-- Invoice Always Available -->
+                    <!-- Invoice only available when payment is not cancelled -->
+                    <% if (order.paymentStatus !== 'cancelled') { %>
                     <button class="btn btn-primary" onclick="downloadInvoice()">
                         <i class="fas fa-download"></i> Download Invoice
                     </button>
+                    <% } %>
                 </div>
             </div>
         </main>

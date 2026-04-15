@@ -155,7 +155,7 @@
                                 <td class="px-6 py-4 text-gray-200"><%= product.name %></td>
                                 <td class="px-6 py-4 text-gray-400"><%= product.category %></td>
                                 <td class="px-6 py-4 "><%= product.unitsSold %></td>
-                                <td class="px-6 py-4 font-bold text-blue-400">₹<%= product.revenue.toLocaleString('en-IN') %></td>
+                                <td class="px-6 py-4 font-bold text-blue-400">₹<%= Math.round(product.revenue).toLocaleString('en-IN') %></td>
                             </tr>
                         <% }) %>
                     </tbody>
@@ -182,7 +182,7 @@
                                 <td class="px-6 py-4 font-medium"><%= index + 1 %></td>
                                 <td class="px-6 py-4 text-gray-200"><%= cat.name %></td>
                                 <td class="px-6 py-4 "><%= cat.unitsSold %></td>
-                                <td class="px-6 py-4 font-bold text-blue-400">₹<%= cat.revenue.toLocaleString('en-IN') %></td>
+                                <td class="px-6 py-4 font-bold text-blue-400">₹<%= Math.round(cat.revenue).toLocaleString('en-IN') %></td>
                             </tr>
                         <% }) %>
                     </tbody>
@@ -209,7 +209,7 @@
                                 <td class="px-6 py-4 font-medium"><%= index + 1 %></td>
                                 <td class="px-6 py-4 text-gray-200"><%= brand.name %></td>
                                 <td class="px-6 py-4 "><%= brand.unitsSold %></td>
-                                <td class="px-6 py-4 font-bold text-blue-400">₹<%= brand.revenue.toLocaleString('en-IN') %></td>
+                                <td class="px-6 py-4 font-bold text-blue-400">₹<%= Math.round(brand.revenue).toLocaleString('en-IN') %></td>
                             </tr>
                         <% }) %>
                     </tbody>
@@ -236,7 +236,7 @@
                                 <td class="px-6 py-4 font-medium"><%= index + 1 %></td>
                                 <td class="px-6 py-4 text-gray-200"><%= vendor.name %></td>
                                 <td class="px-6 py-4 "><%= vendor.unitsSold %></td>
-                                <td class="px-6 py-4 font-bold text-blue-400">₹<%= vendor.revenue.toLocaleString('en-IN') %></td>
+                                <td class="px-6 py-4 font-bold text-blue-400">₹<%= Math.round(vendor.revenue).toLocaleString('en-IN') %></td>
                             </tr>
                         <% }) %>
                     </tbody>
@@ -303,7 +303,7 @@
                             color: '#9ca3af', 
                             font: { size: 10 },
                             callback: function(value) {
-                                if (value >= 1000) return '₹' + (value/1000).toFixed(1) + 'k';
+                                if (value >= 1000) return '₹' + Math.round(value/1000) + 'k';
                                 return '₹' + value;
                             }
                         }

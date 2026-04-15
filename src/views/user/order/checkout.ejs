@@ -414,7 +414,7 @@
             <img src="<%= item.mainImage || '/images/watch.png' %>" alt="<%= item.name %>">
             <div>
               <div class="order-item-name"><%= item.name %></div>
-              <div class="order-item-price">₹<%= (item.price || 0).toFixed(1) %></div>
+              <div class="order-item-price">₹<%= Math.round(item.price || 0) %></div>
               <% if (item.offer > 0) { %>
                 <div class="text-green-500 text-[10px] font-semibold"><%= item.offer %>% OFF</div>
               <% } %>
@@ -425,13 +425,13 @@
 
       <div class="price-row">
         <span style="color:#b0b8c1;">Subtotal:</span>
-        <span id="subtotalDisplay">₹<%= (total + discountAmount || 0).toFixed(1) %></span>
+        <span id="subtotalDisplay">₹<%= Math.round(total + discountAmount || 0) %></span>
       </div>
 
       <% if (Number(discountAmount) > 0) { %>
       <div class="price-row" id="couponDiscountRow" style="display:flex;">
           <span style="color:#b0b8c1;" id="couponDiscountLabel">Coupon Discount:</span>
-          <span style="color:#22c55e;" id="couponDiscountAmount">- ₹<%= Number(discountAmount).toFixed(1) %></span>
+          <span style="color:#22c55e;" id="couponDiscountAmount">- ₹<%= Math.round(Number(discountAmount)) %></span>
       </div>
       <% } else { %>
       <div class="price-row" id="couponDiscountRow" style="display:none;">
@@ -442,12 +442,12 @@
 
       <div class="price-row" style="border-bottom:1px solid #2a3f66; padding-bottom:12px;">
         <span style="color:#b0b8c1;">Shipping:</span>
-        <span style="color:#22c55e;">₹<%= Number(shippingFee || 0).toFixed(1) %></span>
+        <span style="color:#22c55e;">₹<%= Math.round(Number(shippingFee || 0)) %></span>
       </div>
 
       <div class="price-row total-row">
         <span>Total:</span>
-        <span id="totalDisplay">₹<%= ((total || 0) + (shippingFee || 0)).toFixed(1) %></span>
+        <span id="totalDisplay">₹<%= Math.round((total || 0) + (shippingFee || 0)) %></span>
       </div>
 
       <!-- Removed legacy client-side calculation script as server provides accurate values now -->

@@ -822,11 +822,11 @@
                     %>
                     <div class="price" id="variantPrice">
                         <% if (offer > 0) { %>
-                            <span class="original-price">₹<%= originalPrice.toLocaleString('en-IN') %></span>
+                            <span class="original-price">₹<%= Math.round(originalPrice).toLocaleString('en-IN') %></span>
                             <span class="offer-price">₹<%= Math.round(offerPrice).toLocaleString('en-IN') %></span>
                             <span class="offer-badge"><%= offer %>% OFF</span>
                         <% } else { %>
-                            <span class="offer-price">₹<%= originalPrice.toLocaleString('en-IN') %></span>
+                            <span class="offer-price">₹<%= Math.round(originalPrice).toLocaleString('en-IN') %></span>
                         <% } %>
                     </div>
                     <% 
@@ -902,7 +902,7 @@
                         <ul>
                             <% if (product?.variants) { %>
                                 <% product.variants.forEach((variant, index) => { %>
-                                    <li>• <%= variant.color %> - <%= variant.strapMaterial %> (₹<%= variant.price %>)</li>
+                                    <li>• <%= variant.color %> - <%= variant.strapMaterial %> (₹<%= Math.round(variant.price) %>)</li>
                                 <% }); %>
                             <% } else { %>
                                 <li>No variants available</li>
@@ -973,11 +973,11 @@ const relatedOfferPrice = relatedOriginalPrice - (relatedOriginalPrice * related
                             %>
                             <div class="card-price" style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
                                 <% if (relatedOffer > 0) { %>
-                                    <span style="font-size: 16px; font-weight: 500; color: #9ca3af; text-decoration: line-through;">₹<%= relatedOriginalPrice.toLocaleString('en-IN') %></span>
+                                    <span style="font-size: 16px; font-weight: 500; color: #9ca3af; text-decoration: line-through;">₹<%= Math.round(relatedOriginalPrice).toLocaleString('en-IN') %></span>
                                     <span style="font-size: 20px; font-weight: 700; color: #3b82f6;">₹<%= Math.round(relatedOfferPrice).toLocaleString('en-IN') %></span>
                                     <span style="display: inline-block; background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); color: #fff; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700;"><%= relatedOffer %>% OFF</span>
                                 <% } else { %>
-                                    ₹<%= relatedOriginalPrice.toLocaleString('en-IN') %>
+                                    ₹<%= Math.round(relatedOriginalPrice).toLocaleString('en-IN') %>
                                 <% } %>
                             </div>
 
@@ -1169,12 +1169,12 @@ const relatedOfferPrice = relatedOriginalPrice - (relatedOriginalPrice * related
             const priceElement = document.getElementById('variantPrice');
             if (offer > 0) {
                 priceElement.innerHTML = `
-                    <span class="original-price">₹${originalPrice.toLocaleString('en-IN')}</span>
+                    <span class="original-price">₹${Math.round(originalPrice).toLocaleString('en-IN')}</span>
                     <span class="offer-price">₹${Math.round(offerPrice).toLocaleString('en-IN')}</span>
                     <span class="offer-badge">${offer}% OFF</span>
                 `;
             } else {
-                priceElement.innerHTML = `<span class="offer-price">₹${originalPrice.toLocaleString('en-IN')}</span>`;
+                priceElement.innerHTML = `<span class="offer-price">₹${Math.round(originalPrice).toLocaleString('en-IN')}</span>`;
             }
             
             // Update stock status

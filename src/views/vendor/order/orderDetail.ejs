@@ -106,12 +106,12 @@
                     %>
                     <div class="flex justify-between text-gray-600">
                         <span>Items Total</span>
-                        <span>₹<%= itemsTotal.toFixed(1) %></span>
+                        <span>₹<%= Math.round(itemsTotal) %></span>
                     </div>
                     <% if (order.discountAmount && order.discountAmount > 0) { %>
                     <div class="flex justify-between text-gray-600">
                         <span>Coupon Discount <%= order.couponCode ? `(${order.couponCode})` : '' %></span>
-                        <span class="text-green-600">- ₹<%= order.discountAmount.toFixed(1) %></span>
+                        <span class="text-green-600">- ₹<%= Math.round(order.discountAmount) %></span>
                     </div>
                     <% } %>
                     <div class="flex justify-between text-gray-600">
@@ -120,7 +120,7 @@
                     </div>
                     <div class="pt-3 border-t border-gray-100 flex justify-between items-center">
                         <span class="font-bold text-gray-900">Total</span>
-                        <span class="font-bold text-2xl text-blue-600">₹<%= order.total.toFixed(1) %></span>
+                        <span class="font-bold text-2xl text-blue-600">₹<%= Math.round(order.total) %></span>
                     </div>
                 </div>
             </div>
@@ -139,13 +139,13 @@
                         <p class="text-sm text-green-400 font-medium">Variant: <%= item.variant %></p>
                         <div class="flex items-center gap-4 mt-2 text-sm text-gray-400">
                             <span>Qty: <span class="text-white"><%= item.quantity %></span></span>
-                            <span>Price: <span class="text-white">₹<%= item.price %></span></span>
+                            <span>Price: <span class="text-white">₹<%= Math.round(item.price) %></span></span>
                             <% if(item.offer) { %>
                                 <span class="text-rose-400 font-bold"><%= item.offer %>% OFF</span>
                             <% } %>
                         </div>
                     </div>
-                        <p class="text-xl font-bold text-white">₹<%= item.price.toFixed(1) %></p>
+                        <p class="text-xl font-bold text-white">₹<%= Math.round(item.price) %></p>
                         
                         <div class="mt-3 flex items-center gap-2 justify-end">
                             <span class="text-xs text-gray-500 uppercase tracking-widest block"><%= item.status.replace(/_/g, ' ') %></span>

@@ -147,7 +147,7 @@
                 <!-- Wallet Balance -->
                 <div class="wallet-balance-box">
                     <div class="wallet-balance-text">Available wallet balance:</div>
-                    <div class="wallet-amount">₹<%= walletBalance || '0.00' %></div>
+                    <div class="wallet-amount">₹<%= Math.round(Number(walletBalance) || 0) %></div>
                 </div>
 
                 <!-- Transactions Table -->
@@ -173,7 +173,7 @@ const formatted = date.toLocaleDateString("en-GB", {
                             <tr>
                                 <td><%= transaction.id.toString().slice(-6).toUpperCase() %></td>
                                 <td><%= formatted %></td>
-                                <td><%= transaction.amount %></td>
+                                <td><%= Math.round(transaction.amount) %></td>
                                 <td><%= transaction.source %></td>
                                 <td class="<%= transaction.type === 'credit' ? 'status-credited' : 'status-debited' %>">
                                     Amount <%= transaction.type === 'credit' ? 'Credited' : 'Debited' %>

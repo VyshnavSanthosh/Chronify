@@ -138,11 +138,11 @@
             <div class="product-price" style="display: flex; flex-direction: column; gap: 4px;">
                 <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
                     <% if (offer > 0) { %>
-                        <span style="font-size: 13px; font-weight: 500; color: #9ca3af; text-decoration: line-through;">₹<%= originalPrice.toLocaleString('en-IN') %></span>
+                        <span style="font-size: 13px; font-weight: 500; color: #9ca3af; text-decoration: line-through;">₹<%= Math.round(originalPrice).toLocaleString('en-IN') %></span>
                         <span style="font-size: 14px; font-weight: 600; color: #3b82f6;">₹<%= Math.round(offerPrice).toLocaleString('en-IN') %></span>
                         <span style="display: inline-block; background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); color: #fff; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700;"><%= offer %>% OFF</span>
                     <% } else { %>
-                        <span style="font-size: 14px; font-weight: 600; color: #3b82f6;">₹<%= originalPrice.toLocaleString('en-IN') %></span>
+                        <span style="font-size: 14px; font-weight: 600; color: #3b82f6;">₹<%= Math.round(originalPrice).toLocaleString('en-IN') %></span>
                     <% } %>
                 </div>
             </div>

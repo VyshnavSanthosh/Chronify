@@ -1307,11 +1307,11 @@
                                     %>
                                     <div class="price-container">
                                         <% if (offer > 0) { %>
-                                            <span class="original-price">₹<%= originalPrice.toLocaleString('en-IN') %></span>
+                                            <span class="original-price">₹<%= Math.round(originalPrice).toLocaleString('en-IN') %></span>
                                             <span class="offer-price">₹<%= Math.round(offerPrice).toLocaleString('en-IN') %></span>
                                             <span class="offer-badge"><%= offer %>% OFF</span>
                                         <% } else { %>
-                                            <span class="offer-price">₹<%= originalPrice.toLocaleString('en-IN') %></span>
+                                            <span class="offer-price">₹<%= Math.round(originalPrice).toLocaleString('en-IN') %></span>
                                         <% } %>
                                     </div>
                                 <% } else { %>
